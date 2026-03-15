@@ -47,16 +47,18 @@
 }
 
 :root {
-  --blue-main: #1a2ca3;
-  --blue-deep: #0d1a63;
-  --blue-soft: #2e56b6;
-  --sand-soft: #d1cac3;
-  --bg-main: #070912;
-  --bg-panel: rgba(255, 255, 255, 0.04);
-  --text-main: #f5f4f0;
-  --text-soft: rgba(245, 244, 240, 0.72);
-  --line-soft: rgba(255, 255, 255, 0.08);
-  --shadow-main: 0 24px 70px rgba(0, 0, 0, 0.38);
+  --blue-main: #E2DACC; /* Now mapping to Sand/Light element color for buttons and foregrounds */
+  --blue-deep: #0D1A63; /* Darkest element color */
+  --blue-accent: #1A2CA3; /* Mid-tone blue for panels */
+  --sand-soft: #E2DACC;
+  --bg-main: #2251A4; /* Background base */
+  --bg-panel: #1A2CA3; /* Background for panels */
+  --text-main: #E2DACC;
+  --text-soft: rgba(226, 218, 204, 0.75);
+  --line-soft: rgba(226, 218, 204, 0.2);
+  --shadow-main: 0 32px 80px rgba(0, 0, 0, 0.45);
+  --glass-bg: rgba(26, 44, 163, 0.6);
+  --transition-smooth: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -69,10 +71,29 @@ body {
   padding: 0;
   min-height: 100%;
   font-family: 'MontserratArabic', sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(46, 86, 182, 0.15), transparent 20%),
-    linear-gradient(135deg, #06070b 0%, #08102a 38%, #0d1a63 100%);
+  background: var(--bg-main); /* Deepest blue globally */
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Monolithic Island Layout used for encapsulating wide pages into center frames */
+.monolithic-island {
+  border-radius: 40px;
+  background-color: var(--bg-panel); /* Medium blue for differentiation */
+  padding: 60px;
+  box-shadow: var(--shadow-main);
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+
+/* For smaller screens, reduce massive padding */
+@media (max-width: 900px) {
+  .monolithic-island {
+    padding: 30px;
+    border-radius: 20px;
+  }
 }
 
 body {
@@ -103,30 +124,20 @@ main {
 
 .navbar-luxury-inner {
   display: grid;
-  grid-template-columns: 80px 1fr auto;
+  grid-template-columns: 180px 1fr auto;
   align-items: center;
   gap: 20px;
-  padding: 12px 12px;
+  padding: 12px 24px;
   border-radius: 999px;
-  background: rgba(5, 8, 18, 0.55);
+  background: var(--bg-panel);
   border: 1px solid var(--line-soft);
-  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .brand-link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
   color: var(--text-main);
-}
-
-.brand-mark {
-  font-size: 2.2rem;
-  font-weight: 800;
-  line-height: 1;
 }
 
 .nav-center-pills {
@@ -140,15 +151,15 @@ main {
 .nav-pill-link {
   padding: 12px 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.88);
+  background: var(--blue-deep);
+  border: 1px solid var(--blue-accent);
+  color: var(--text-main);
   font-size: 0.92rem;
   transition: 0.25s ease;
 }
 
 .nav-pill-link:hover {
-  background: rgba(26, 44, 163, 0.45);
+  background: var(--blue-main);
 }
 
 .nav-right-actions {
@@ -164,6 +175,7 @@ main {
   padding: 12px 18px;
   transition: 0.25s ease;
   font-family: 'MontserratArabic', sans-serif;
+  cursor: pointer;
 }
 
 .lang-switch-btn {
@@ -172,7 +184,7 @@ main {
 }
 
 .contact-cta-btn {
-  background: #05060c;
+  background: var(--blue-deep);
   color: var(--text-main);
   border: 1px solid var(--line-soft);
 }
@@ -188,12 +200,7 @@ main {
 
 .homepage-frame {
   border-radius: 42px;
-  background: linear-gradient(
-    145deg,
-    rgba(8, 10, 20, 0.98) 0%,
-    rgba(9, 13, 28, 0.96) 58%,
-    rgba(13, 26, 99, 0.92) 100%
-  );
+  background: var(--bg-panel);
   border: 1px solid var(--line-soft);
   overflow: hidden;
   box-shadow: var(--shadow-main);
@@ -207,9 +214,7 @@ main {
   position: relative;
   height: 100%;
   padding: 80px 70px 60px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.04), transparent 20%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+  background: transparent;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -240,13 +245,6 @@ main {
   margin-bottom: 18px;
 }
 
-.smartwood-subtitle {
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-  color: var(--sand-soft);
-  font-weight: 500;
-  margin-bottom: 18px;
-}
-
 .smartwood-description {
   font-size: 1.02rem;
   line-height: 1.9;
@@ -272,59 +270,27 @@ main {
   font-weight: 700;
   transition: 0.25s ease;
   font-family: 'MontserratArabic', sans-serif;
+  cursor: pointer;
 }
 
 .hero-primary-btn {
   background: var(--blue-main);
-  color: white;
-  box-shadow: 0 10px 30px rgba(26, 44, 163, 0.3);
-}
-
-.hero-primary-btn:hover {
-  background: var(--blue-soft);
+  color: var(--blue-deep);
+  box-shadow: 0 10px 30px rgba(226, 218, 204, 0.2);
 }
 
 .hero-secondary-btn {
-  margin-top: 18px;
   background: transparent;
   color: var(--text-main);
   border: 1px solid var(--line-soft);
 }
 
-.hero-secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.hero-bottom-note {
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  margin-top: 56px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.hero-note-index {
-  font-size: 2rem;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.22);
-}
-
-.hero-note-label {
-  font-size: 0.95rem;
-  color: var(--sand-soft);
-  margin-bottom: 4px;
-}
-
-.hero-note-text {
-  color: var(--text-soft);
-  font-size: 0.95rem;
-}
-
 .homepage-right-visual {
   position: relative;
-  height: 100%;
-  min-height: 860px;
-  border-radius: 34px 0 0 34px;
+  height: calc(100% - 40px);
+  margin: 20px;
+  min-height: 820px;
+  border-radius: 34px;
   background:
     linear-gradient(to bottom, rgba(0,0,0,0.06), rgba(0,0,0,0.12)),
     url('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80')
@@ -383,7 +349,7 @@ main {
   height: 100%;
   overflow: hidden;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-panel);
   border: 1px solid var(--line-soft);
   box-shadow: var(--shadow-main);
 }
@@ -412,11 +378,7 @@ main {
 .smartwood-story-panel {
   padding: 36px;
   border-radius: 32px;
-  background: linear-gradient(
-    145deg,
-    rgba(26, 44, 163, 0.18),
-    rgba(13, 26, 99, 0.3)
-  );
+  background: var(--bg-panel);
   border: 1px solid var(--line-soft);
 }
 
@@ -438,23 +400,17 @@ main {
   height: 260px;
 }
 
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(28px);
-  animation: fadeUp 0.9s ease forwards;
+
+/* Base transition for hover effects */
+.furniture-card, .smartwood-story-panel {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.fade-delay-1 { animation-delay: 0.1s; }
-.fade-delay-2 { animation-delay: 0.2s; }
-.fade-delay-3 { animation-delay: 0.3s; }
-.fade-delay-4 { animation-delay: 0.4s; }
-
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.furniture-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
+
 
 @media (max-width: 1199px) {
   .homepage-left-panel {
@@ -522,4 +478,44 @@ main {
   .homepage-frame {
     border-radius: 28px;
   }
+}
+
+/* Form Styles for Furniture Manager */
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.form-control, .form-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  font-family: inherit;
+}
+
+.category-nav-pills {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 auto 40px;
+}
+
+.category-nav-pills button {
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--blue-deep);
+  border: 1px solid var(--blue-accent);
+  color: var(--text-main);
+  font-family: 'MontserratArabic', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.category-nav-pills button:hover {
+  background: var(--blue-main);
+  transform: translateY(-2px);
 }

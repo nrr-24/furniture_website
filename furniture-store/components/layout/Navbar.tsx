@@ -18,65 +18,64 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="navbar-luxury-wrap" dir={isRtl ? 'rtl' : 'ltr'}>
-            <div className="container">
-                <div className="navbar-luxury-inner">
-                    <Link href="/" className="brand-link">
-                        <img 
-                            src={`/images/LOGO/smartwood-${language}-white.svg`}
-                            alt="SmartWood Logo" 
-                            className="brand-logo-img"
-                            style={{ height: '40px', width: 'auto' }}
-                        />
-                    </Link>
+        <nav className="lumiere-nav" dir={isRtl ? 'rtl' : 'ltr'}>
+            <Link href="/" className="brand-link">
+                <img 
+                    src={`/images/LOGO/smartwood-${language}-white.svg`}
+                    alt="SmartWood Logo" 
+                    className="brand-logo-img"
+                    style={{ height: '32px', width: 'auto' }}
+                />
+            </Link>
 
-                    <div className="nav-center-pills">
-                        <Link href="/" className="nav-pill-link">{t('home')}</Link>
-                        <Link href="/shop" className="nav-pill-link">{t('collections')}</Link>
-                        <Link href="/about" className="nav-pill-link">{t('craftsmanship')}</Link>
-                    </div>
+            <div className="nav-center-pills">
+                <Link href="/" className="nav-pill-link active">{t('home')}</Link>
+                <Link href="/shop" className="nav-pill-link">{t('collections')}</Link>
+                <Link href="/about" className="nav-pill-link">{t('craftsmanship')}</Link>
+            </div>
 
-                    <div className="nav-right-actions">
-                        <button className="lang-switch-btn" onClick={toggleLanguage}>
-                            {t('switchLang')}
-                        </button>
-                        
-                        {/* Role Selector */}
-                        <div style={{ position: 'relative' }} className="d-flex align-items-center gap-2">
-                            <select 
-                                value={role} 
-                                onChange={(e) => setRole(e.target.value as 'admin' | 'customer')}
-                                style={{
-                                    background: 'rgba(255,255,255,0.06)',
-                                    color: 'var(--text-main)',
-                                    border: '1px solid var(--line-soft)',
-                                    borderRadius: '999px',
-                                    padding: '12px 18px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <option value="customer" style={{ color: 'black' }}>Customer View</option>
-                                <option value="admin" style={{ color: 'black' }}>Admin View</option>
-                            </select>
-                        </div>
+            <div className="nav-right-actions">
+                <button className="nav-icon-btn" onClick={toggleLanguage} title={t('switchLang')}>
+                    <i className="bi bi-globe2"></i>
+                </button>
+                
+                {/* Role Selector */}
+                <select 
+                    value={role} 
+                    onChange={(e) => setRole(e.target.value as 'admin' | 'customer')}
+                    style={{
+                        background: 'transparent',
+                        color: 'var(--text-main)',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '0.8rem',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        opacity: 0.8
+                    }}
+                >
+                    <option value="customer" style={{ color: 'black' }}>Customer</option>
+                    <option value="admin" style={{ color: 'black' }}>Admin</option>
+                </select>
 
-                        {/* Cart Icon (Customer Only) */}
-                        {isCustomer && (
-                            <button 
-                                className="contact-cta-btn position-relative"
-                                onClick={() => setIsCartOpen(true)}
-                                style={{ padding: '12px 18px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                            >
-                                <i className="bi bi-cart"></i>
-                                {totalItems > 0 && (
-                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.75rem' }}>
-                                        {totalItems}
-                                    </span>
-                                )}
-                            </button>
+                {/* Contact Us / Cart Icon (Customer Only) */}
+                {isCustomer ? (
+                    <button 
+                        className="contact-cta-btn position-relative d-flex align-items-center gap-2"
+                        onClick={() => setIsCartOpen(true)}
+                    >
+                        {isRtl ? 'سلة المشتريات' : 'Cart'}
+                        {totalItems > 0 && (
+                            <span className="badge rounded-pill bg-danger" style={{ fontSize: '0.7rem', padding: '4px 6px' }}>
+                                {totalItems}
+                            </span>
                         )}
-                    </div>
-                </div>
+                    </button>
+                ) : (
+                    <button className="contact-cta-btn">
+                        {isRtl ? 'تواصل معنا' : 'Contact Us'}
+                    </button>
+                )}
             </div>
 
             {/* Cart Sidebar Modal */}

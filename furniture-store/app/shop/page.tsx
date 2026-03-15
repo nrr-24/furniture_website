@@ -35,8 +35,8 @@ export default function ShopPage() {
   }));
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '120px 20px 60px', backgroundColor: 'var(--bg-main)', color: 'var(--text-main)', minHeight: '100vh' }}>
-      <div className="container monolithic-island position-relative">
+    <main dir={isRtl ? 'rtl' : 'ltr'} className="monolithic-island" style={{ padding: '140px 60px 40px' }}>
+      <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
           <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)' }}>{t('collections')}</h1>

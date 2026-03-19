@@ -247,6 +247,13 @@ img {
   height: 90px;
   object-fit: cover;
   border-radius: 8px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+}
+
+.mini-gallery-strip img:hover {
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
 .scroll-down-indicator {
@@ -314,10 +321,20 @@ img {
   box-shadow: 0 10px 30px rgba(226, 218, 204, 0.2);
 }
 
+.hero-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(226, 218, 204, 0.35);
+}
+
 .hero-secondary-btn {
   background: transparent;
   color: var(--text-main);
   border: 1px solid var(--line-soft);
+}
+
+.hero-secondary-btn:hover {
+  background: rgba(226, 218, 204, 0.08);
+  transform: translateY(-2px);
 }
 
 .homepage-right-visual {

@@ -24,6 +24,33 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     category: initialItem?.category || 'sofas'
   });
 
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setUploading(true);
+    const file = e.target.files[0];
+    try {
+      const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: 'POST',
+        body: file,
+      });
+      
+      const newBlob = await response.json();
+      if (newBlob.url) {
+        setFormData({ ...formData, image: newBlob.url });
+      } else {
+        alert(newBlob.error || 'Failed to upload image.');
+      }
+    } catch (error) {
+      console.error('Upload Error:', error);
+      alert('Error uploading image.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -99,11 +126,21 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               />
             </div>
             <div className="col-md-5">
-              <label className="form-label">Image URL</label>
-              <input 
-                type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} 
-              />
+              <label className="form-label">Image</label>
+              <div className="d-flex gap-2">
+                <input 
+                  type="text" className="form-control bg-dark text-white border-secondary" 
+                  value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} 
+                  placeholder="URL"
+                />
+                <input 
+                  type="file" accept="image/*" className="d-none" 
+                  id={`imageUpload-${initialItem?.id || 'new'}`} onChange={handleImageUpload} 
+                />
+                <label htmlFor={`imageUpload-${initialItem?.id || 'new'}`} className="btn hero-secondary-btn d-flex align-items-center mb-0" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {uploading ? (isRtl ? 'جاري الرفع...' : 'Uploading...') : (isRtl ? 'رفع صورة' : 'Upload')}
+                </label>
+              </div>
             </div>
             <div className="col-md-3">
               <label className="form-label">Price</label>

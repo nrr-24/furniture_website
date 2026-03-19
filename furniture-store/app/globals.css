@@ -47,11 +47,11 @@
 }
 
 :root {
-  --blue-main: #E2DACC; /* Now mapping to Sand/Light element color for buttons and foregrounds */
-  --blue-deep: #0D1A63; /* Darkest element color */
-  --blue-accent: #1A2CA3; /* Mid-tone blue for panels */
+  --blue-main: #E2DACC; /* Light element color */
+  --blue-deep: #2251A4; /* Lightest blue: Buttons, Accents */
+  --blue-accent: #1A2CA3; /* Mid-tone blue */
   --sand-soft: #E2DACC;
-  --bg-main: #2251A4; /* Background base */
+  --bg-main: #0D1A63; /* Darkest: Core website background */
   --bg-panel: #1A2CA3; /* Background for panels */
   --text-main: #E2DACC;
   --text-soft: rgba(226, 218, 204, 0.75);
@@ -76,28 +76,35 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Monolithic Island Layout used for encapsulating wide pages into center frames */
+/* Base monolithic container wrapping all pages for the "App" look */
 .monolithic-island {
   border-radius: 40px;
-  background-color: var(--bg-panel); /* Medium blue for differentiation */
-  padding: 60px;
+  background-color: var(--bg-panel);
+  /* Full screen minus a neat edge gap */
+  height: calc(100vh - 40px);
+  margin: 20px;
   box-shadow: var(--shadow-main);
-  margin-top: 40px;
-  margin-bottom: 40px;
   border: 1px solid var(--line-soft);
-  overflow: hidden;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* For smaller screens, reduce massive padding */
 @media (max-width: 900px) {
   .monolithic-island {
-    padding: 30px;
+    height: calc(100vh - 20px);
+    margin: 10px;
     border-radius: 20px;
   }
 }
 
 body {
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -110,29 +117,24 @@ img {
   max-width: 100%;
 }
 
-main {
-  padding-top: 18px;
-}
 
-.container {
-  max-width: 1360px;
-}
-
-.navbar-luxury-wrap {
-  padding: 20px 0 0;
-}
-
-.navbar-luxury-inner {
-  display: grid;
-  grid-template-columns: 180px 1fr auto;
+.lumiere-nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  padding: 12px 24px;
-  border-radius: 999px;
-  background: var(--bg-panel);
-  border: 1px solid var(--line-soft);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 40px;
+  z-index: 100;
+  background: rgba(13, 26, 99, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+
 
 .brand-link {
   display: inline-flex;
@@ -144,93 +146,126 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 32px;
   flex-wrap: wrap;
 }
 
+/* Subtle Text Links instead of Buttons */
 .nav-pill-link {
-  padding: 12px 18px;
-  border-radius: 999px;
-  background: var(--blue-deep);
-  border: 1px solid var(--blue-accent);
   color: var(--text-main);
-  font-size: 0.92rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   transition: 0.25s ease;
+  opacity: 0.7;
 }
 
-.nav-pill-link:hover {
-  background: var(--blue-main);
+.nav-pill-link:hover,
+.nav-pill-link.active {
+  opacity: 1;
 }
 
 .nav-right-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
-.lang-switch-btn,
 .contact-cta-btn {
   border: none;
   border-radius: 999px;
-  padding: 12px 18px;
+  padding: 12px 24px;
+  background: var(--bg-main); /* Dark pill floating over image */
+  color: var(--text-main);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   transition: 0.25s ease;
-  font-family: 'MontserratArabic', sans-serif;
   cursor: pointer;
 }
 
-.lang-switch-btn {
-  background: rgba(255, 255, 255, 0.06);
+.nav-icon-btn {
+  background: var(--bg-main);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   color: var(--text-main);
-}
-
-.contact-cta-btn {
-  background: var(--blue-deep);
-  color: var(--text-main);
-  border: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.25s ease;
 }
 
 .contact-cta-btn:hover,
-.lang-switch-btn:hover {
-  transform: translateY(-1px);
+.nav-icon-btn:hover {
+  background: var(--blue-deep);
+  transform: translateY(-2px);
 }
 
-.homepage-shell {
-  padding: 22px 0 0;
+/* --- Riad Lumiere Split View (Home Page) --- */
+.lumiere-split {
+  display: flex;
+  min-height: 100%;
+  flex: 1;
 }
 
-.homepage-frame {
-  border-radius: 42px;
-  background: var(--bg-panel);
-  border: 1px solid var(--line-soft);
-  overflow: hidden;
-  box-shadow: var(--shadow-main);
-}
-
-.homepage-hero-row {
-  min-height: 860px;
-}
-
-.homepage-left-panel {
-  position: relative;
-  height: 100%;
-  padding: 80px 70px 60px;
-  background: transparent;
+.split-left {
+  flex: 1;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.split-right {
+  flex: 1;
+  padding: 0;
+}
+
+.split-right-img-container {
+  border-radius: 36px;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  min-height: 600px;
 }
 
 .mini-gallery-strip {
   display: flex;
-  gap: 10px;
-  margin-bottom: 44px;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
 }
 
 .mini-gallery-strip img {
-  width: 110px;
-  height: 140px;
+  width: 70px;
+  height: 90px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
+}
+
+.scroll-down-indicator {
+  margin-top: auto;
+  opacity: 0.4;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: float-discrete 3s ease-in-out infinite;
+}
+
+@keyframes float-discrete {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+  100% { transform: translateY(0); }
 }
 
 .hero-copy-block {
@@ -416,10 +451,27 @@ main {
   .homepage-left-panel {
     padding: 60px 40px 50px;
   }
+  
+  .lumiere-nav {
+    padding: 16px 20px;
+  }
 
   .homepage-hero-row,
   .homepage-right-visual {
     min-height: 700px;
+  }
+  
+  .lumiere-split {
+    flex-direction: column;
+  }
+  
+  .split-left {
+    padding: 40px 20px;
+  }
+
+  .split-right {
+    padding: 0;
+    min-height: 50vh;
   }
 }
 
@@ -448,18 +500,41 @@ main {
 }
 
 @media (max-width: 767px) {
-  .mini-gallery-strip img {
-    width: 86px;
-    height: 110px;
+  .lumiere-nav {
+    padding: 12px 16px;
+    gap: 10px;
   }
 
   .nav-center-pills {
     justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-pill-link {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
   }
 
   .nav-right-actions {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px;
+  }
+
+  .contact-cta-btn {
+    padding: 8px 16px;
+    font-size: 0.65rem;
+  }
+
+  .nav-icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .mini-gallery-strip img {
+    width: 86px;
+    height: 110px;
   }
 
   .story-side-grid {
@@ -518,4 +593,19 @@ main {
 .category-nav-pills button:hover {
   background: var(--blue-main);
   transform: translateY(-2px);
+}
+
+/* Custom Webkit scrollbar block */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(226, 218, 204, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(226, 218, 204, 0.6);
 }

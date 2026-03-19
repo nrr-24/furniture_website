@@ -35,8 +35,8 @@ export default function ShopPage() {
   }));
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '120px 20px 60px', backgroundColor: 'var(--bg-main)', color: 'var(--text-main)', minHeight: '100vh' }}>
-      <div className="container monolithic-island position-relative">
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto' }}>
+      <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
           <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)' }}>{t('collections')}</h1>
@@ -195,7 +195,7 @@ export default function ShopPage() {
             <button 
               onClick={() => setIsEditorOpen(false)}
               style={{
-                position: 'absolute', top: '20px', right: '20px', background: 'var(--blue-deep)',
+                position: 'absolute', top: '-45px', right: '0', background: 'var(--blue-deep)',
                 color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10
               }}
             >&times;</button>

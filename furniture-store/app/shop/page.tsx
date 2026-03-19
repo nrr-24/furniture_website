@@ -35,7 +35,7 @@ export default function ShopPage() {
   }));
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} className="monolithic-island" style={{ padding: '140px 60px 40px' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto' }}>
       <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
@@ -195,7 +195,7 @@ export default function ShopPage() {
             <button 
               onClick={() => setIsEditorOpen(false)}
               style={{
-                position: 'absolute', top: '20px', right: '20px', background: 'var(--blue-deep)',
+                position: 'absolute', top: '-45px', right: '0', background: 'var(--blue-deep)',
                 color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10
               }}
             >&times;</button>

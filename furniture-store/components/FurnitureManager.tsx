@@ -26,10 +26,19 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Inject Fallbacks for missing required user data
+    const finalData = {
+      ...formData,
+      name: formData.name.trim() || 'Unnamed Item',
+      nameAr: formData.nameAr.trim() || 'منتج غير مسمى',
+      image: formData.image.trim() || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80',
+    };
+
     if (initialItem) {
-      updateItem(initialItem.id, formData);
+      updateItem(initialItem.id, finalData);
     } else {
-      addItem(formData);
+      addItem(finalData);
     }
     if (onClose) onClose();
   };
@@ -65,14 +74,14 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               <label className="form-label">Name (EN)</label>
               <input 
                 type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required 
+                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
               />
             </div>
             <div className="col-md-6">
               <label className="form-label">الاسم (AR)</label>
               <input 
                 type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.nameAr} onChange={e => setFormData({...formData, nameAr: e.target.value})} required 
+                value={formData.nameAr} onChange={e => setFormData({...formData, nameAr: e.target.value})} 
               />
             </div>
             <div className="col-12">
@@ -93,7 +102,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               <label className="form-label">Image URL</label>
               <input 
                 type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} required 
+                value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} 
               />
             </div>
             <div className="col-md-3">

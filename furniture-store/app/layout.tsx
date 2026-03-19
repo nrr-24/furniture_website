@@ -24,8 +24,10 @@ export default function RootLayout({
           <FurnitureProvider>
             <CartProvider>
               <LanguageProvider>
-                <Navbar />
-                <main>{children}</main>
+                <div className="monolithic-island">
+                  <Navbar />
+                  {children}
+                </div>
               </LanguageProvider>
             </CartProvider>
           </FurnitureProvider>

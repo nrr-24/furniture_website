@@ -35,8 +35,13 @@ export default function Navbar() {
             </div>
 
             <div className="nav-right-actions">
-                <button className="nav-icon-btn" onClick={toggleLanguage} title={t('switchLang')}>
-                    <i className="bi bi-globe2"></i>
+                <button 
+                    className="nav-icon-btn" 
+                    style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }} 
+                    onClick={toggleLanguage} 
+                    title={t('switchLang')}
+                >
+                    {language === 'en' ? 'AR' : 'EN'}
                 </button>
                 
                 {/* Role Selector */}
@@ -59,23 +64,24 @@ export default function Navbar() {
                 </select>
 
                 {/* Contact Us / Cart Icon (Customer Only) */}
-                {isCustomer ? (
+                {isCustomer && (
                     <button 
                         className="contact-cta-btn position-relative d-flex align-items-center gap-2"
                         onClick={() => setIsCartOpen(true)}
+                        style={{ padding: '12px 24px' }}
                     >
-                        {isRtl ? 'سلة المشتريات' : 'Cart'}
+                        {isRtl ? 'سلة المشتريات' : 'CART'}
                         {totalItems > 0 && (
                             <span className="badge rounded-pill bg-danger" style={{ fontSize: '0.7rem', padding: '4px 6px' }}>
                                 {totalItems}
                             </span>
                         )}
                     </button>
-                ) : (
-                    <button className="contact-cta-btn">
-                        {isRtl ? 'تواصل معنا' : 'Contact Us'}
-                    </button>
                 )}
+                
+                <button className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)' }}>
+                    {isRtl ? 'تواصل معنا' : 'CONTACT US'}
+                </button>
             </div>
 
             {/* Cart Sidebar Modal */}

@@ -47,11 +47,11 @@
 }
 
 :root {
-  --blue-main: #E2DACC; /* Now mapping to Sand/Light element color for buttons and foregrounds */
-  --blue-deep: #0D1A63; /* Darkest element color */
-  --blue-accent: #1A2CA3; /* Mid-tone blue for panels */
+  --blue-main: #E2DACC; /* Light element color */
+  --blue-deep: #2251A4; /* Lightest blue: Buttons, Accents */
+  --blue-accent: #1A2CA3; /* Mid-tone blue */
   --sand-soft: #E2DACC;
-  --bg-main: #2251A4; /* Background base */
+  --bg-main: #0D1A63; /* Darkest: Core website background */
   --bg-panel: #1A2CA3; /* Background for panels */
   --text-main: #E2DACC;
   --text-soft: rgba(226, 218, 204, 0.75);
@@ -118,24 +118,23 @@ img {
 }
 
 
-/* --- Riad Lumiere Style Transparent Absolute Nav --- */
 .lumiere-nav {
-  position: absolute;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  display: grid;
-  grid-template-columns: 120px 1fr auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  padding: 40px 60px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 40px;
   z-index: 100;
-  pointer-events: none; /* Let clicks pass through empty areas */
+  background: rgba(13, 26, 99, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.lumiere-nav * {
-  pointer-events: auto; /* Re-enable clicks on real navigation elements */
-}
+
 
 .brand-link {
   display: inline-flex;
@@ -214,16 +213,17 @@ img {
 
 .split-left {
   flex: 1;
-  padding: 140px 60px 40px; /* Top padding to clear absolute nav */
+  padding: 40px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   text-align: center;
 }
 
 .split-right {
   flex: 1;
-  padding: 24px;
+  padding: 0;
 }
 
 .split-right-img-container {
@@ -247,6 +247,25 @@ img {
   height: 90px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.scroll-down-indicator {
+  margin-top: auto;
+  opacity: 0.4;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: float-discrete 3s ease-in-out infinite;
+}
+
+@keyframes float-discrete {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+  100% { transform: translateY(0); }
 }
 
 .hero-copy-block {
@@ -432,10 +451,27 @@ img {
   .homepage-left-panel {
     padding: 60px 40px 50px;
   }
+  
+  .lumiere-nav {
+    padding: 16px 20px;
+  }
 
   .homepage-hero-row,
   .homepage-right-visual {
     min-height: 700px;
+  }
+  
+  .lumiere-split {
+    flex-direction: column;
+  }
+  
+  .split-left {
+    padding: 40px 20px;
+  }
+
+  .split-right {
+    padding: 0;
+    min-height: 50vh;
   }
 }
 
@@ -464,18 +500,41 @@ img {
 }
 
 @media (max-width: 767px) {
-  .mini-gallery-strip img {
-    width: 86px;
-    height: 110px;
+  .lumiere-nav {
+    padding: 12px 16px;
+    gap: 10px;
   }
 
   .nav-center-pills {
     justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-pill-link {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
   }
 
   .nav-right-actions {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px;
+  }
+
+  .contact-cta-btn {
+    padding: 8px 16px;
+    font-size: 0.65rem;
+  }
+
+  .nav-icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .mini-gallery-strip img {
+    width: 86px;
+    height: 110px;
   }
 
   .story-side-grid {
@@ -534,4 +593,19 @@ img {
 .category-nav-pills button:hover {
   background: var(--blue-main);
   transform: translateY(-2px);
+}
+
+/* Custom Webkit scrollbar block */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(226, 218, 204, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(226, 218, 204, 0.6);
 }

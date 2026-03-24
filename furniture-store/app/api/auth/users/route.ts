@@ -10,7 +10,7 @@ export async function GET() {
     const { blobs } = await list({ prefix: USERS_FILENAME });
     if (blobs.length === 0) return NextResponse.json({ users: [] });
 
-    const dataStore = await fetch(blobs[0].url, { cache: 'no-store' });
+    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
     const users: any[] = await dataStore.json();
     
     // Strip passwords before sending to front-end admin dashboard
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const { blobs } = await list({ prefix: USERS_FILENAME });
     if (blobs.length === 0) return NextResponse.json({ error: 'No users found' }, { status: 404 });
 
-    const dataStore = await fetch(blobs[0].url, { cache: 'no-store' });
+    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
     let users: any[] = await dataStore.json();
 
     if (action === 'delete') {

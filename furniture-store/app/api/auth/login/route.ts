@@ -17,10 +17,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const dataStore = await fetch(blobs[0].url, { cache: 'no-store' });
+    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
     const users: any[] = await dataStore.json();
 
-    const user = users.find(u => u.email === email && u.password === password);
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = password.trim();
+    const user = users.find(u => (u.email || '').toLowerCase().trim() === cleanEmail && u.password === cleanPassword);
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });

@@ -225,13 +225,17 @@ img {
   padding: 0;
 }
 
+[dir="rtl"] .split-right {
+  padding: 0;
+}
+
 .split-right-img-container {
   border-radius: 36px;
   overflow: hidden;
   height: 100%;
   width: 100%;
   position: relative;
-  min-height: 600px;
+  min-height: 0; /* Allow the image to shrink to fit the viewport vertically */
 }
 
 .mini-gallery-strip {

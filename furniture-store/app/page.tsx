@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
 import { useCart } from '../data/CartContext';
@@ -37,7 +38,7 @@ export default function HomePage() {
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-      
+
       {/* 1. Hero Section (The First Impression) */}
       <section className="lumiere-split" style={{ flex: 1 }}>
         {/* Left Side: Copy, Gallery, Actions */}
@@ -50,18 +51,18 @@ export default function HomePage() {
           </h1>
 
           <p className="smartwood-description" style={{ fontSize: '1.2rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px' }}>
-            {isRtl 
-              ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتقنة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.' 
+            {isRtl
+              ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتقنة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
               : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
           </p>
 
           <div className="hero-main-actions d-flex gap-3">
-            <a href="/shop" className="hero-primary-btn" style={{ padding: '16px 40px', background: 'var(--text-main)', color: 'var(--bg-main)', borderRadius: '12px' }}>
+            <Link href="/shop" className="hero-primary-btn" style={{ padding: '16px 40px', background: 'var(--text-main)', color: 'var(--bg-main)', borderRadius: '12px', textDecoration: 'none' }}>
               {isRtl ? 'استكشف مجموعتنا' : 'Explore Our Collection'}
-            </a>
-            <a href="#contact" className="hero-secondary-btn" style={{ padding: '16px 40px', borderRadius: '12px' }}>
+            </Link>
+            <Link href="/contact" className="hero-secondary-btn" style={{ padding: '16px 40px', borderRadius: '12px', textDecoration: 'none' }}>
               {isRtl ? 'اطلب استشارة' : 'Request a Consultation'}
-            </a>
+            </Link>
           </div>
 
         </div>

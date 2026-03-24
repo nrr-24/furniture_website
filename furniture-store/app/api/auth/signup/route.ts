@@ -16,20 +16,23 @@ export async function POST(request: Request) {
     let users: any[] = [];
     
     if (blobs.length > 0) {
-      const dataStore = await fetch(blobs[0].url, { cache: 'no-store' });
+      const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
       users = await dataStore.json();
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = password.trim();
+
     // 2. Check if email exists
-    if (users.find(u => u.email === email)) {
+    if (users.find(u => (u.email || '').toLowerCase().trim() === cleanEmail)) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
     // 3. Create new user
     const newUser = {
       id: Math.random().toString(36).substring(2, 9),
-      email,
-      password, // Storing raw string mock due to serverless constraints without bcrypt
+      email: cleanEmail,
+      password: cleanPassword, // Storing raw string mock due to serverless constraints without bcrypt
       role: users.length === 0 ? 'admin' : 'customer' // First user is always admin
     };
 

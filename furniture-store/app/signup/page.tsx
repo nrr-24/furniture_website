@@ -43,8 +43,8 @@ export default function SignupPage() {
   };
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: 'var(--bg-main)' }}>
-      <div style={{ maxWidth: '400px', width: '100%', background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', boxShadow: 'var(--shadow-main)' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: 'var(--bg-main)', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '400px', width: '100%', background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', boxShadow: 'var(--shadow-main)', margin: 'auto' }}>
         <h1 className="smartwood-title" style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '8px' }}>
           {isRtl ? 'إنشاء حساب' : 'Create Account'}
         </h1>

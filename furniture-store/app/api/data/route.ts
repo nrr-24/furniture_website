@@ -11,8 +11,8 @@ export async function GET(request: Request) {
     const { blobs } = await list({ prefix: DATA_FILENAME });
     
     if (blobs.length > 0) {
-      // Fetch the contents from the Blob URL
-      const dataStore = await fetch(blobs[0].url, { cache: 'no-store' });
+      // Fetch the contents from the Blob URL with cache bypass
+      const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
       const jsonData = await dataStore.json();
       return NextResponse.json({ items: jsonData });
     }

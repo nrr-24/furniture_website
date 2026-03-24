@@ -18,19 +18,38 @@ export function FurnitureProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('smartwood_furniture');
-    if (saved) {
-      setItems(JSON.parse(saved));
-    } else {
-      setItems(DEFAULT_ITEMS);
-      localStorage.setItem('smartwood_furniture', JSON.stringify(DEFAULT_ITEMS));
-    }
-    setInitialized(true);
+    const loadFromVercel = async () => {
+      try {
+        const response = await fetch('/api/data', { cache: 'no-store' });
+        const result = await response.json();
+        
+        if (result.items) {
+          setItems(result.items);
+        } else {
+          // Initialize fresh Vercel Blob if empty
+          setItems(DEFAULT_ITEMS);
+          await fetch('/api/data', { method: 'POST', body: JSON.stringify(DEFAULT_ITEMS) });
+        }
+      } catch (error) {
+        console.error('Failed to read from Vercel Blob Storage, using defaults.', error);
+        setItems(DEFAULT_ITEMS);
+      } finally {
+        setInitialized(true);
+      }
+    };
+    loadFromVercel();
   }, []);
 
-  const saveItems = (newItems: FurnitureItem[]) => {
+  const saveItems = async (newItems: FurnitureItem[]) => {
+    // Instantly update UI (Optimistic Update)
     setItems(newItems);
-    localStorage.setItem('smartwood_furniture', JSON.stringify(newItems));
+    
+    // Background sync to Vercel Storage Blob
+    try {
+      await fetch('/api/data', { method: 'POST', body: JSON.stringify(newItems) });
+    } catch (error) {
+      console.error('Failed to save to Vercel Blob Database', error);
+    }
   };
 
   const addItem = (item: Omit<FurnitureItem, 'id'>) => {

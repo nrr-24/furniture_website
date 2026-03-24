@@ -2,11 +2,18 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Role = 'admin' | 'customer';
+export type Role = 'admin' | 'customer';
+
+export interface User {
+  id: string;
+  email: string;
+  role: Role;
+}
 
 interface AuthContextProps {
-  role: Role;
-  setRole: (role: Role) => void;
+  user: User | null;
+  login: (userData: User) => void;
+  logout: () => void;
   isAdmin: boolean;
   isCustomer: boolean;
 }
@@ -14,20 +21,29 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [role, setRoleState] = useState<Role>('customer');
+  const [user, setUser] = useState<User | null>(null);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('smartwood_role');
-    if (saved && (saved === 'admin' || saved === 'customer')) {
-      setRoleState(saved as Role);
+    const savedUser = localStorage.getItem('smartwood_user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Failed to parse user session");
+      }
     }
     setInitialized(true);
   }, []);
 
-  const setRole = (newRole: Role) => {
-    setRoleState(newRole);
-    localStorage.setItem('smartwood_role', newRole);
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('smartwood_user', JSON.stringify(userData));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('smartwood_user');
   };
 
   if (!initialized) return null;
@@ -35,10 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        role,
-        setRole,
-        isAdmin: role === 'admin',
-        isCustomer: role === 'customer',
+        user,
+        login,
+        logout,
+        isAdmin: user?.role === 'admin',
+        isCustomer: user?.role === 'customer' || !user, // Allow non-logged-in users strictly viewer access via isCustomer flag (or split it into isGuest if needed, but this allows shop viewing)
       }}
     >
       {children}

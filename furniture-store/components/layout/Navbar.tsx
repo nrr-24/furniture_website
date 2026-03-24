@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 export default function Navbar() {
     const { language, setLanguage, isRtl, t } = useLanguage();
-    const { role, setRole, isAdmin, isCustomer } = useAuth();
+    const { user, logout, isAdmin, isCustomer } = useAuth();
     const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
     
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -44,24 +44,31 @@ export default function Navbar() {
                     {language === 'en' ? 'AR' : 'EN'}
                 </button>
                 
-                {/* Role Selector */}
-                <select 
-                    value={role} 
-                    onChange={(e) => setRole(e.target.value as 'admin' | 'customer')}
-                    style={{
-                        background: 'transparent',
-                        color: 'var(--text-main)',
-                        border: 'none',
-                        outline: 'none',
-                        fontSize: '0.8rem',
-                        textTransform: 'uppercase',
-                        cursor: 'pointer',
-                        opacity: 0.8
-                    }}
-                >
-                    <option value="customer" style={{ color: 'black' }}>Customer</option>
-                    <option value="admin" style={{ color: 'black' }}>Admin</option>
-                </select>
+                {/* Authentication Controls */}
+                {user ? (
+                    <div className="d-flex align-items-center gap-3">
+                        {isAdmin && (
+                            <Link href="/admin/users" style={{ color: 'var(--blue-main)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}>
+                                {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
+                            </Link>
+                        )}
+                        <button 
+                            onClick={logout}
+                            style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                            {isRtl ? 'تسجيل الخروج' : 'LOG OUT'}
+                        </button>
+                    </div>
+                ) : (
+                    <div className="d-flex align-items-center gap-3">
+                        <Link href="/login" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, letterSpacing: '0.5px' }}>
+                            {isRtl ? 'تسجيل الدخول' : 'LOG IN'}
+                        </Link>
+                        <Link href="/signup" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600, padding: '6px 16px', background: 'var(--blue-deep)', borderRadius: '20px', letterSpacing: '0.5px' }}>
+                            {isRtl ? 'حساب جديد' : 'SIGN UP'}
+                        </Link>
+                    </div>
+                )}
 
                 {/* Contact Us / Cart Icon (Customer Only) */}
                 {isCustomer && (

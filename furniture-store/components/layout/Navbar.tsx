@@ -18,7 +18,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="lumiere-nav" dir={isRtl ? 'rtl' : 'ltr'}>
+        <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
             <Link href="/" className="brand-link">
                 <img 
                     src={`/images/LOGO/smartwood-${language}-white.svg`}
@@ -79,9 +79,9 @@ export default function Navbar() {
                     </button>
                 )}
                 
-                <button className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)' }}>
+                <Link href="/contact" className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
                     {isRtl ? 'تواصل معنا' : 'CONTACT US'}
-                </button>
+                </Link>
             </div>
 
             {/* Cart Sidebar Modal */}

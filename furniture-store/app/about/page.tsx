@@ -5,8 +5,10 @@ import { useLanguage } from '../../data/LanguageContext';
 export default function AboutPage() {
   const { t, isRtl } = useLanguage();
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} className="lumiere-split" style={{ flex: 1, minHeight: 0 }}>
-        
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
+      
+      {/* 1. Heritage Split Section */}
+      <section className="lumiere-split" style={{ minHeight: 'calc(100vh - 80px)' }}>
         {/* Left Side: Copy & Info */}
         <div className="split-left" style={{ justifyContent: 'center' }}>
           
@@ -59,6 +61,54 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* 2. Why Smartwood? (The Competitive Edge) */}
+      <section style={{ padding: '100px 5%' }}>
+        <div className="smartwood-story-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
+          <div style={{ flex: '1 1 400px' }}>
+            <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'The Competitive Edge'}</span>
+            <h2 className="section-title" style={{ marginBottom: '30px' }}>{isRtl ? 'لماذا سمارت وود؟' : 'Why Smartwood?'}</h2>
+            
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <li style={{ display: 'flex', gap: '16px' }}>
+                <i className="bi bi-cpu" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
+                <div>
+                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'دقة CNC المتقدمة' : 'Advanced CNC Precision'}</h4>
+                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'آلات آلية بالكامل تضمن دقة 100٪.' : 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.'}</p>
+                </div>
+              </li>
+              <li style={{ display: 'flex', gap: '16px' }}>
+                <i className="bi bi-geo-alt" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
+                <div>
+                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'بفخر صُنع في الكويت' : 'Proudly Made in Kuwait'}</h4>
+                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع.' : 'A national brand committed to local excellence, faster delivery, and superior support.'}</p>
+                </div>
+              </li>
+              <li style={{ display: 'flex', gap: '16px' }}>
+                <i className="bi bi-tree" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
+                <div>
+                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'مصادر مواد فاخرة' : 'Premium Material'}</h4>
+                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'خشب مستدام تم اختباره لتحمل مناخ الخليج.' : 'Sourcing the finest sustainable woods tested to withstand the Gulf’s unique climate.'}</p>
+                </div>
+              </li>
+              <li style={{ display: 'flex', gap: '16px' }}>
+                <i className="bi bi-clock-history" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
+                <div>
+                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'تجربة سلسة' : 'Streamlined Experience'}</h4>
+                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'سير عمل رقمي يضمن الشفافية والدقة.' : 'Digitalized production workflow guaranteeing transparency, precision, and on-time delivery.'}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+          
+          <div style={{ flex: '1 1 400px' }} className="story-side-grid">
+            <img src="https://images.unsplash.com/photo-1622372736546-2e19d20c5b36?auto=format&fit=crop&w=600&q=80" alt="Factory" />
+            <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=300&q=80" alt="Wood Detail" />
+            <img src="https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=300&q=80" alt="Design" />
+          </div>
+        </div>
+      </section>
 
     </main>
   );

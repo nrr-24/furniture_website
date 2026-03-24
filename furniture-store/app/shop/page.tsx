@@ -79,7 +79,7 @@ export default function ShopPage() {
                   const inCart = !!cartItem;
                   
                   return (
-                  <div className="col-md-6 col-lg-3" key={item.id}>
+                  <div className="col-md-6 col-lg-4" key={item.id}>
                     <div 
                       className="furniture-card position-relative"
                       style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.03)' }}

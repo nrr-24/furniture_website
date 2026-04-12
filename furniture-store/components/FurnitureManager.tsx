@@ -93,6 +93,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     }
   };
 
+  return (
     <div className="container py-0" dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="furniture-card p-3 p-md-4 mb-2" style={{ background: 'var(--bg-main)', border: '1px solid var(--line-soft)', borderRadius: '16px' }}>
         <div className="d-flex justify-content-between align-items-center mb-3">

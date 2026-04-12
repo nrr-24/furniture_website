@@ -6,22 +6,45 @@ import { LanguageProvider } from '../data/LanguageContext';
 import { AuthProvider } from '../data/AuthContext';
 import { CartProvider } from '../data/CartContext';
 import { FurnitureProvider } from '../data/FurnitureContext';
+import { supabase } from '../lib/supabase';
+import { mapDbRowToItem } from '../data/furnitureData';
 
 export const metadata = {
   title: 'SmartWood | Luxury Furniture',
   description: 'Luxury furniture storefront frontend',
 };
 
-export default function RootLayout({
+async function getInitialProducts() {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Server-side fetch error:', error.message);
+      return [];
+    }
+
+    return (data || []).map(mapDbRowToItem);
+  } catch (error) {
+    console.error('Server-side fetch failed:', error);
+    return [];
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialProducts = await getInitialProducts();
+
   return (
     <html lang="en">
       <body>
         <AuthProvider>
-          <FurnitureProvider>
+          <FurnitureProvider initialItems={initialProducts}>
             <CartProvider>
               <LanguageProvider>
                 <div className="monolithic-island">

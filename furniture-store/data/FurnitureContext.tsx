@@ -14,9 +14,15 @@ interface FurnitureContextType {
 
 const FurnitureContext = createContext<FurnitureContextType | undefined>(undefined);
 
-export function FurnitureProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<FurnitureItem[]>([]);
-  const [initialized, setInitialized] = useState(false);
+export function FurnitureProvider({ 
+  children, 
+  initialItems = [] 
+}: { 
+  children: ReactNode, 
+  initialItems?: FurnitureItem[] 
+}) {
+  const [items, setItems] = useState<FurnitureItem[]>(initialItems);
+  const [initialized, setInitialized] = useState(initialItems.length > 0);
 
   useEffect(() => {
     const loadProducts = async () => {

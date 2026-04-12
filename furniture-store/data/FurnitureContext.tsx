@@ -95,7 +95,8 @@ export function FurnitureProvider({
     if (updates.descriptionAr !== undefined) dbUpdates.description_ar = updates.descriptionAr;
     if (updates.price !== undefined) dbUpdates.price = updates.price;
     if (updates.image !== undefined) dbUpdates.image_url = updates.image;
-    if (updates.category !== undefined) dbUpdates.category = updates.category;
+    if (updates.categoryId !== undefined) dbUpdates.category_id = updates.categoryId;
+    if (updates.sortOrder !== undefined) dbUpdates.sort_order = updates.sortOrder;
 
     // Optimistic update
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
@@ -108,6 +109,19 @@ export function FurnitureProvider({
 
     if (error) {
       console.error('API update error:', error);
+    }
+  };
+
+  const deleteItem = async (id: string) => {
+    // Optimistic update
+    setItems(prev => prev.filter(i => i.id !== id));
+
+    const { error } = await fetch(`/api/products?id=${id}`, {
+      method: 'DELETE',
+    }).then(res => res.json());
+
+    if (error) {
+      console.error('API delete error:', error);
     }
   };
 

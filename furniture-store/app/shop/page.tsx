@@ -8,7 +8,7 @@ import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
 
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80';
+const FALLBACK_IMAGE = 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.png';
 
 export default function ShopPage() {
   const { t, isRtl } = useLanguage();

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../data/AuthContext';
 import { useLanguage } from '../../data/LanguageContext';

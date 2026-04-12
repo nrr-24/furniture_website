@@ -54,12 +54,11 @@ export default function AboutPage() {
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.5) 0%, transparent 100%)' }}></div>
 
-            {/* Corner Text overlay inside the image */}
+            {/* Corner Text overlay inside the image - Fixed to Left to avoid FAB collision */}
             <div style={{ 
               position: 'absolute', 
               bottom: '100px', 
-              left: isRtl ? 'auto' : '60px', 
-              right: isRtl ? '60px' : 'auto',
+              left: '60px',
               color: 'rgba(255,255,255,0.9)',
               textAlign: isRtl ? 'right' : 'left'
             }}>

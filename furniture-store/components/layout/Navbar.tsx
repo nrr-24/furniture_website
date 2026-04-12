@@ -101,8 +101,8 @@ export default function Navbar() {
                     style={{
                         position: 'fixed',
                         bottom: '30px',
-                        right: isRtl ? 'auto' : '30px',
-                        left: isRtl ? '30px' : 'auto',
+                        right: '30px',
+                        left: 'auto',
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',

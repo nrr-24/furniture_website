@@ -13,8 +13,8 @@ const getEnv = (name: string) => {
 let _supabase: any = null;
 export const getSupabase = () => {
   if (!_supabase) {
-    const url = getEnv('SUPABASE_URL') || 'https://placeholder.supabase.co';
-    const key = getEnv('SUPABASE_ANON_KEY') || 'placeholder-key';
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
     _supabase = createClient(url, key);
   }
   return _supabase;
@@ -26,8 +26,8 @@ export const getSupabase = () => {
 let _supabaseAdmin: any = null;
 export const getSupabaseAdmin = () => {
   if (!_supabaseAdmin) {
-    const url = getEnv('SUPABASE_URL') || 'https://placeholder.supabase.co';
-    const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     if (!serviceKey) {
       console.warn('SUPABASE_SERVICE_ROLE_KEY is missing, falling back to anon client');

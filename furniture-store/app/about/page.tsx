@@ -8,7 +8,7 @@ export default function AboutPage() {
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
 
       {/* 1. Heritage Split Section */}
-      <section className="lumiere-split" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <section className="lumiere-split" style={{ minHeight: 'calc(100vh - 80px)', flexShrink: 0 }}>
         {/* Left Side: Copy & Info */}
         <div className="split-left" style={{ justifyContent: 'center' }}>
 
@@ -55,9 +55,19 @@ export default function AboutPage() {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.5) 0%, transparent 100%)' }}></div>
 
             {/* Corner Text overlay inside the image */}
-            <div style={{ position: 'absolute', bottom: '40px', left: '40px', color: 'rgba(255,255,255,0.9)' }}>
+            <div style={{ 
+              position: 'absolute', 
+              bottom: '100px', 
+              left: isRtl ? 'auto' : '60px', 
+              right: isRtl ? '60px' : 'auto',
+              color: 'rgba(255,255,255,0.9)',
+              textAlign: isRtl ? 'right' : 'left'
+            }}>
               <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>02 /</span>
-              <h3 style={{ fontSize: '2rem', fontWeight: 300, margin: 0 }}>MADE IN<br />KUWAIT</h3>
+              <h3 style={{ fontSize: '2.2rem', fontWeight: 300, margin: 0, lineHeight: 1.2 }}>
+                {isRtl ? 'صُنع في' : 'MADE IN'}<br />
+                <span style={{ fontWeight: 700 }}>{isRtl ? 'الكويت' : 'KUWAIT'}</span>
+              </h3>
             </div>
           </div>
         </div>

@@ -93,59 +93,58 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     }
   };
 
-  return (
     <div className="container py-0" dir={isRtl ? 'rtl' : 'ltr'}>
-      <div className="furniture-card p-4 mb-5" style={{ background: 'var(--bg-main)' }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 style={{ fontSize: '1.8rem', margin: 0 }}>
+      <div className="furniture-card p-3 p-md-4 mb-2" style={{ background: 'var(--bg-main)', border: '1px solid var(--line-soft)', borderRadius: '16px' }}>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 style={{ fontSize: '1.5rem', margin: 0, fontWeight: 700 }}>
             {initialItem ? (isRtl ? 'تعديل المنتج' : 'Edit Item') : (isRtl ? 'إضافة منتج' : 'Add Item')}
           </h2>
           {initialItem && (
             <button
-              className="hero-secondary-btn border-danger text-danger"
+              className="btn btn-sm btn-outline-danger"
               onClick={handleDelete}
               type="button"
-              style={{ padding: '8px 16px' }}
+              style={{ padding: '6px 12px', borderRadius: '8px' }}
             >
-              <i className="bi bi-trash"></i> {isRtl ? 'حذف المنتج' : 'Delete'}
+              <i className="bi bi-trash"></i> {isRtl ? 'حذف' : 'Delete'}
             </button>
           )}
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="row g-3">
+          <div className="row g-2">
             <div className="col-md-6">
-              <label className="form-label">Name (EN)</label>
+              <label className="form-label small opacity-75">Name (EN)</label>
               <input
-                type="text" className="form-control bg-dark text-white border-secondary"
+                type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
                 value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div className="col-md-6">
-              <label className="form-label">الاسم (AR)</label>
+              <label className="form-label small opacity-75">الاسم (AR)</label>
               <input
-                type="text" className="form-control bg-dark text-white border-secondary"
+                type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
                 value={formData.nameAr} onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
               />
             </div>
-            <div className="col-12">
-              <label className="form-label">Description (EN)</label>
+            <div className="col-md-6">
+              <label className="form-label small opacity-75">Description (EN)</label>
               <textarea
-                className="form-control bg-dark text-white border-secondary"
+                className="form-control bg-dark text-white border-secondary form-control-sm" rows={2}
                 value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required
               />
             </div>
-            <div className="col-12">
-              <label className="form-label">الوصف (AR)</label>
+            <div className="col-md-6">
+              <label className="form-label small opacity-75">الوصف (AR)</label>
               <textarea
-                className="form-control bg-dark text-white border-secondary"
+                className="form-control bg-dark text-white border-secondary form-control-sm" rows={2}
                 value={formData.descriptionAr} onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })} required
               />
             </div>
-            <div className="col-md-5">
-              <label className="form-label">Image</label>
+            <div className="col-md-6">
+              <label className="form-label small opacity-75">Image URL</label>
               <div className="d-flex gap-2">
                 <input
-                  type="text" className="form-control bg-dark text-white border-secondary"
+                  type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
                   value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })}
                   placeholder="URL"
                 />
@@ -153,27 +152,31 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                   type="file" accept="image/*" className="d-none"
                   id={`imageUpload-${initialItem?.id || 'new'}`} onChange={handleImageUpload}
                 />
-                <label htmlFor={`imageUpload-${initialItem?.id || 'new'}`} className="btn hero-secondary-btn d-flex align-items-center mb-0" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  {uploading ? (isRtl ? 'جاري الرفع...' : 'Uploading...') : (isRtl ? 'رفع صورة' : 'Upload')}
+                <label htmlFor={`imageUpload-${initialItem?.id || 'new'}`} className="btn btn-sm hero-secondary-btn py-1 px-3 d-flex align-items-center mb-0" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {uploading ? <span className="spinner-border spinner-border-sm me-2"></span> : <i className="bi bi-upload me-2"></i>}
+                  {uploading ? (isRtl ? 'جاري...' : 'Up...') : (isRtl ? 'رفع' : 'Upload')}
                 </label>
               </div>
             </div>
             <div className="col-md-3">
-              <label className="form-label">Price</label>
-              <input
-                type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
-                value={formData.price ?? 0} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required
-              />
+              <label className="form-label small opacity-75">Price</label>
+              <div className="input-group input-group-sm">
+                <span className="input-group-text bg-dark border-secondary text-white">$</span>
+                <input
+                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
+                  value={formData.price ?? 0} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required
+                />
+              </div>
             </div>
-            <div className="col-md-4">
-              <label className="form-label">{isRtl ? 'الفئة' : 'Category'}</label>
+            <div className="col-md-3">
+              <label className="form-label small opacity-75">{isRtl ? 'الفئة' : 'Category'}</label>
               <select
-                className="form-select bg-dark text-white border-secondary"
+                className="form-select bg-dark text-white border-secondary form-select-sm"
                 value={formData.categoryId} 
                 onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
                 required
               >
-                <option value="" disabled>{isRtl ? 'اختر فئة' : 'Select category'}</option>
+                <option value="" disabled>{isRtl ? 'اختر' : 'Select'}</option>
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>
                     {isRtl ? cat.nameAr : cat.name}
@@ -181,12 +184,12 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                 ))}
               </select>
             </div>
-            <div className="col-12 mt-4 d-flex gap-3">
-              <button type="submit" className="hero-primary-btn flex-grow-1">
+            <div className="col-12 mt-3 d-flex gap-2">
+              <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px' }}>
                 {initialItem ? (isRtl ? 'تحديث' : 'Update Item') : (isRtl ? 'حفظ' : 'Save Item')}
               </button>
               {onClose && (
-                <button type="button" className="hero-secondary-btn" onClick={onClose}>
+                <button type="button" className="hero-secondary-btn px-4 py-2" style={{ borderRadius: '8px' }} onClick={onClose}>
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
               )}
@@ -196,5 +199,4 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
       </div>
     </div>
   );
-
 }

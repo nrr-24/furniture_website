@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLanguage } from '../../data/LanguageContext';
 import { FurnitureItem, Category } from '../../data/furnitureData';
 import { useFurniture } from '../../data/FurnitureContext';
@@ -14,7 +14,7 @@ export default function ShopPage() {
   const { t, isRtl } = useLanguage();
   const { 
     items, categories, initialized, 
-    addItem, updateItem, deleteItem, deleteMultipleItems, reorderItems,
+    addItem, updateItem, deleteItem, reorderItems,
     addCategory, updateCategory, deleteCategory, reorderCategories 
   } = useFurniture();
   const { isAdmin, isCustomer } = useAuth();
@@ -24,14 +24,13 @@ export default function ShopPage() {
   const [selectedItem, setSelectedItem] = useState<FurnitureItem | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<FurnitureItem | null>(null);
-  
-  // Management States
-  const [isManageMode, setIsManageMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
 
+  // Drag and Drop States
+  const [draggedItem, setDraggedItem] = useState<{ id: string, index: number, categoryId?: string, type: 'product' | 'category' } | null>(null);
+
   // Confirmation Modals
-  const [confirmDelete, setConfirmDelete] = useState<{ type: 'product' | 'batch' | 'category', id?: string, count?: number, name?: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ type: 'product' | 'category', id?: string, count?: number, name?: string } | null>(null);
 
   if (!initialized) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-soft)' }}>Loading Collections...</div>;
 
@@ -40,46 +39,78 @@ export default function ShopPage() {
     products: items.filter(item => item.categoryId === cat.id).sort((a, b) => a.sortOrder - b.sortOrder)
   }));
 
-  const handleBatchDelete = async () => {
-    if (selectedIds.length === 0) return;
-    await deleteMultipleItems(selectedIds);
-    setSelectedIds([]);
-    setConfirmDelete(null);
-  };
-
   const handleDeleteCategory = async (id: string) => {
     await deleteCategory(id);
     setConfirmDelete(null);
   };
 
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  // --- Vanilla DND Handlers ---
+  
+  // Category DND
+  const handleCategoryDragStart = (e: React.DragEvent, index: number, id: string) => {
+    setDraggedItem({ type: 'category', index, id });
   };
 
-  // Reordering Logic (Using Arrow Buttons as requested "functionality" for sorting)
-  const moveCategory = async (index: number, direction: 'up' | 'down') => {
+  const handleCategoryDrop = async (e: React.DragEvent, targetIndex: number) => {
+    if (!draggedItem || draggedItem.type !== 'category') return;
+    const sourceIndex = draggedItem.index;
+    if (sourceIndex === targetIndex) return;
+
     const newCats = [...categories];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= newCats.length) return;
+    const [moved] = newCats.splice(sourceIndex, 1);
+    newCats.splice(targetIndex, 0, moved);
     
-    [newCats[index], newCats[targetIndex]] = [newCats[targetIndex], newCats[index]];
     await reorderCategories(newCats);
+    setDraggedItem(null);
   };
 
-  const moveProduct = async (categoryId: string, index: number, direction: 'up' | 'down') => {
-    const catProducts = groupedItems.find(g => g.id === categoryId)?.products || [];
-    const newProducts = [...catProducts];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= newProducts.length) return;
+  // Product DND
+  const handleProductDragStart = (e: React.DragEvent, categoryId: string, index: number, id: string) => {
+    setDraggedItem({ type: 'product', categoryId, index, id });
+  };
 
-    [newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]];
-    await reorderItems(categoryId, newProducts);
+  const handleProductDrop = async (e: React.DragEvent, targetCategoryId: string, targetIndex: number) => {
+    if (!draggedItem || draggedItem.type !== 'product' || !draggedItem.categoryId) return;
+    
+    const sourceCategoryId = draggedItem.categoryId;
+    const sourceIndex = draggedItem.index;
+
+    // Movement within the same category
+    if (sourceCategoryId === targetCategoryId) {
+      if (sourceIndex === targetIndex) return;
+      const catGroup = groupedItems.find(g => g.id === targetCategoryId);
+      if (!catGroup) return;
+
+      const newProducts = [...catGroup.products];
+      const [moved] = newProducts.splice(sourceIndex, 1);
+      newProducts.splice(targetIndex, 0, moved);
+      
+      await reorderItems(targetCategoryId, newProducts);
+    } else {
+       // Movement between categories
+       // For now, let's keep it simple: moving to a new category triggers a re-parenting
+       const item = items.find(i => i.id === draggedItem.id);
+       if (!item) return;
+       
+       const targetGroup = groupedItems.find(g => g.id === targetCategoryId);
+       if (!targetGroup) return;
+
+       const newProducts = [...targetGroup.products];
+       newProducts.splice(targetIndex, 0, { ...item, categoryId: targetCategoryId });
+       
+       await reorderItems(targetCategoryId, newProducts);
+    }
+    setDraggedItem(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Required to allow drop
   };
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto', position: 'relative' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto' }}>
       <div className="container">
-        <header style={{ marginBottom: '60px', textAlign: 'center', position: 'relative' }}>
+        <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
           <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)' }}>{t('collections')}</h1>
           <p className="section-text mx-auto" style={{ color: 'var(--text-soft)' }}>{t('collectionDesc')}</p>
@@ -87,18 +118,11 @@ export default function ShopPage() {
           {isAdmin && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
               <button 
-                onClick={() => setIsManageMode(!isManageMode)}
-                className="hero-secondary-btn"
-                style={{ padding: '8px 20px', fontSize: '0.9rem', borderColor: isManageMode ? 'var(--blue-accent)' : 'var(--line-soft)', color: isManageMode ? 'var(--blue-accent)' : 'var(--text-soft)' }}
-              >
-                <i className={`bi ${isManageMode ? 'bi-check-circle-fill' : 'bi-gear'}`}></i> {isManageMode ? (isRtl ? 'إنهاء الإدارة' : 'Exit Management') : (isRtl ? 'إدارة المعرض' : 'Manage Gallery')}
-              </button>
-              <button 
                 onClick={() => setIsCategoryManagerOpen(true)}
-                className="hero-secondary-btn"
-                style={{ padding: '8px 20px', fontSize: '0.9rem' }}
+                className="hero-secondary-btn py-2 px-4 shadow-sm"
+                style={{ fontSize: '0.9rem', borderRadius: '12px' }}
               >
-                <i className="bi bi-tags"></i> {isRtl ? 'الفئات' : 'Categories'}
+                <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
               </button>
             </div>
           )}
@@ -113,9 +137,9 @@ export default function ShopPage() {
                 const el = document.getElementById(`category-${cat.id}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
+              className="px-4 py-2 rounded-pill shadow-sm"
               style={{
-                padding: '10px 24px', borderRadius: '50px', background: 'var(--blue-deep)',
-                color: 'var(--text-main)', border: '1px solid var(--blue-accent)',
+                background: 'var(--blue-deep)', color: 'var(--text-main)', border: '1px solid var(--blue-accent)',
                 cursor: 'pointer', transition: 'all 0.3s ease', fontWeight: 'bold'
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -127,16 +151,28 @@ export default function ShopPage() {
         </div>
 
         {groupedItems.map((group, groupIdx) => (
-          <section id={`category-${group.id}`} key={group.id} style={{ marginBottom: '80px', scrollMarginTop: '160px' }}>
+          <section 
+            id={`category-${group.id}`} 
+            key={group.id} 
+            style={{ 
+              marginBottom: '80px', 
+              scrollMarginTop: '160px',
+              opacity: draggedItem?.type === 'category' && draggedItem.id === group.id ? 0.3 : 1 
+            }}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleCategoryDrop(e, groupIdx)}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
-              <h2 className="section-title" style={{ margin: 0 }}>{isRtl ? group.nameAr : group.name}</h2>
-              {isManageMode && (
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button disabled={groupIdx === 0} onClick={() => moveCategory(groupIdx, 'up')} style={{ background: 'none', border: '1px solid var(--line-soft)', color: 'var(--text-soft)', cursor: 'pointer', borderRadius: '4px', opacity: groupIdx === 0 ? 0.3 : 1 }}><i className="bi bi-chevron-up"></i></button>
-                  <button disabled={groupIdx === categories.length - 1} onClick={() => moveCategory(groupIdx, 'down')} style={{ background: 'none', border: '1px solid var(--line-soft)', color: 'var(--text-soft)', cursor: 'pointer', borderRadius: '4px', opacity: groupIdx === categories.length - 1 ? 0.3 : 1 }}><i className="bi bi-chevron-down"></i></button>
-                  <button onClick={() => setConfirmDelete({ type: 'category', id: group.id, name: isRtl ? group.nameAr : group.name, count: group.products.length })} style={{ background: 'none', border: '1px solid #ff4d4d', color: '#ff4d4d', cursor: 'pointer', borderRadius: '4px' }}><i className="bi bi-trash"></i></button>
+              {isAdmin && (
+                <div 
+                  draggable 
+                  onDragStart={(e) => handleCategoryDragStart(e, groupIdx, group.id)}
+                  style={{ cursor: 'grab', color: 'var(--text-soft)', padding: '5px' }}
+                >
+                  <i className="bi bi-list" style={{ fontSize: '1.5rem' }}></i>
                 </div>
               )}
+              <h2 className="section-title" style={{ margin: 0 }}>{isRtl ? group.nameAr : group.name}</h2>
               <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
             </div>
 
@@ -145,56 +181,41 @@ export default function ShopPage() {
                 {group.products.map((item, idx) => {
                   const cartItem = cart.find(i => i.id === item.id);
                   const inCart = !!cartItem;
-                  const isSelected = selectedIds.includes(item.id);
 
                   return (
-                    <div className="col-md-6 col-lg-4" key={item.id}>
+                    <div 
+                      className="col-md-6 col-lg-4" 
+                      key={item.id}
+                      draggable={isAdmin}
+                      onDragStart={(e) => handleProductDragStart(e, group.id, idx, item.id)}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => { e.stopPropagation(); handleProductDrop(e, group.id, idx); }}
+                      style={{ opacity: draggedItem?.type === 'product' && draggedItem.id === item.id ? 0.3 : 1 }}
+                    >
                       <div
-                        className={`furniture-card position-relative ${isSelected ? 'selected-card' : ''}`}
-                        style={{ 
-                          cursor: 'pointer', 
-                          background: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'rgba(255,255,255,0.03)',
-                          border: isSelected ? '1px solid var(--blue-accent)' : '1px solid transparent'
-                        }}
-                        onClick={() => isManageMode ? toggleSelect(item.id) : !isAdmin && setSelectedItem(item)}
+                        className="furniture-card position-relative"
+                        style={{ cursor: isAdmin ? 'default' : 'pointer' }}
+                        onClick={() => !isAdmin && setSelectedItem(item)}
                       >
-                        {/* Manager Controls */}
-                        {isManageMode && (
-                           <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 11 }}>
-                             <input 
-                               type="checkbox" 
-                               checked={isSelected} 
-                               onChange={() => toggleSelect(item.id)}
-                               style={{ width: '24px', height: '24px', cursor: 'pointer' }}
-                               onClick={(e) => e.stopPropagation()}
-                             />
-                           </div>
-                        )}
-
-                        {isAdmin && isManageMode && (
-                          <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, display: 'flex', gap: '8px' }}>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); moveProduct(group.id, idx, 'up'); }}
-                              disabled={idx === 0}
-                              style={{ background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: idx === 0 ? 0.5 : 1 }}
-                            ><i className="bi bi-arrow-up"></i></button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); moveProduct(group.id, idx, 'down'); }}
-                              disabled={idx === group.products.length - 1}
-                              style={{ background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: idx === group.products.length - 1 ? 0.5 : 1 }}
-                            ><i className="bi bi-arrow-down"></i></button>
+                        {isAdmin && (
+                          <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, display: 'flex', gap: '8px' }}>
+                            <div style={{ background: 'rgba(0,0,0,0.5)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab' }}>
+                               <i className="bi bi-list"></i>
+                            </div>
                           </div>
                         )}
 
-                        {isAdmin && !isManageMode && (
+                        {isAdmin && (
                           <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, display: 'flex', gap: '8px' }}>
                             <button
                               onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
-                              style={{ background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+                              className="admin-action-btn"
+                              style={{ background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '36px', height: '36px' }}
                             ><i className="bi bi-pencil-fill"></i></button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setConfirmDelete({ type: 'product', id: item.id, name: isRtl ? item.nameAr : item.name }); }}
-                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+                              className="admin-action-btn"
+                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px' }}
                             ><i className="bi bi-trash-fill"></i></button>
                           </div>
                         )}
@@ -262,7 +283,11 @@ export default function ShopPage() {
                 })}
               </div>
             ) : (
-              <div style={{ padding: '40px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--line-soft)' }}>
+              <div 
+                style={{ padding: '40px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--line-soft)' }}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleProductDrop(e, group.id, 0)}
+              >
                 <p style={{ color: 'var(--text-soft)', fontStyle: 'italic', margin: 0 }}>
                   {isRtl ? 'لا توجد منتجات في هذا القسم حالياً' : 'No products found in this category yet.'}
                 </p>
@@ -271,39 +296,15 @@ export default function ShopPage() {
           </section>
         ))}
 
-        {/* Floating Batch Actions Bar */}
-        {isManageMode && selectedIds.length > 0 && (
-          <div style={{
-            position: 'fixed', bottom: '110px', left: '50%', transform: 'translateX(-50%)',
-            background: 'var(--bg-panel)', padding: '15px 30px', borderRadius: '100px',
-            display: 'flex', alignItems: 'center', gap: '20px', zIndex: 1000,
-            boxShadow: '0 10px 30px rgba(0,0,0,0.4)', border: '1px solid var(--blue-accent)'
-          }}>
-            <span style={{ fontWeight: 'bold' }}>{isRtl ? `${selectedIds.length} بنود مختارة` : `${selectedIds.length} items selected`}</span>
-            <div style={{ width: '1px', height: '24px', background: 'var(--line-soft)' }}></div>
-            <button 
-              onClick={() => setConfirmDelete({ type: 'batch', count: selectedIds.length })}
-              style={{ background: '#ff4d4d', border: 'none', color: 'white', padding: '6px 20px', borderRadius: '50px', fontWeight: 'bold', cursor: 'pointer' }}
-            >
-              <i className="bi bi-trash-fill me-2"></i> {isRtl ? 'حذف الكل' : 'Delete All'}
-            </button>
-            <button 
-              onClick={() => setSelectedIds([])}
-              style={{ background: 'none', border: 'none', color: 'var(--text-soft)', cursor: 'pointer' }}
-            >
-              {isRtl ? 'إلغاء' : 'Clear'}
-            </button>
-          </div>
-        )}
-
         {/* Global Admin Floating Add Button */}
-        {isAdmin && !isEditorOpen && !isManageMode && (
+        {isAdmin && !isEditorOpen && (
           <button
             onClick={() => { setItemToEdit(null); setIsEditorOpen(true); }}
+            className="fixed-add-btn"
             style={{
               position: 'fixed', bottom: '40px', right: isRtl ? 'auto' : '40px', left: isRtl ? '40px' : 'auto', zIndex: 1000,
-              background: 'var(--text-main)', color: 'var(--blue-deep)', border: 'none', borderRadius: '50px',
-              padding: '16px 32px', fontSize: '1.1rem', fontWeight: 'bold', boxShadow: 'var(--shadow-main)', cursor: 'pointer',
+              background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50px',
+              padding: '16px 32px', fontSize: '1.1rem', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px'
             }}
           >
@@ -315,30 +316,20 @@ export default function ShopPage() {
       {/* Confirmation Modal */}
       {confirmDelete && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', maxWidth: '500px', width: '100%', textAlign: 'center', border: '1px solid var(--line-soft)' }}>
-             <div style={{ fontSize: '3rem', color: '#ff4d4d', marginBottom: '20px' }}>
-                <i className="bi bi-exclamation-triangle-fill"></i>
-             </div>
+          <div className="confirm-modal" style={{ background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', maxWidth: '500px', width: '100%', textAlign: 'center', border: '1px solid var(--line-soft)' }}>
+             <i className="bi bi-exclamation-triangle-fill" style={{ fontSize: '3rem', color: '#ff4d4d', marginBottom: '20px', display: 'block' }}></i>
              <h3 style={{ fontSize: '1.8rem', marginBottom: '15px' }}>{isRtl ? 'هل أنت متأكد؟' : 'Are you sure?'}</h3>
-             <p style={{ color: 'var(--text-soft)', marginBottom: '30px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+             <p style={{ color: 'var(--text-soft)', marginBottom: '30px', fontSize: '1.1rem' }}>
                 {confirmDelete.type === 'product' && (isRtl ? `سيتم حذف "${confirmDelete.name}" نهائياً.` : `"${confirmDelete.name}" will be permanently deleted.`)}
-                {confirmDelete.type === 'batch' && (isRtl ? `سيتم حذف ${confirmDelete.count} منتجات تم اختيارها نهائياً.` : `${confirmDelete.count} selected products will be permanently deleted.`)}
-                {confirmDelete.type === 'category' && (isRtl ? `حذف فئة "${confirmDelete.name}" سيؤدي أيضاً إلى حذف ${confirmDelete.count} منتجات داخلها نهائياً.` : `Deleting "${confirmDelete.name}" will also permanently delete all ${confirmDelete.count} products inside it.`)}
+                {confirmDelete.type === 'category' && (isRtl ? `حذف فئة "${confirmDelete.name}" سيؤدي أيضاً إلى حذف كافة المنتجات داخلها نهائياً.` : `Deleting "${confirmDelete.name}" will also permanently delete all products inside it.`)}
              </p>
              <div style={{ display: 'flex', gap: '15px' }}>
-                <button 
-                  onClick={() => setConfirmDelete(null)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '12px', background: 'var(--blue-deep)', color: 'var(--text-main)', border: '1px solid var(--line-soft)', cursor: 'pointer', fontWeight: 'bold' }}
-                >{isRtl ? 'إلغاء' : 'Cancel'}</button>
-                <button 
-                  onClick={() => {
-                    if (confirmDelete.type === 'product' && confirmDelete.id) deleteItem(confirmDelete.id);
-                    else if (confirmDelete.type === 'batch') handleBatchDelete();
-                    else if (confirmDelete.type === 'category' && confirmDelete.id) handleDeleteCategory(confirmDelete.id);
-                    setConfirmDelete(null);
-                  }}
-                  style={{ flex: 1, padding: '12px', borderRadius: '12px', background: '#ff4d4d', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
-                >{isRtl ? 'حذف نهائي' : 'Delete Permanently'}</button>
+                <button onClick={() => setConfirmDelete(null)} className="hero-secondary-btn py-2 flex-grow-1">{isRtl ? 'إلغاء' : 'Cancel'}</button>
+                <button onClick={() => {
+                   if (confirmDelete.type === 'product' && confirmDelete.id) deleteItem(confirmDelete.id);
+                   else if (confirmDelete.type === 'category' && confirmDelete.id) handleDeleteCategory(confirmDelete.id);
+                   setConfirmDelete(null);
+                }} style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '12px', flexGrow: 1, fontWeight: 'bold' }}>{isRtl ? 'حذف نهائي' : 'Delete'}</button>
              </div>
           </div>
         </div>
@@ -346,47 +337,59 @@ export default function ShopPage() {
 
       {/* Category Manager Modal */}
       {isCategoryManagerOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setIsCategoryManagerOpen(false)}>
+          <div 
+            className="category-modal shadow-lg" 
+            style={{ 
+              background: 'var(--bg-panel)', padding: '30px', borderRadius: '24px', maxWidth: '600px', width: '100%', 
+              maxHeight: '85vh', display: 'flex', flexDirection: 'column', position: 'relative', border: '1px solid var(--line-soft)' 
+            }} 
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="d-flex justify-content-between align-items-center mb-4">
-               <h3 style={{ margin: 0 }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
-               <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '2rem' }}>&times;</button>
+               <h3 style={{ margin: 0, fontWeight: 700 }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
+               <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
             </div>
             
-            <div style={{ marginBottom: '30px', padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-               <h4 style={{ fontSize: '1rem', marginBottom: '15px', color: 'var(--text-soft)' }}>{isRtl ? 'إضافة فئة جديدة' : 'Add New Category'}</h4>
+            <div style={{ marginBottom: '20px', padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
+               <h4 style={{ fontSize: '0.9rem', marginBottom: '15px', color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '1px' }}>{isRtl ? 'إضافة فئة جديدة' : 'Add New Category'}</h4>
                <form onSubmit={(e) => {
                  e.preventDefault();
                  const formData = new FormData(e.currentTarget);
                  addCategory(formData.get('name') as string, formData.get('nameAr') as string);
                  e.currentTarget.reset();
                }} className="d-flex gap-2">
-                 <input name="name" placeholder="English Name" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px' }} />
-                 <input name="nameAr" placeholder="Arabic Name" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px' }} />
-                 <button type="submit" className="hero-primary-btn" style={{ padding: '8px 20px' }}><i className="bi bi-plus-lg"></i></button>
+                 <input name="name" placeholder="English" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px', fontSize: '0.9rem' }} />
+                 <input name="nameAr" placeholder="Arabic" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px', fontSize: '0.9rem' }} />
+                 <button type="submit" className="hero-primary-btn" style={{ padding: '8px 15px' }}><i className="bi bi-plus-lg"></i></button>
                </form>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '5px' }}>
               {categories.map((cat, idx) => (
-                <div key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <button disabled={idx === 0} onClick={() => moveCategory(idx, 'up')} style={{ background: 'none', border: 'none', color: 'var(--text-soft)', padding: 0, opacity: idx === 0 ? 0.3 : 1 }}><i className="bi bi-chevron-up"></i></button>
-                    <button disabled={idx === categories.length - 1} onClick={() => moveCategory(idx, 'down')} style={{ background: 'none', border: 'none', color: 'var(--text-soft)', padding: 0, opacity: idx === categories.length - 1 ? 0.3 : 1 }}><i className="bi bi-chevron-down"></i></button>
-                  </div>
+                <div 
+                  key={cat.id} 
+                  draggable
+                  onDragStart={(e) => handleCategoryDragStart(e, idx, cat.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleCategoryDrop(e, idx)}
+                  className="cat-list-item d-flex align-items-center gap-3 p-3" 
+                  style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', opacity: draggedItem?.type === 'category' && draggedItem.id === cat.id ? 0.2 : 1 }}
+                >
+                  <div style={{ cursor: 'grab', color: 'var(--text-soft)' }}><i className="bi bi-list"></i></div>
                   <div style={{ flex: 1 }}>
                      <input 
                        defaultValue={cat.name} 
                        onBlur={(e) => updateCategory(cat.id, { name: e.target.value })}
-                       style={{ background: 'none', border: 'none', color: 'white', display: 'block', fontSize: '1rem', width: '100%' }}
+                       style={{ background: 'none', border: 'none', color: 'white', display: 'block', fontSize: '1rem', width: '100%', fontWeight: 600 }}
                      />
                      <input 
                        defaultValue={cat.nameAr} 
                        onBlur={(e) => updateCategory(cat.id, { nameAr: e.target.value })}
-                       style={{ background: 'none', border: 'none', color: 'var(--text-soft)', display: 'block', fontSize: '0.9rem', width: '100%' }}
+                       style={{ background: 'none', border: 'none', color: 'var(--text-soft)', display: 'block', fontSize: '0.85rem', width: '100%' }}
                      />
                   </div>
-                  <button onClick={() => setConfirmDelete({ type: 'category', id: cat.id, name: isRtl ? cat.nameAr : cat.name, count: items.filter(i => i.categoryId === cat.id).length })} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}><i className="bi bi-trash"></i></button>
+                  <button onClick={() => setConfirmDelete({ type: 'category', id: cat.id, name: isRtl ? cat.nameAr : cat.name })} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', padding: '5px' }}><i className="bi bi-trash"></i></button>
                 </div>
               ))}
             </div>
@@ -396,9 +399,13 @@ export default function ShopPage() {
 
       {/* Editor Modal (Admin Only) */}
       {isEditorOpen && isAdmin && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'var(--bg-main)', zIndex: 9999, overflowY: 'auto', padding: '40px 20px', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ maxWidth: '900px', width: '100%', position: 'relative' }}>
-            <button onClick={() => setIsEditorOpen(false)} style={{ position: 'absolute', top: '-45px', right: '0', background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}>&times;</button>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999, overflowY: 'auto', padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+          <div style={{ maxWidth: '800px', width: '100%', position: 'relative', marginTop: '60px' }}>
+            <button 
+              onClick={() => setIsEditorOpen(false)} 
+              className="shadow-lg"
+              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
+            >&times;</button>
             <FurnitureManager initialItem={itemToEdit || undefined} onClose={() => setIsEditorOpen(false)} />
           </div>
         </div>
@@ -407,13 +414,17 @@ export default function ShopPage() {
       {/* Item Details Modal (Customer Only) */}
       {selectedItem && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedItem(null)}>
-          <div style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '24px', maxWidth: '900px', width: '100%', display: 'flex', flexDirection: 'row', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div 
+            className="details-modal"
+            style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '24px', maxWidth: '900px', width: '100%', display: 'flex', flexDirection: isRtl ? 'row-reverse' : 'row', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', position: 'relative' }} 
+            onClick={(e) => e.stopPropagation()}
+          >
             <button onClick={() => setSelectedItem(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10 }}>&times;</button>
             <div style={{ flex: '1', minHeight: '400px' }}>
               <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div style={{ flex: '1', padding: '40px', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={{ fontSize: '2.4rem', marginBottom: '8px', color: 'var(--text-main)' }}> {isRtl ? selectedItem.nameAr : selectedItem.name} </h2>
+              <h2 style={{ fontSize: '2.4rem', marginBottom: '8px', color: 'var(--text-main)', fontWeight: 700 }}> {isRtl ? selectedItem.nameAr : selectedItem.name} </h2>
               <span style={{ fontSize: '1.5rem', color: 'var(--text-soft)', marginBottom: '24px' }}> ${selectedItem.price} </span>
               <p style={{ color: 'var(--text-soft)', lineHeight: '1.8', marginBottom: 'auto' }}> {isRtl ? selectedItem.descriptionAr : selectedItem.description} </p>
               {isCustomer && (
@@ -427,14 +438,10 @@ export default function ShopPage() {
       )}
       
       <style jsx global>{`
-        .selected-card {
-          animation: cardPulse 2s infinite;
-        }
-        @keyframes cardPulse {
-          0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-          70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
+        .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
+        .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
+        .category-modal::-webkit-scrollbar { width: 6px; }
+        .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); borderRadius: 10px; }
       `}</style>
     </main>
   );

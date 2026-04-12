@@ -165,7 +165,10 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                 <span className="input-group-text bg-dark border-secondary text-white">$</span>
                 <input
                   type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
-                  value={formData.price ?? 0} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required
+                  value={formData.price} 
+                  onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                  onFocus={(e) => { if(formData.price === 0) e.target.value = ''; }}
+                  required
                 />
               </div>
             </div>
@@ -186,11 +189,11 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               </select>
             </div>
             <div className="col-12 mt-3 d-flex gap-2">
-              <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px' }}>
+              <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px', border: 'none' }}>
                 {initialItem ? (isRtl ? 'تحديث' : 'Update Item') : (isRtl ? 'حفظ' : 'Save Item')}
               </button>
               {onClose && (
-                <button type="button" className="hero-secondary-btn px-4 py-2" style={{ borderRadius: '8px' }} onClick={onClose}>
+                <button type="button" className="hero-secondary-btn px-4 py-2" style={{ borderRadius: '8px', border: 'none' }} onClick={onClose}>
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
               )}

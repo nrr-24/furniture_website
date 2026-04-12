@@ -156,22 +156,10 @@ export default function ShopPage() {
             key={group.id} 
             style={{ 
               marginBottom: '80px', 
-              scrollMarginTop: '160px',
-              opacity: draggedItem?.type === 'category' && draggedItem.id === group.id ? 0.3 : 1 
+              scrollMarginTop: '160px' 
             }}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleCategoryDrop(e, groupIdx)}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
-              {isAdmin && (
-                <div 
-                  draggable 
-                  onDragStart={(e) => handleCategoryDragStart(e, groupIdx, group.id)}
-                  style={{ cursor: 'grab', color: 'var(--text-soft)', padding: '5px' }}
-                >
-                  <i className="bi bi-list" style={{ fontSize: '1.5rem' }}></i>
-                </div>
-              )}
               <h2 className="section-title" style={{ margin: 0 }}>{isRtl ? group.nameAr : group.name}</h2>
               <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
             </div>
@@ -245,7 +233,7 @@ export default function ShopPage() {
                               {!inCart ? (
                                 <button
                                   className="hero-primary-btn w-100"
-                                  style={{ padding: '10px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+                                  style={{ border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
                                   onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                                 >
                                   <i className="bi bi-cart-plus"></i> {isRtl ? 'إضافة' : 'Add to Cart'}
@@ -321,10 +309,10 @@ export default function ShopPage() {
              <h3 style={{ fontSize: '1.8rem', marginBottom: '15px' }}>{isRtl ? 'هل أنت متأكد؟' : 'Are you sure?'}</h3>
              <p style={{ color: 'var(--text-soft)', marginBottom: '30px', fontSize: '1.1rem' }}>
                 {confirmDelete.type === 'product' && (isRtl ? `سيتم حذف "${confirmDelete.name}" نهائياً.` : `"${confirmDelete.name}" will be permanently deleted.`)}
-                {confirmDelete.type === 'category' && (isRtl ? `حذف فئة "${confirmDelete.name}" سيؤدي أيضاً إلى حذف كافة المنتجات داخلها نهائياً.` : `Deleting "${confirmDelete.name}" will also permanently delete all products inside it.`)}
+                {confirmDelete.type === 'category' && (isRtl ? `حذف فئة "${confirmDelete.name}" سيؤدي أيضاً إلى حذف كافة المنتجات داخلها نهائياً.` : `حذف "${confirmDelete.name}" سيؤدي أيضاً إلى حذف ${confirmDelete.count || ''} منتجات داخلها.`)}
              </p>
              <div style={{ display: 'flex', gap: '15px' }}>
-                <button onClick={() => setConfirmDelete(null)} className="hero-secondary-btn py-2 flex-grow-1">{isRtl ? 'إلغاء' : 'Cancel'}</button>
+                <button onClick={() => setConfirmDelete(null)} className="hero-secondary-btn py-2 flex-grow-1" style={{ border: 'none' }}>{isRtl ? 'إلغاء' : 'Cancel'}</button>
                 <button onClick={() => {
                    if (confirmDelete.type === 'product' && confirmDelete.id) deleteItem(confirmDelete.id);
                    else if (confirmDelete.type === 'category' && confirmDelete.id) handleDeleteCategory(confirmDelete.id);
@@ -337,35 +325,35 @@ export default function ShopPage() {
 
       {/* Category Manager Modal */}
       {isCategoryManagerOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setIsCategoryManagerOpen(false)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setIsCategoryManagerOpen(false)}>
           <div 
             className="category-modal shadow-lg" 
             style={{ 
-              background: 'var(--bg-panel)', padding: '30px', borderRadius: '24px', maxWidth: '600px', width: '100%', 
-              maxHeight: '85vh', display: 'flex', flexDirection: 'column', position: 'relative', border: '1px solid var(--line-soft)' 
+              background: 'var(--bg-panel)', padding: '25px', borderRadius: '24px', maxWidth: '650px', width: '100%', 
+              maxHeight: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', border: '1px solid var(--line-soft)' 
             }} 
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="d-flex justify-content-between align-items-center mb-4">
-               <h3 style={{ margin: 0, fontWeight: 700 }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
-               <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+               <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.5rem' }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
+               <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>&times;</button>
             </div>
             
-            <div style={{ marginBottom: '20px', padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-               <h4 style={{ fontSize: '0.9rem', marginBottom: '15px', color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '1px' }}>{isRtl ? 'إضافة فئة جديدة' : 'Add New Category'}</h4>
+            <div style={{ marginBottom: '25px', padding: '20px', background: 'var(--bg-main)', borderRadius: '16px', border: '1px solid var(--line-soft)' }}>
+               <h4 style={{ fontSize: '0.8rem', marginBottom: '12px', color: 'var(--text-soft)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>{isRtl ? 'فئة جديدة' : 'Add New Category'}</h4>
                <form onSubmit={(e) => {
                  e.preventDefault();
                  const formData = new FormData(e.currentTarget);
                  addCategory(formData.get('name') as string, formData.get('nameAr') as string);
                  e.currentTarget.reset();
                }} className="d-flex gap-2">
-                 <input name="name" placeholder="English" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px', fontSize: '0.9rem' }} />
-                 <input name="nameAr" placeholder="Arabic" required style={{ flex: 1, background: 'var(--bg-main)', border: '1px solid var(--line-soft)', color: 'white', padding: '8px 12px', borderRadius: '8px', fontSize: '0.9rem' }} />
-                 <button type="submit" className="hero-primary-btn" style={{ padding: '8px 15px' }}><i className="bi bi-plus-lg"></i></button>
+                 <input name="name" placeholder="Name (EN)" required style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid var(--line-soft)', color: 'white', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
+                 <input name="nameAr" placeholder="الاسم (AR)" required style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid var(--line-soft)', color: 'white', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
+                 <button type="submit" className="hero-primary-btn" style={{ padding: '10px 15px', border: 'none' }}><i className="bi bi-plus-lg"></i></button>
                </form>
             </div>
 
-            <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '5px' }}>
+            <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '8px' }}>
               {categories.map((cat, idx) => (
                 <div 
                   key={cat.id} 
@@ -373,23 +361,32 @@ export default function ShopPage() {
                   onDragStart={(e) => handleCategoryDragStart(e, idx, cat.id)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleCategoryDrop(e, idx)}
-                  className="cat-list-item d-flex align-items-center gap-3 p-3" 
-                  style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', opacity: draggedItem?.type === 'category' && draggedItem.id === cat.id ? 0.2 : 1 }}
+                  className="cat-list-item d-flex align-items-center gap-3 p-3 transition-all" 
+                  style={{ background: 'var(--bg-main)', borderRadius: '14px', border: '1px solid var(--line-soft)', opacity: draggedItem?.type === 'category' && draggedItem.id === cat.id ? 0.2 : 1 }}
                 >
-                  <div style={{ cursor: 'grab', color: 'var(--text-soft)' }}><i className="bi bi-list"></i></div>
+                  <div style={{ cursor: 'grab', color: 'var(--text-soft)', padding: '5px' }}><i className="bi bi-list" style={{ fontSize: '1.2rem' }}></i></div>
                   <div style={{ flex: 1 }}>
-                     <input 
-                       defaultValue={cat.name} 
-                       onBlur={(e) => updateCategory(cat.id, { name: e.target.value })}
-                       style={{ background: 'none', border: 'none', color: 'white', display: 'block', fontSize: '1rem', width: '100%', fontWeight: 600 }}
-                     />
-                     <input 
-                       defaultValue={cat.nameAr} 
-                       onBlur={(e) => updateCategory(cat.id, { nameAr: e.target.value })}
-                       style={{ background: 'none', border: 'none', color: 'var(--text-soft)', display: 'block', fontSize: '0.85rem', width: '100%' }}
-                     />
+                     <label className="small opacity-50 d-block mb-1" style={{ fontSize: '0.7rem' }}>{isRtl ? 'الاسم' : 'NAMES'}</label>
+                     <div className="d-flex gap-2">
+                       <input 
+                         defaultValue={cat.name} 
+                         onBlur={(e) => updateCategory(cat.id, { name: e.target.value })}
+                         placeholder="English"
+                         style={{ flex: 1, background: 'none', border: 'none', color: 'white', fontSize: '1rem', fontWeight: 600, padding: 0 }}
+                       />
+                       <input 
+                         defaultValue={cat.nameAr} 
+                         onBlur={(e) => updateCategory(cat.id, { nameAr: e.target.value })}
+                         placeholder="Arabic"
+                         dir="rtl"
+                         style={{ flex: 1, background: 'none', border: 'none', color: 'var(--text-soft)', fontSize: '0.9rem', textAlign: isRtl ? 'right' : 'left', padding: 0 }}
+                       />
+                     </div>
                   </div>
-                  <button onClick={() => setConfirmDelete({ type: 'category', id: cat.id, name: isRtl ? cat.nameAr : cat.name })} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', padding: '5px' }}><i className="bi bi-trash"></i></button>
+                  <button onClick={() => {
+                    const itemCount = items.filter(i => i.categoryId === cat.id).length;
+                    setConfirmDelete({ type: 'category', id: cat.id, name: isRtl ? cat.nameAr : cat.name, count: itemCount });
+                  }} style={{ background: 'rgba(255,77,77,0.1)', border: 'none', color: '#ff4d4d', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="bi bi-trash"></i></button>
                 </div>
               ))}
             </div>

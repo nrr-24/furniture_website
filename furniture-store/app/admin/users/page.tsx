@@ -7,10 +7,10 @@ import { useLanguage } from '../../../data/LanguageContext';
 export default function AdminUsersPage() {
   const { isAdmin, isCustomer } = useAuth();
   const { isRtl, t } = useLanguage();
-  
+
   const [users, setUsers] = useState<User[]>([]);
   const [masterAdminId, setMasterAdminId] = useState<string | null>(null);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -91,14 +91,14 @@ export default function AdminUsersPage() {
     e.preventDefault();
     if (!newEmail || !newPassword) return;
     setIsCreating(true);
-    
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newEmail, password: newPassword }),
       });
-      
+
       const data = await res.json();
       if (res.ok && data.user) {
         setUsers([...users, data.user]);
@@ -122,8 +122,8 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '80px', flex: 1, color: 'var(--text-main)', textAlign: 'center' }}>
-         <div className="spinner-border text-info mb-3"></div>
-         <p>{isRtl ? 'جاري تحميل المستخدمين...' : 'Loading access control...'}</p>
+        <div className="spinner-border text-info mb-3"></div>
+        <p>{isRtl ? 'جاري تحميل المستخدمين...' : 'Loading access control...'}</p>
       </main>
     );
   }
@@ -135,7 +135,7 @@ export default function AdminUsersPage() {
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        
+
         {/* Header Section */}
         <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
           <div>
@@ -144,9 +144,9 @@ export default function AdminUsersPage() {
               {isRtl ? 'إدارة المستخدمين' : 'User Base'}
             </h1>
           </div>
-          <button 
+          <button
             onClick={() => setIsFormVisible(!isFormVisible)}
-            className="hero-primary-btn" 
+            className="hero-primary-btn"
             style={{ minHeight: '48px', padding: '0 24px', borderRadius: '12px', gap: '8px', border: 'none' }}
           >
             <i className={`bi ${isFormVisible ? 'bi-dash-lg' : 'bi-plus-lg'}`}></i>
@@ -160,9 +160,9 @@ export default function AdminUsersPage() {
             <h4 style={{ marginBottom: '20px', fontSize: '1.2rem' }}>{isRtl ? 'إضافة مستخدم جديد للنظام' : 'Provision New System Access'}</h4>
             <form onSubmit={handleCreateUser} className="row g-3">
               <div className="col-md-5">
-                <input 
-                  type="email" 
-                  className="form-control bg-dark text-white border-secondary" 
+                <input
+                  type="email"
+                  className="form-control bg-dark text-white border-secondary"
                   placeholder={isRtl ? 'البريد الإلكتروني' : 'Email Address'}
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
@@ -171,9 +171,9 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="col-md-5">
-                <input 
-                  type="password" 
-                  className="form-control bg-dark text-white border-secondary" 
+                <input
+                  type="password"
+                  className="form-control bg-dark text-white border-secondary"
                   placeholder={isRtl ? 'كلمة المرور' : 'Secure Password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -193,21 +193,26 @@ export default function AdminUsersPage() {
         {/* Search Bar */}
         <div style={{ position: 'relative', marginBottom: '30px' }}>
           <i className="bi bi-search" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}></i>
-          <input 
-            type="text" 
-            className="form-control border-0" 
-            style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              color: 'white', 
-              padding: '16px 20px 16px 50px', 
+          <input
+            type="text"
+            className="form-control border-0"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              color: 'white',
+              padding: '16px 20px 16px 50px',
               borderRadius: '16px',
               fontSize: '1rem',
               backdropFilter: 'blur(10px)'
-            }} 
+            }}
             placeholder={isRtl ? 'تصفية حسب البريد أو الدور...' : 'Filter by email, role or permalink...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          <style jsx>{`
+            input::placeholder {
+              color: rgba(255, 255, 255, 0.4) !important;
+            }
+          `}</style>
         </div>
 
         {error && <div className="alert alert-danger" style={{ borderRadius: '12px' }}>{error}</div>}
@@ -217,22 +222,22 @@ export default function AdminUsersPage() {
           {filteredUsers.map(user => {
             const isMaster = user.id === masterAdminId;
             return (
-              <div 
-                key={user.id} 
+              <div
+                key={user.id}
                 className="user-row transition-all"
-                style={{ 
-                  background: 'var(--bg-panel)', 
-                  borderRadius: '16px', 
-                  padding: '18px 24px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
+                style={{
+                  background: 'var(--bg-panel)',
+                  borderRadius: '16px',
+                  padding: '18px 24px',
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: '20px',
                   border: '1px solid var(--line-soft)',
                 }}
               >
                 {/* Avatar Icon */}
-                <div style={{ 
-                  width: '44px', height: '44px', borderRadius: '50%', 
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '50%',
                   background: isMaster ? 'linear-gradient(45deg, #FFD700, #FFA500)' : 'linear-gradient(45deg, var(--blue-deep), var(--blue-accent))',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontWeight: 800, fontSize: '0.8rem', color: isMaster ? '#000' : '#fff'
@@ -249,23 +254,23 @@ export default function AdminUsersPage() {
                 {/* Role Badge / Switch */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                   {isMaster ? (
-                    <span style={{ 
-                      background: 'rgba(255, 215, 0, 0.15)', color: '#FFD700', padding: '6px 14px', 
+                    <span style={{
+                      background: 'rgba(255, 215, 0, 0.15)', color: '#FFD700', padding: '6px 14px',
                       borderRadius: '50px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase'
                     }}>
                       Master Admin
                     </span>
                   ) : (
                     <div style={{ position: 'relative' }}>
-                      <select 
-                        className="form-select-sm" 
-                        style={{ 
-                          background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', 
+                      <select
+                        className="form-select-sm"
+                        style={{
+                          background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)',
                           border: '1px solid var(--line-soft)', borderRadius: '10px',
                           padding: '6px 30px 6px 12px', cursor: 'pointer', appearance: 'none',
                           fontSize: '0.85rem'
                         }}
-                        value={user.role} 
+                        value={user.role}
                         onChange={(e) => handleUpdateRole(user.id, e.target.value as Role)}
                       >
                         <option value="customer">{isRtl ? 'عميل' : 'Customer'}</option>
@@ -276,11 +281,11 @@ export default function AdminUsersPage() {
                   )}
 
                   {!isMaster && (
-                    <button 
+                    <button
                       className="btn-trash-sleek"
                       onClick={() => handleDeleteUser(user.id)}
-                      style={{ 
-                        background: 'rgba(255, 77, 77, 0.1)', border: 'none', color: '#ff4d4d', 
+                      style={{
+                        background: 'rgba(255, 77, 77, 0.1)', border: 'none', color: '#ff4d4d',
                         width: '36px', height: '36px', borderRadius: '10px', transition: '0.2s'
                       }}
                     >
@@ -304,7 +309,6 @@ export default function AdminUsersPage() {
       <style jsx>{`
         .user-row:hover {
           background: rgba(255,255,255,0.03) !important;
-          transform: translateX(5px);
           border-color: var(--blue-deep) !important;
         }
         .btn-trash-sleek:hover {

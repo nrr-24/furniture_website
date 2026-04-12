@@ -92,85 +92,96 @@ export default function Navbar() {
             </div>
 
             {/* Cart Sidebar Modal */}
-            {isCartOpen && isCustomer && (
-                <div style={{
+            <div 
+                style={{
                     position: 'fixed',
                     inset: 0,
                     backgroundColor: 'rgba(0,0,0,0.5)',
+                    backdropFilter: 'blur(8px)',
                     zIndex: 2000,
+                    opacity: isCartOpen ? 1 : 0,
+                    visibility: isCartOpen ? 'visible' : 'hidden',
+                    transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
                     display: 'flex',
                     justifyContent: isRtl ? 'flex-start' : 'flex-end'
-                }}>
-                    <div style={{
-                        width: '400px',
-                        maxWidth: '100%',
+                }}
+                onClick={() => setIsCartOpen(false)}
+            >
+                <div 
+                    style={{
+                        width: '450px',
+                        maxWidth: '90%',
                         backgroundColor: 'var(--bg-main)',
                         height: '100%',
-                        padding: '24px',
-                        boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
+                        padding: '30px',
+                        boxShadow: isRtl ? '10px 0 40px rgba(0,0,0,0.4)' : '-10px 0 40px rgba(0,0,0,0.4)',
                         overflowY: 'auto',
                         display: 'flex',
-                        flexDirection: 'column'
-                    }}>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h3 style={{ margin: 0, color: 'var(--text-main)' }}>{isRtl ? 'عربة التسوق' : 'Shopping Cart'}</h3>
-                            <button
-                                onClick={() => setIsCartOpen(false)}
-                                style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer' }}
-                            >
-                                &times;
-                            </button>
-                        </div>
+                        flexDirection: 'column',
+                        transform: isCartOpen ? 'translateX(0)' : (isRtl ? 'translateX(-100%)' : 'translateX(100%)'),
+                        transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+                        borderLeft: isRtl ? 'none' : '1px solid var(--line-soft)',
+                        borderRight: isRtl ? '1px solid var(--line-soft)' : 'none'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="d-flex justify-content-between align-items-center mb-5">
+                        <h3 style={{ margin: 0, fontWeight: 700, letterSpacing: '1px' }}>{isRtl ? 'عربة التسوق' : 'Shopping Cart'}</h3>
+                        <button
+                            onClick={() => setIsCartOpen(false)}
+                            style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', width: '36px', height: '36px', borderRadius: '50%', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }}
+                        >
+                            &times;
+                        </button>
+                    </div>
 
-                        <div style={{ flex: 1, overflowY: 'auto' }}>
-                            {cart.length === 0 ? (
-                                <p style={{ color: 'var(--text-soft)', textAlign: 'center', marginTop: '40px' }}>
-                                    {isRtl ? 'العربة فارغة' : 'Your cart is empty.'}
-                                </p>
-                            ) : (
-                                <div className="d-flex flex-column gap-3">
-                                    {cart.map((item) => (
-                                        <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
-                                            <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
-                                            <div style={{ flex: 1 }}>
-                                                <h5 style={{ margin: '0 0 4px', fontSize: '1rem', color: 'var(--text-main)' }}>{isRtl ? item.name : item.name}</h5>
-                                                <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.9rem' }}>${item.price}</p>
-                                            </div>
-                                            <div className="d-flex align-items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    value={item.quantity}
-                                                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                                                    style={{ width: '50px', background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--line-soft)', borderRadius: '4px', padding: '4px' }}
-                                                />
-                                                <button
-                                                    onClick={() => removeFromCart(item.id)}
-                                                    style={{ background: 'transparent', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}
-                                                >
-                                                    <i className="bi bi-trash"></i>
-                                                </button>
-                                            </div>
+                    <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
+                        {cart.length === 0 ? (
+                            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.5 }}>
+                                <i className="bi bi-cart-x" style={{ fontSize: '3rem', display: 'block', marginBottom: '15px' }}></i>
+                                <p style={{ fontSize: '1.1rem' }}>{isRtl ? 'العربة فارغة حالياً' : 'Your cart is empty.'}</p>
+                            </div>
+                        ) : (
+                            <div className="d-flex flex-column gap-4">
+                                {cart.map((item) => (
+                                    <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--line-soft)' }}>
+                                        <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
+                                        <div style={{ flex: 1 }}>
+                                            <h5 style={{ margin: '0 0 6px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
+                                            <p style={{ margin: 0, color: 'var(--blue-main)', fontSize: '1rem', fontWeight: 700 }}>${item.price}</p>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {cart.length > 0 && (
-                            <div style={{ paddingTop: '20px', borderTop: '1px solid var(--line-soft)', marginTop: '20px' }}>
-                                <div className="d-flex justify-content-between mb-3">
-                                    <span style={{ fontSize: '1.2rem', color: 'var(--text-main)' }}>{isRtl ? 'المجموع' : 'Total'}:</span>
-                                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-main)' }}>${totalPrice.toFixed(2)}</span>
-                                </div>
-                                <button className="hero-primary-btn w-100" style={{ padding: '16px' }}>
-                                    {isRtl ? 'إتمام الشراء' : 'Checkout'}
-                                </button>
+                                        <div className="d-flex flex-column align-items-center gap-2">
+                                            <div className="d-flex align-items-center gap-3" style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '8px' }}>
+                                                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', color: 'white', padding: 0 }}>-</button>
+                                                <span style={{ minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ background: 'none', border: 'none', color: 'white', padding: 0 }}>+</button>
+                                            </div>
+                                            <button
+                                                onClick={() => removeFromCart(item.id)}
+                                                style={{ background: 'transparent', border: 'none', color: '#ff4d4d', fontSize: '0.8rem', opacity: 0.7 }}
+                                            >
+                                                {isRtl ? 'إزالة' : 'Remove'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
+
+                    {cart.length > 0 && (
+                        <div style={{ paddingTop: '30px', borderTop: '1px solid var(--line-soft)', marginTop: '30px' }}>
+                            <div className="d-flex justify-content-between mb-4">
+                                <span style={{ fontSize: '1.1rem', opacity: 0.7 }}>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
+                                <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>${totalPrice.toLocaleString()}</span>
+                            </div>
+                            <button className="hero-primary-btn w-100 shadow-lg" style={{ minHeight: '64px', fontSize: '1.1rem', borderRadius: '18px' }}>
+                                {isRtl ? 'إتمام الطلب' : 'CHECKOUT NOW'}
+                            </button>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </nav>
     );
 }

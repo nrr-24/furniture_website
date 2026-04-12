@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../data/AuthContext';
 import { useLanguage } from '../../data/LanguageContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const { user, updateUser, logout, isAdmin } = useAuth();

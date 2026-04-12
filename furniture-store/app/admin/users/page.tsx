@@ -324,7 +324,7 @@ export default function AdminUsersPage() {
                     </div>
                     <div className="d-flex gap-3">
                        <span style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>{user.role}</span>
-                       <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Joined {new Date(user.created_at).toLocaleDateString()}</span>
+                       <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Joined {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
                     </div>
                   </div>
 
@@ -385,7 +385,7 @@ export default function AdminUsersPage() {
                                 <div key={order.id} style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
                                   <div className="d-flex justify-content-between mb-2">
                                     <span style={{ fontWeight: 700 }}>#{order.id.substring(0,8)}</span>
-                                    <span style={{ opacity: 0.6 }}>{new Date(order.created_at).toLocaleDateString()}</span>
+                                    <span style={{ opacity: 0.6 }}>{order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</span>
                                   </div>
                                   <div className="d-flex justify-content-between align-items-center">
                                     <span style={{ color: 'var(--blue-main)', fontWeight: 700 }}>${order.total_amount}</span>

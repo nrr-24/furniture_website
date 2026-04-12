@@ -326,7 +326,7 @@ export default function Navbar() {
                                             <div key={order.id} style={{ borderRadius: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--line-soft)', padding: '20px' }}>
                                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                                     <div>
-                                                        <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>{new Date(order.created_at).toLocaleDateString()}</div>
+                                                        <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>{order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</div>
                                                         <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Order #{order.id.substring(0,8)}</div>
                                                     </div>
                                                     <span style={{ 

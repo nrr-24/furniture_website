@@ -7,21 +7,29 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
 
-  if (!filename) {
-    return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
-  }
+    if (!filename) {
+      return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
+    }
 
-  if (!request.body) {
-    return NextResponse.json({ error: 'Image body is required' }, { status: 400 });
-  }
+    // Diagnostic check for the admin client
+    if (!supabaseAdmin || supabaseAdmin.auth === undefined) {
+      console.error('Supabase Admin client failed to initialize');
+      return NextResponse.json({ error: 'Storage client initialization failed' }, { status: 500 });
+    }
 
-  try {
-    // Read the request body as an ArrayBuffer
+    try {
+      // Read the request body as an ArrayBuffer
     const arrayBuffer = await request.arrayBuffer();
     const buffer = new Uint8Array(arrayBuffer);
 
+    if (buffer.length === 0) {
+      return NextResponse.json({ error: 'File body is empty' }, { status: 400 });
+    }
+
     // Generate a unique filename to avoid collisions
-    const uniqueName = `${Date.now()}-${filename}`;
+    const uniqueName = `${Date.now()}-${filename.replace(/\s+/g, '_')}`;
+
+    console.log(`Uploading ${filename} as ${uniqueName} (${buffer.length} bytes)...`);
 
     const { data, error } = await supabaseAdmin.storage
       .from('product-images')

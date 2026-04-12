@@ -37,6 +37,21 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
         body: file,
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Upload API Error:', response.status, errorText);
+        alert(`Upload failed (${response.status}): ${errorText.substring(0, 100)}...`);
+        return;
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response received:', text);
+        alert('Unexpected server response. Please check the logs.');
+        return;
+      }
+
       const newBlob = await response.json();
       if (newBlob.url) {
         setFormData({ ...formData, image: newBlob.url });
@@ -44,8 +59,8 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
         alert(newBlob.error || 'Failed to upload image.');
       }
     } catch (error) {
-      console.error('Upload Error:', error);
-      alert('Error uploading image.');
+      console.error('Upload Exception:', error);
+      alert('Network or processing error during upload.');
     } finally {
       setUploading(false);
     }

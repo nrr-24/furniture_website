@@ -147,38 +147,37 @@ export default function Navbar() {
 
             {/* Cart Sidebar Modal */}
             <div 
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    backdropFilter: 'blur(8px)',
-                    zIndex: 2000,
-                    opacity: isCartOpen ? 1 : 0,
-                    visibility: isCartOpen ? 'visible' : 'hidden',
-                    transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-                    display: 'flex',
-                    justifyContent: isRtl ? 'flex-start' : 'flex-end'
-                }}
-                onClick={() => setIsCartOpen(false)}
-            >
-                <div 
                     style={{
-                        width: '450px',
-                        maxWidth: '90%',
-                        backgroundColor: 'var(--bg-main)',
-                        height: '100%',
-                        padding: '30px',
-                        boxShadow: isRtl ? '10px 0 40px rgba(0,0,0,0.4)' : '-10px 0 40px rgba(0,0,0,0.4)',
-                        overflowY: 'auto',
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(8px)',
+                        zIndex: 2000,
+                        opacity: isCartOpen ? 1 : 0,
+                        visibility: isCartOpen ? 'visible' : 'hidden',
+                        transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
                         display: 'flex',
-                        flexDirection: 'column',
-                        transform: isCartOpen ? 'translateX(0)' : (isRtl ? 'translateX(-100%)' : 'translateX(100%)'),
-                        transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-                        borderLeft: isRtl ? 'none' : '1px solid var(--line-soft)',
-                        borderRight: isRtl ? '1px solid var(--line-soft)' : 'none'
+                        justifyContent: 'flex-end'
                     }}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={() => setIsCartOpen(false)}
                 >
+                    <div 
+                        style={{
+                            width: '450px',
+                            maxWidth: '90%',
+                            backgroundColor: 'var(--bg-main)',
+                            height: '100%',
+                            padding: '30px',
+                            boxShadow: '-10px 0 40px rgba(0,0,0,0.4)',
+                            overflowY: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            transform: isCartOpen ? 'translateX(0)' : 'translateX(100%)',
+                            transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+                            borderLeft: '1px solid var(--line-soft)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                     <div className="d-flex justify-content-between align-items-center mb-5">
                         <h3 style={{ margin: 0, fontWeight: 700, letterSpacing: '1px' }}>{isRtl ? 'عربة التسوق' : 'Shopping Cart'}</h3>
                         <button

@@ -1,8 +1,7 @@
-import { put, list } from '@vercel/blob';
+import { supabase } from '../../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-const USERS_FILENAME = 'users-data.json';
 
 export async function POST(request: Request) {
   try {
@@ -11,38 +10,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    // 1. Fetch existing users
-    const { blobs } = await list({ prefix: USERS_FILENAME });
-    let users: any[] = [];
-    
-    if (blobs.length > 0) {
-      const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
-      users = await dataStore.json();
-    }
-
     const cleanEmail = email.toLowerCase().trim();
     const cleanPassword = password.trim();
 
-    // 2. Check if email exists
-    if (users.find(u => (u.email || '').toLowerCase().trim() === cleanEmail)) {
+    // Check if email already exists
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', cleanEmail)
+      .single();
+
+    if (existing) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
-    // 3. Create new user
-    const newUser = {
-      id: Math.random().toString(36).substring(2, 9),
-      email: cleanEmail,
-      password: cleanPassword, // Storing raw string mock due to serverless constraints without bcrypt
-      role: users.length === 0 ? 'admin' : 'customer' // First user is always admin
-    };
+    // Check if this is the first user (make them admin)
+    const { count } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true });
 
-    users.push(newUser);
+    const role = (count === 0 || count === null) ? 'admin' : 'customer';
 
-    // 4. Save to DB
-    await put(USERS_FILENAME, JSON.stringify(users), {
-      access: 'public',
-      addRandomSuffix: false,
-    });
+    // Insert new user
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert([{
+        email: cleanEmail,
+        password: cleanPassword,
+        role,
+      }])
+      .select()
+      .single();
+
+    if (error || !newUser) {
+      console.error('Signup insert error:', error);
+      return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
+    }
 
     // Strip password from response
     const { password: _, ...userSafe } = newUser;

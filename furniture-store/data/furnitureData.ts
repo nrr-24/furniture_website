@@ -11,6 +11,33 @@ export interface FurnitureItem {
   category: 'sofas' | 'bedrooms' | 'dining' | 'accents';
 }
 
+/** Maps a Supabase DB row to the app-level FurnitureItem */
+export function mapDbRowToItem(row: any): FurnitureItem {
+  return {
+    id: row.id,
+    name: row.name || '',
+    nameAr: row.name_ar || '',
+    description: row.description || '',
+    descriptionAr: row.description_ar || '',
+    image: row.image_url || '',
+    price: row.price || 0,
+    category: row.category || 'sofas',
+  };
+}
+
+/** Maps a FurnitureItem to a Supabase DB row (for insert/update) */
+export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
+  return {
+    name: item.name,
+    name_ar: item.nameAr,
+    description: item.description,
+    description_ar: item.descriptionAr,
+    price: item.price,
+    image_url: item.image,
+    category: item.category,
+  };
+}
+
 export const DEFAULT_ITEMS: FurnitureItem[] = [
   {
     id: '1',

@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { supabase } from '../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -14,13 +14,47 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const blob = await put(filename, request.body, {
-      access: 'public',
-    });
+    // Read the request body as an ArrayBuffer
+    const arrayBuffer = await request.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
 
-    return NextResponse.json(blob);
+    // Generate a unique filename to avoid collisions
+    const uniqueName = `${Date.now()}-${filename}`;
+
+    const { data, error } = await supabase.storage
+      .from('product-images')
+      .upload(uniqueName, buffer, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: getContentType(filename),
+      });
+
+    if (error) {
+      console.error('Supabase Storage upload error:', error);
+      return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+    }
+
+    // Get the public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(data.path);
+
+    return NextResponse.json({ url: publicUrlData.publicUrl });
   } catch (error) {
-    console.error('Error uploading to Vercel Blob:', error);
+    console.error('Error uploading to Supabase Storage:', error);
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
+}
+
+function getContentType(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  const types: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    svg: 'image/svg+xml',
+  };
+  return types[ext || ''] || 'application/octet-stream';
 }

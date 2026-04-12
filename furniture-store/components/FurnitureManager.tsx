@@ -28,7 +28,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
-    
+
     setUploading(true);
     const file = e.target.files[0];
     try {
@@ -36,7 +36,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
         method: 'POST',
         body: file,
       });
-      
+
       const newBlob = await response.json();
       if (newBlob.url) {
         setFormData({ ...formData, image: newBlob.url });
@@ -53,7 +53,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Inject Fallbacks for missing required user data
     const finalData = {
       ...formData,
@@ -85,8 +85,8 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
             {initialItem ? (isRtl ? 'تعديل المنتج' : 'Edit Item') : (isRtl ? 'إضافة منتج' : 'Add Item')}
           </h2>
           {initialItem && (
-            <button 
-              className="hero-secondary-btn border-danger text-danger" 
+            <button
+              className="hero-secondary-btn border-danger text-danger"
               onClick={handleDelete}
               type="button"
               style={{ padding: '8px 16px' }}
@@ -99,43 +99,43 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
           <div className="row g-3">
             <div className="col-md-6">
               <label className="form-label">Name (EN)</label>
-              <input 
-                type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
+              <input
+                type="text" className="form-control bg-dark text-white border-secondary"
+                value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div className="col-md-6">
               <label className="form-label">الاسم (AR)</label>
-              <input 
-                type="text" className="form-control bg-dark text-white border-secondary" 
-                value={formData.nameAr} onChange={e => setFormData({...formData, nameAr: e.target.value})} 
+              <input
+                type="text" className="form-control bg-dark text-white border-secondary"
+                value={formData.nameAr} onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
               />
             </div>
             <div className="col-12">
               <label className="form-label">Description (EN)</label>
-              <textarea 
-                className="form-control bg-dark text-white border-secondary" 
-                value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required 
+              <textarea
+                className="form-control bg-dark text-white border-secondary"
+                value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required
               />
             </div>
             <div className="col-12">
               <label className="form-label">الوصف (AR)</label>
-              <textarea 
-                className="form-control bg-dark text-white border-secondary" 
-                value={formData.descriptionAr} onChange={e => setFormData({...formData, descriptionAr: e.target.value})} required 
+              <textarea
+                className="form-control bg-dark text-white border-secondary"
+                value={formData.descriptionAr} onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })} required
               />
             </div>
             <div className="col-md-5">
               <label className="form-label">Image</label>
               <div className="d-flex gap-2">
-                <input 
-                  type="text" className="form-control bg-dark text-white border-secondary" 
-                  value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} 
+                <input
+                  type="text" className="form-control bg-dark text-white border-secondary"
+                  value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })}
                   placeholder="URL"
                 />
-                <input 
-                  type="file" accept="image/*" className="d-none" 
-                  id={`imageUpload-${initialItem?.id || 'new'}`} onChange={handleImageUpload} 
+                <input
+                  type="file" accept="image/*" className="d-none"
+                  id={`imageUpload-${initialItem?.id || 'new'}`} onChange={handleImageUpload}
                 />
                 <label htmlFor={`imageUpload-${initialItem?.id || 'new'}`} className="btn hero-secondary-btn d-flex align-items-center mb-0" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   {uploading ? (isRtl ? 'جاري الرفع...' : 'Uploading...') : (isRtl ? 'رفع صورة' : 'Upload')}
@@ -144,16 +144,16 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
             </div>
             <div className="col-md-3">
               <label className="form-label">Price</label>
-              <input 
-                type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary" 
-                value={formData.price ?? 0} onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})} required 
+              <input
+                type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
+                value={formData.price ?? 0} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required
               />
             </div>
             <div className="col-md-4">
               <label className="form-label">Category</label>
-              <select 
-                className="form-select bg-dark text-white border-secondary" 
-                value={formData.category} onChange={e => setFormData({...formData, category: e.target.value as any})}
+              <select
+                className="form-select bg-dark text-white border-secondary"
+                value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value as any })}
               >
                 <option value="sofas">Sofas</option>
                 <option value="bedrooms">Bedrooms</option>

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { FurnitureItem, DEFAULT_ITEMS } from './furnitureData';
+import { FurnitureItem, mapDbRowToItem, mapItemToDbRow } from './furnitureData';
+import { supabase } from '../lib/supabase';
 
 interface FurnitureContextType {
   items: FurnitureItem[];
@@ -18,51 +19,83 @@ export function FurnitureProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const loadFromVercel = async () => {
+    const loadProducts = async () => {
       try {
-        const response = await fetch('/api/data', { cache: 'no-store' });
-        const result = await response.json();
-        
-        if (result.items) {
-          setItems(result.items);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Supabase fetch error:', error.message);
+          setItems([]);
         } else {
-          // Initialize fresh Vercel Blob if empty
-          setItems(DEFAULT_ITEMS);
-          await fetch('/api/data', { method: 'POST', body: JSON.stringify(DEFAULT_ITEMS) });
+          setItems((data || []).map(mapDbRowToItem));
         }
       } catch (error) {
-        console.error('Failed to read from Vercel Blob Storage, using defaults.', error);
-        setItems(DEFAULT_ITEMS);
+        console.error('Failed to load products from Supabase:', error);
+        setItems([]);
       } finally {
         setInitialized(true);
       }
     };
-    loadFromVercel();
+    loadProducts();
   }, []);
 
-  const saveItems = async (newItems: FurnitureItem[]) => {
-    // Instantly update UI (Optimistic Update)
-    setItems(newItems);
-    
-    // Background sync to Vercel Storage Blob
-    try {
-      await fetch('/api/data', { method: 'POST', body: JSON.stringify(newItems) });
-    } catch (error) {
-      console.error('Failed to save to Vercel Blob Database', error);
+  const addItem = async (item: Omit<FurnitureItem, 'id'>) => {
+    const dbRow = mapItemToDbRow(item);
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert([dbRow])
+      .select();
+
+    if (error) {
+      console.error('Supabase insert error:', error.message);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setItems(prev => [...prev, mapDbRowToItem(data[0])]);
     }
   };
 
-  const addItem = (item: Omit<FurnitureItem, 'id'>) => {
-    const newItem = { ...item, id: Math.random().toString(36).substr(2, 9) };
-    saveItems([...items, newItem]);
+  const updateItem = async (id: string, updates: Partial<FurnitureItem>) => {
+    // Build partial DB row from the updates
+    const dbUpdates: any = {};
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.nameAr !== undefined) dbUpdates.name_ar = updates.nameAr;
+    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.descriptionAr !== undefined) dbUpdates.description_ar = updates.descriptionAr;
+    if (updates.price !== undefined) dbUpdates.price = updates.price;
+    if (updates.image !== undefined) dbUpdates.image_url = updates.image;
+    if (updates.category !== undefined) dbUpdates.category = updates.category;
+
+    // Optimistic update
+    setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
+
+    const { error } = await supabase
+      .from('products')
+      .update(dbUpdates)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase update error:', error.message);
+    }
   };
 
-  const updateItem = (id: string, updates: Partial<FurnitureItem>) => {
-    saveItems(items.map(i => i.id === id ? { ...i, ...updates } : i));
-  };
+  const deleteItem = async (id: string) => {
+    // Optimistic update
+    setItems(prev => prev.filter(i => i.id !== id));
 
-  const deleteItem = (id: string) => {
-    saveItems(items.filter(i => i.id !== id));
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase delete error:', error.message);
+    }
   };
 
   return (

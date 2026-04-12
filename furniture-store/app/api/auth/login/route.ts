@@ -1,8 +1,7 @@
-import { list } from '@vercel/blob';
+import { supabase } from '../../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-const USERS_FILENAME = 'users-data.json';
 
 export async function POST(request: Request) {
   try {
@@ -11,20 +10,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const { blobs } = await list({ prefix: USERS_FILENAME });
-    
-    if (blobs.length === 0) {
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = password.trim();
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', cleanEmail)
+      .single();
+
+    if (error || !user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
-    const users: any[] = await dataStore.json();
-
-    const cleanEmail = email.toLowerCase().trim();
-    const cleanPassword = password.trim();
-    const user = users.find(u => (u.email || '').toLowerCase().trim() === cleanEmail && u.password === cleanPassword);
-
-    if (!user) {
+    if (user.password !== cleanPassword) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 

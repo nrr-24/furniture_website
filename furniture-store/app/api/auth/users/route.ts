@@ -1,25 +1,22 @@
-import { put, list } from '@vercel/blob';
+import { supabase } from '../../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-const USERS_FILENAME = 'users-data.json';
 
 // Fetch users for Admin Dashboard
 export async function GET() {
   try {
-    const { blobs } = await list({ prefix: USERS_FILENAME });
-    if (blobs.length === 0) return NextResponse.json({ users: [] });
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, email, role, created_at')
+      .order('created_at', { ascending: true });
 
-    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
-    const users: any[] = await dataStore.json();
-    
-    // Strip passwords before sending to front-end admin dashboard
-    const safeUsers = users.map(u => {
-      const { password, ...rest } = u;
-      return rest;
-    });
+    if (error) {
+      console.error('Fetch Users Error:', error);
+      return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+    }
 
-    return NextResponse.json({ users: safeUsers });
+    return NextResponse.json({ users: users || [] });
   } catch (error) {
     console.error('Fetch Users Error:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
@@ -30,29 +27,34 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { action, userId, role } = await request.json();
-    
+
     if (!action || !userId) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
     }
 
-    const { blobs } = await list({ prefix: USERS_FILENAME });
-    if (blobs.length === 0) return NextResponse.json({ error: 'No users found' }, { status: 404 });
-
-    const dataStore = await fetch(`${blobs[0].url}?t=${Date.now()}`, { cache: 'no-store' });
-    let users: any[] = await dataStore.json();
-
     if (action === 'delete') {
-      users = users.filter(u => u.id !== userId);
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Delete user error:', error);
+        return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+      }
     } else if (action === 'updateRole') {
-      users = users.map(u => u.id === userId ? { ...u, role: role || 'customer' } : u);
+      const { error } = await supabase
+        .from('users')
+        .update({ role: role || 'customer' })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Update role error:', error);
+        return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
+      }
     } else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-
-    await put(USERS_FILENAME, JSON.stringify(users), {
-      access: 'public',
-      addRandomSuffix: false,
-    });
 
     return NextResponse.json({ success: true });
 

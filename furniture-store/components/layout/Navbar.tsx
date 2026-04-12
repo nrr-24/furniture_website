@@ -10,7 +10,7 @@ export default function Navbar() {
     const { language, setLanguage, isRtl, t } = useLanguage();
     const { user, logout, isAdmin, isCustomer } = useAuth();
     const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
-    
+
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const toggleLanguage = () => {
@@ -20,9 +20,9 @@ export default function Navbar() {
     return (
         <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
             <Link href="/" className="brand-link">
-                <img 
+                <img
                     src={`/images/LOGO/smartwood-${language}-white.svg`}
-                    alt="SmartWood Logo" 
+                    alt="SmartWood Logo"
                     className="brand-logo-img"
                     style={{ height: '32px', width: 'auto' }}
                 />
@@ -35,15 +35,15 @@ export default function Navbar() {
             </div>
 
             <div className="nav-right-actions">
-                <button 
-                    className="nav-icon-btn" 
-                    style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }} 
-                    onClick={toggleLanguage} 
+                <button
+                    className="nav-icon-btn"
+                    style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}
+                    onClick={toggleLanguage}
                     title={t('switchLang')}
                 >
                     {language === 'en' ? 'AR' : 'EN'}
                 </button>
-                
+
                 {/* Authentication Controls */}
                 {user ? (
                     <div className="d-flex align-items-center gap-3">
@@ -52,7 +52,7 @@ export default function Navbar() {
                                 {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
                             </Link>
                         )}
-                        <button 
+                        <button
                             onClick={logout}
                             style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
                         >
@@ -72,7 +72,7 @@ export default function Navbar() {
 
                 {/* Contact Us / Cart Icon (Customer Only) */}
                 {isCustomer && (
-                    <button 
+                    <button
                         className="contact-cta-btn position-relative d-flex align-items-center gap-2"
                         onClick={() => setIsCartOpen(true)}
                         style={{ padding: '12px 24px' }}
@@ -85,7 +85,7 @@ export default function Navbar() {
                         )}
                     </button>
                 )}
-                
+
                 <Link href="/contact" className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
                     {isRtl ? 'تواصل معنا' : 'CONTACT US'}
                 </Link>
@@ -114,14 +114,14 @@ export default function Navbar() {
                     }}>
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h3 style={{ margin: 0, color: 'var(--text-main)' }}>{isRtl ? 'عربة التسوق' : 'Shopping Cart'}</h3>
-                            <button 
+                            <button
                                 onClick={() => setIsCartOpen(false)}
                                 style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer' }}
                             >
                                 &times;
                             </button>
                         </div>
-                        
+
                         <div style={{ flex: 1, overflowY: 'auto' }}>
                             {cart.length === 0 ? (
                                 <p style={{ color: 'var(--text-soft)', textAlign: 'center', marginTop: '40px' }}>
@@ -137,14 +137,14 @@ export default function Navbar() {
                                                 <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.9rem' }}>${item.price}</p>
                                             </div>
                                             <div className="d-flex align-items-center gap-2">
-                                                <input 
-                                                    type="number" 
-                                                    min="1" 
-                                                    value={item.quantity} 
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={item.quantity}
                                                     onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
                                                     style={{ width: '50px', background: 'transparent', color: 'var(--text-main)', border: '1px solid var(--line-soft)', borderRadius: '4px', padding: '4px' }}
                                                 />
-                                                <button 
+                                                <button
                                                     onClick={() => removeFromCart(item.id)}
                                                     style={{ background: 'transparent', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}
                                                 >

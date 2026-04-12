@@ -8,13 +8,58 @@ import { useState } from 'react';
 
 export default function Navbar() {
     const { language, setLanguage, isRtl, t } = useLanguage();
-    const { user, logout, isAdmin, isCustomer } = useAuth();
+    const { user, logout, isAdmin, isCustomer, updateUser } = useAuth();
     const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
 
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    
+    // Profile Edit State
+    const [editName, setEditName] = useState(user?.full_name || '');
+    const [editPhone, setEditPhone] = useState(user?.phone_number || '');
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveMessage, setSaveMessage] = useState('');
 
     const toggleLanguage = () => {
         setLanguage(language === 'en' ? 'ar' : 'en');
+    };
+
+    const handleSaveProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        setSaveMessage('');
+        
+        const success = await updateUser({
+            full_name: editName,
+            phone_number: editPhone
+        });
+
+        if (success) {
+            setSaveMessage(isRtl ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
+            setTimeout(() => setSaveMessage(''), 3000);
+        } else {
+            setSaveMessage(isRtl ? 'فشل الحفظ. حاول مرة أخرى.' : 'Save failed. Try again.');
+        }
+        setIsSaving(false);
+    };
+
+    // Order History Fetching
+    const [orders, setOrders] = useState<any[]>([]);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+    const [activeTab, setActiveTab] = useState<'info' | 'history'>('info');
+
+    const fetchOrders = async () => {
+        if (!user) return;
+        setIsLoadingOrders(true);
+        try {
+            const res = await fetch(`/api/orders?userId=${user.id}`);
+            const data = await res.json();
+            if (data.orders) setOrders(data.orders);
+        } catch (err) {
+            console.error('Error fetching orders:', err);
+        } finally {
+            setIsLoadingOrders(false);
+        }
     };
 
     return (
@@ -44,7 +89,7 @@ export default function Navbar() {
                     {language === 'en' ? 'AR' : 'EN'}
                 </button>
 
-                {/* Authentication Controls */}
+                {/* Authentication & Profile Controls */}
                 {user ? (
                     <div className="d-flex align-items-center gap-3">
                         {isAdmin && (
@@ -52,6 +97,20 @@ export default function Navbar() {
                                 {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
                             </Link>
                         )}
+                        
+                        {/* Profile Avatar Icon */}
+                        <button 
+                            className="nav-icon-btn" 
+                            onClick={() => {
+                                setIsProfileOpen(true);
+                                if (activeTab === 'history') fetchOrders();
+                            }}
+                            title={isRtl ? 'الملف الشخصي' : 'Profile Settings'}
+                            style={{ fontSize: '1.4rem', color: 'var(--text-main)', opacity: 0.8 }}
+                        >
+                            <i className="bi bi-person-circle"></i>
+                        </button>
+
                         <button
                             onClick={logout}
                             style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
@@ -70,25 +129,237 @@ export default function Navbar() {
                     </div>
                 )}
 
-                {/* Contact Us / Cart Icon (Customer Only) */}
-                {isCustomer && (
-                    <button
-                        className="contact-cta-btn position-relative d-flex align-items-center gap-2"
-                        onClick={() => setIsCartOpen(true)}
-                        style={{ padding: '12px 24px' }}
-                    >
-                        {isRtl ? 'سلة المشتريات' : 'CART'}
-                        {totalItems > 0 && (
-                            <span className="badge rounded-pill bg-danger" style={{ fontSize: '0.7rem', padding: '4px 6px' }}>
-                                {totalItems}
-                            </span>
-                        )}
-                    </button>
-                )}
-
                 <Link href="/contact" className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
                     {isRtl ? 'تواصل معنا' : 'CONTACT US'}
                 </Link>
+            </div>
+
+            {/* Floating Cart Button (FAB) */}
+            {isCustomer && (
+                <button
+                    className="floating-cart-fab pulse"
+                    onClick={() => setIsCartOpen(true)}
+                    style={{
+                        position: 'fixed',
+                        bottom: '30px',
+                        right: isRtl ? 'auto' : '30px',
+                        left: isRtl ? '30px' : 'auto',
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '50%',
+                        background: 'var(--blue-deep)',
+                        color: 'white',
+                        border: 'none',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                        zIndex: 1500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        cursor: 'pointer',
+                        transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    }}
+                >
+                    <i className="bi bi-cart3"></i>
+                    {totalItems > 0 && (
+                        <span style={{
+                            position: 'absolute',
+                            top: '-5px',
+                            right: isRtl ? 'auto' : '-5px',
+                            left: isRtl ? '-5px' : 'auto',
+                            background: '#ff4d4d',
+                            color: 'white',
+                            minWidth: '22px',
+                            height: '22px',
+                            borderRadius: '11px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '0 6px',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                        }}>
+                            {totalItems}
+                        </span>
+                    )}
+                </button>
+            )}
+
+            {/* Profile Modal */}
+            <div 
+                style={{
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    backdropFilter: 'blur(10px)',
+                    zIndex: 3000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: isProfileOpen ? 1 : 0,
+                    visibility: isProfileOpen ? 'visible' : 'hidden',
+                    transition: 'all 0.4s ease',
+                    padding: '20px'
+                }}
+                onClick={() => setIsProfileOpen(false)}
+            >
+                <div 
+                    className="profile-modal shadow-lg"
+                    style={{
+                        width: '550px',
+                        maxWidth: '100%',
+                        maxHeight: '85vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: 'var(--bg-panel)',
+                        borderRadius: '30px',
+                        padding: '40px',
+                        position: 'relative',
+                        border: '1px solid var(--line-soft)',
+                        transform: isProfileOpen ? 'scale(1)' : 'scale(0.9)',
+                        transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button onClick={() => setIsProfileOpen(false)} style={{ position: 'absolute', top: '25px', right: '25px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', width: '32px', height: '32px', borderRadius: '50%', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10 }}>&times;</button>
+                    
+                    <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                        <div style={{ 
+                            width: '70px', height: '70px', borderRadius: '50%', 
+                            background: 'linear-gradient(135deg, var(--blue-main), var(--blue-deep))', 
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto 15px', fontSize: '1.8rem', color: 'white',
+                            boxShadow: '0 10px 30px rgba(13, 26, 99, 0.3)'
+                        }}>
+                            <i className="bi bi-person"></i>
+                        </div>
+                        <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 700 }}>{isRtl ? 'حسابي' : 'My Account'}</h2>
+                    </div>
+
+                    {/* Tabs Navigation */}
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', background: 'rgba(0,0,0,0.2)', padding: '5px', borderRadius: '15px' }}>
+                        <button 
+                            onClick={() => setActiveTab('info')}
+                            style={{ 
+                                flex: 1, padding: '10px', borderRadius: '12px', border: 'none', 
+                                background: activeTab === 'info' ? 'var(--blue-deep)' : 'transparent',
+                                color: 'white', fontSize: '0.9rem', fontWeight: 600, transition: '0.3s'
+                            }}
+                        >
+                            {isRtl ? 'المعلومات' : 'Profile Info'}
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab('history'); fetchOrders(); }}
+                            style={{ 
+                                flex: 1, padding: '10px', borderRadius: '12px', border: 'none', 
+                                background: activeTab === 'history' ? 'var(--blue-deep)' : 'transparent',
+                                color: 'white', fontSize: '0.9rem', fontWeight: 600, transition: '0.3s'
+                            }}
+                        >
+                            {isRtl ? 'الطلبات' : 'Order History'}
+                        </button>
+                    </div>
+
+                    <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
+                        {activeTab === 'info' ? (
+                            <form onSubmit={handleSaveProfile}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-soft)' }}>
+                                        {isRtl ? 'الاسم الكامل' : 'Full Name'}
+                                    </label>
+                                    <input 
+                                        type="text"
+                                        className="form-control"
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '12px', padding: '12px 16px' }}
+                                        placeholder={isRtl ? 'أدخل اسمك' : 'Enter your name'}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '30px' }}>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-soft)' }}>
+                                        {isRtl ? 'رقم الهاتف' : 'Phone Number'}
+                                    </label>
+                                    <input 
+                                        type="tel"
+                                        className="form-control"
+                                        value={editPhone}
+                                        onChange={(e) => setEditPhone(e.target.value)}
+                                        style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '12px', padding: '12px 16px' }}
+                                        placeholder="+123 456 7890"
+                                    />
+                                </div>
+
+                                {saveMessage && (
+                                    <div style={{ 
+                                        marginBottom: '20px', padding: '12px', borderRadius: '10px', 
+                                        background: saveMessage.includes('فشل') || saveMessage.includes('failed') ? 'rgba(255,77,77,0.1)' : 'rgba(0,184,148,0.1)',
+                                        color: saveMessage.includes('فشل') || saveMessage.includes('failed') ? '#ff4d4d' : '#00b894',
+                                        fontSize: '0.9rem', textAlign: 'center'
+                                    }}>
+                                        {saveMessage}
+                                    </div>
+                                )}
+
+                                <button 
+                                    type="submit" 
+                                    disabled={isSaving}
+                                    className="hero-primary-btn w-100"
+                                    style={{ minHeight: '56px', borderRadius: '15px', border: 'none' }}
+                                >
+                                    {isSaving ? '...' : (isRtl ? 'حفظ التغييرات' : 'Save Changes')}
+                                </button>
+                            </form>
+                        ) : (
+                            <div className="order-history-list">
+                                {isLoadingOrders ? (
+                                    <div style={{ textAlign: 'center', padding: '40px' }}><div className="spinner-border text-info"></div></div>
+                                ) : orders.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: '40px', opacity: 0.5 }}>
+                                        <i className="bi bi-receipt" style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}></i>
+                                        {isRtl ? 'لا توجد طلبات سابقة' : 'No order history yet.'}
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        {orders.map(order => (
+                                            <div key={order.id} style={{ borderRadius: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--line-soft)', padding: '20px' }}>
+                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>{new Date(order.created_at).toLocaleDateString()}</div>
+                                                        <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>Order #{order.id.substring(0,8)}</div>
+                                                    </div>
+                                                    <span style={{ 
+                                                        fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', 
+                                                        padding: '4px 10px', borderRadius: '50px',
+                                                        background: order.status === 'delivered' ? 'rgba(0,184,148,0.1)' : 'rgba(255,165,0,0.1)',
+                                                        color: order.status === 'delivered' ? '#00b894' : '#ffa500'
+                                                    }}>
+                                                        {order.status}
+                                                    </span>
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
+                                                    {order.order_items?.map((oi: any) => (
+                                                        <div key={oi.id} className="d-flex justify-content-between align-items-center">
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                                <img src={oi.products?.image_url} style={{ width: '32px', height: '32px', borderRadius: '6px', objectFit: 'cover' }} />
+                                                                <span style={{ fontSize: '0.85rem' }}>{oi.products?.name} <small style={{ opacity: 0.5 }}>x{oi.quantity}</small></span>
+                                                            </div>
+                                                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>${oi.price}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div style={{ borderTop: '1px solid var(--line-soft)', paddingTop: '10px', textAlign: 'right', fontWeight: 800, fontSize: '1.1rem' }}>
+                                                    ${order.total_amount}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Cart Sidebar Modal */}
@@ -182,6 +453,23 @@ export default function Navbar() {
                     )}
                 </div>
             </div>
+
+            <style jsx>{`
+                .floating-cart-fab:hover {
+                    transform: scale(1.1) translateY(-5px);
+                }
+                .floating-cart-fab:active {
+                    transform: scale(0.95);
+                }
+                .pulse {
+                    animation: pulse-animation 2s infinite;
+                }
+                @keyframes pulse-animation {
+                    0% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0.4); }
+                    70% { box-shadow: 0 0 0 20px rgba(13, 26, 99, 0); }
+                    100% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0); }
+                }
+            `}</style>
         </nav>
     );
 }

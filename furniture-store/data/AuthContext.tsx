@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
 
 export type Role = 'admin' | 'customer';
 
@@ -8,12 +9,15 @@ export interface User {
   id: string;
   email: string;
   role: Role;
+  full_name?: string;
+  phone_number?: string;
 }
 
 interface AuthContextProps {
   user: User | null;
   login: (userData: User) => void;
   logout: () => void;
+  updateUser: (updates: Partial<User>) => Promise<boolean>;
   isAdmin: boolean;
   isCustomer: boolean;
 }
@@ -46,6 +50,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('smartwood_user');
   };
 
+  const updateUser = async (updates: Partial<User>) => {
+    if (!user) return false;
+
+    try {
+      // Map frontend camelCase to DB snake_case if needed, 
+      // but here we align them or use direct mapping
+      const dbUpdates: any = {};
+      if (updates.full_name !== undefined) dbUpdates.full_name = updates.full_name;
+      if (updates.phone_number !== undefined) dbUpdates.phone_number = updates.phone_number;
+
+      const { data, error } = await supabase
+        .from('users')
+        .update(dbUpdates)
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        localStorage.setItem('smartwood_user', JSON.stringify(updatedUser));
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Failed to update user profile:', err);
+      return false;
+    }
+  };
+
   if (!initialized) return null;
 
   return (
@@ -54,8 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         logout,
+        updateUser,
         isAdmin: user?.role === 'admin',
-        isCustomer: user?.role === 'customer' || !user, // Allow non-logged-in users strictly viewer access via isCustomer flag (or split it into isGuest if needed, but this allows shop viewing)
+        isCustomer: user?.role === 'customer' || !user,
       }}
     >
       {children}

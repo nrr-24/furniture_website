@@ -1,9 +1,6 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../data/AuthContext';
 import { useLanguage } from '../../data/LanguageContext';
-import Navbar from '../../components/layout/Navbar';
 import Link from 'next/link';
 
 export default function ProfilePage() {
@@ -133,7 +130,6 @@ export default function ProfilePage() {
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'white' }}>
-      <Navbar />
       
       <main style={{ maxWidth: '1200px', margin: '140px auto 100px', padding: '0 40px' }}>
         <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap' }}>

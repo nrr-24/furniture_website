@@ -54,7 +54,7 @@ export default function HomePage() {
         <div className="split-right">
           <div className="split-right-img-container">
             <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.png"
+              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
               alt={isRtl ? 'أثاث فاخر' : 'Luxury Furniture'}
               style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
             />

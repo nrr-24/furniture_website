@@ -208,11 +208,6 @@ export default function AdminUsersPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <style jsx>{`
-            input::placeholder {
-              color: rgba(255, 255, 255, 0.4) !important;
-            }
-          `}</style>
         </div>
 
         {error && <div className="alert alert-danger" style={{ borderRadius: '12px' }}>{error}</div>}
@@ -314,6 +309,9 @@ export default function AdminUsersPage() {
         .btn-trash-sleek:hover {
           background: #ff4d4d !important;
           color: white !important;
+        }
+        input::placeholder {
+          color: rgba(255, 255, 255, 0.4) !important;
         }
       `}</style>
     </main>

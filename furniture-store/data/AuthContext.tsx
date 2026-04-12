@@ -11,6 +11,7 @@ export interface User {
   role: Role;
   full_name?: string;
   phone_number?: string;
+  created_at?: string;
 }
 
 interface AuthContextProps {

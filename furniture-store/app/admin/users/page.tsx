@@ -417,10 +417,14 @@ export default function AdminUsersPage() {
 
       <style jsx>{`
         .user-card:hover {
-          border-color: rgba(255,255,255,0.2);
+          border-color: var(--blue-accent) !important;
         }
-        .user-card.active {
-          margin: 10px 0;
+        .transition-all {
+          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        input::placeholder {
+          color: white !important;
+          opacity: 0.35 !important;
         }
         .admin-label {
           display: block;

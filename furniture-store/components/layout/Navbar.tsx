@@ -57,7 +57,7 @@ export default function Navbar() {
                         )}
                         
                         {/* Profile Link - Hidden in Admin View */}
-                        {!isAdminView && (
+                        {!isAdmin && (
                             <Link 
                                 href="/profile"
                                 className="nav-icon-btn" 

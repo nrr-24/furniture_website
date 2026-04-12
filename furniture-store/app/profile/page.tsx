@@ -6,8 +6,9 @@ import { useLanguage } from '../../data/LanguageContext';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser, logout, isAdmin } = useAuth();
   const { isRtl, language } = useLanguage();
+  const router = useRouter();
 
   const [activeTab, setActiveTab ] = useState<'info' | 'addresses' | 'history'>('info');
   const [saveMessage, setSaveMessage] = useState('');
@@ -28,6 +29,12 @@ export default function ProfilePage() {
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin) {
+      router.push('/admin/users');
+    }
+  }, [isAdmin, router]);
 
   useEffect(() => {
     if (user) {
@@ -202,7 +209,7 @@ export default function ProfilePage() {
                           </div>
                        </div>
 
-                       {saveMessage && (
+                       {!isAdmin && (
                           <div style={{ marginTop: '20px', color: '#00b894', background: 'rgba(0,184,148,0.1)', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
                              {saveMessage}
                           </div>
@@ -362,6 +369,13 @@ export default function ProfilePage() {
            border: 1px solid var(--line-soft) !important;
            color: white !important;
            border-radius: 12px !important;
+        }
+        .transition-all {
+          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        input::placeholder {
+          color: white !important;
+          opacity: 0.35 !important;
         }
       `}</style>
     </div>

@@ -131,9 +131,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', minHeight: '100vh', color: 'white' }}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column' }}>
       
-      <main style={{ maxWidth: '1200px', margin: '140px auto 100px', padding: '0 40px' }}>
+      <main style={{ maxWidth: '1200px', margin: '40px auto 100px', padding: '0 40px', flex: 1, overflowY: 'auto' }}>
         <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap' }}>
           
           {/* Sidebar Navigation */}

@@ -19,23 +19,6 @@ export default function HomePage() {
 
   if (!initialized) return null;
 
-  // Group items by category
-  const groupedItems = items.reduce((acc, item) => {
-    const cat = item.category || 'other';
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(item);
-    return acc;
-  }, {} as Record<string, typeof items>);
-
-  const categories = Object.keys(groupedItems);
-
-  const handleScrollToCategory = (categoryId: string) => {
-    const el = document.getElementById(`category-${categoryId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
 

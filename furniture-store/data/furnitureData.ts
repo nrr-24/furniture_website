@@ -67,7 +67,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'تصاميم مريحة مع حضور بصري قوي.',
     image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80',
     price: 1200,
-    category: 'sofas'
+    categoryId: 'sofas',
+    sortOrder: 0
   },
   {
     id: '2',
@@ -77,7 +78,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'فخامة هادئة لمساحات مريحة وراحة فائقة.',
     image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80',
     price: 850,
-    category: 'bedrooms'
+    categoryId: 'bedrooms',
+    sortOrder: 0
   },
   {
     id: '3',
@@ -87,7 +89,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'طاولات وكراسي مصممة للقاءات لا تُنسى.',
     image: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80',
     price: 1500,
-    category: 'dining'
+    categoryId: 'dining',
+    sortOrder: 0
   },
   {
     id: '4',
@@ -97,7 +100,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'مجموعة من التفاصيل التي تكمل الغرفة.',
     image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
     price: 300,
-    category: 'accents'
+    categoryId: 'accents',
+    sortOrder: 0
   },
   {
     id: '5',
@@ -107,7 +111,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'أريكة بمقاعد عميقة وإسفنج عالي المرونة.',
     image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
     price: 1850,
-    category: 'sofas'
+    categoryId: 'sofas',
+    sortOrder: 1
   },
   {
     id: '6',
@@ -117,7 +122,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'تصميم كلاسيكي من الجلد الإيطالي الفاخر.',
     image: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=900&q=80',
     price: 3200,
-    category: 'sofas'
+    categoryId: 'sofas',
+    sortOrder: 2
   },
   {
     id: '7',
@@ -127,7 +133,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'إطار سرير خشبي بتصميم منخفض وبسيط.',
     image: 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&w=900&q=80',
     price: 2100,
-    category: 'bedrooms'
+    categoryId: 'bedrooms',
+    sortOrder: 1
   },
   {
     id: '8',
@@ -137,7 +144,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'هيكل مظلة أنيق مع خيارات للستائر الشفافة.',
     image: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=900&q=80',
     price: 3500,
-    category: 'bedrooms'
+    categoryId: 'bedrooms',
+    sortOrder: 2
   },
   {
     id: '9',
@@ -147,7 +155,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'سطح طاولة من الرخام الصلب مع أرجل بلمسة نحاسية.',
     image: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&w=900&q=80',
     price: 4500,
-    category: 'dining'
+    categoryId: 'dining',
+    sortOrder: 1
   },
   {
     id: '10',
@@ -157,7 +166,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'طاولة طعام متعددة الاستخدامات تتسع حتى ١٢ شخصاً.',
     image: 'https://images.unsplash.com/photo-1604578762246-41134e37f9cc?auto=format&fit=crop&w=900&q=80',
     price: 2800,
-    category: 'dining'
+    categoryId: 'dining',
+    sortOrder: 2
   },
   {
     id: '11',
@@ -167,7 +177,8 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'مصباح أرضي نحاسي هندسي لإضاءة الزوايا المظلمة.',
     image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
     price: 450,
-    category: 'accents'
+    categoryId: 'accents',
+    sortOrder: 1
   },
   {
     id: '12',
@@ -177,6 +188,7 @@ export const DEFAULT_ITEMS: FurnitureItem[] = [
     descriptionAr: 'سجادة صوف معنقدة يدوياً تتميز بزخارف الفن الحديث.',
     image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80',
     price: 600,
-    category: 'accents'
+    categoryId: 'accents',
+    sortOrder: 2
   }
 ];

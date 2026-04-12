@@ -24,45 +24,28 @@ export function FurnitureProvider({
   const [items, setItems] = useState<FurnitureItem[]>(initialItems);
   const [initialized, setInitialized] = useState(initialItems.length > 0);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Supabase fetch error:', error.message);
-          setItems([]);
-        } else {
-          setItems((data || []).map(mapDbRowToItem));
-        }
-      } catch (error) {
-        console.error('Failed to load products from Supabase:', error);
-        setItems([]);
-      } finally {
-        setInitialized(true);
-      }
-    };
-    loadProducts();
-  }, []);
-
   const addItem = async (item: Omit<FurnitureItem, 'id'>) => {
     const dbRow = mapItemToDbRow(item);
 
-    const { data, error } = await supabase
-      .from('products')
-      .insert([dbRow])
-      .select();
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dbRow),
+      });
 
-    if (error) {
-      console.error('Supabase insert error:', error.message);
-      return;
-    }
+      const { data, error } = await response.json();
 
-    if (data && data.length > 0) {
-      setItems(prev => [...prev, mapDbRowToItem(data[0])]);
+      if (error) {
+        console.error('API insert error:', error);
+        return;
+      }
+
+      if (data) {
+        setItems(prev => [...prev, mapDbRowToItem(data)]);
+      }
+    } catch (err) {
+      console.error('Add item failed:', err);
     }
   };
 
@@ -80,13 +63,14 @@ export function FurnitureProvider({
     // Optimistic update
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
 
-    const { error } = await supabase
-      .from('products')
-      .update(dbUpdates)
-      .eq('id', id);
+    const { data, error } = await fetch('/api/products', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, updates: dbUpdates }),
+    }).then(res => res.json());
 
     if (error) {
-      console.error('Supabase update error:', error.message);
+      console.error('API update error:', error);
     }
   };
 
@@ -94,13 +78,12 @@ export function FurnitureProvider({
     // Optimistic update
     setItems(prev => prev.filter(i => i.id !== id));
 
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
+    const { error } = await fetch(`/api/products?id=${id}`, {
+      method: 'DELETE',
+    }).then(res => res.json());
 
     if (error) {
-      console.error('Supabase delete error:', error.message);
+      console.error('API delete error:', error);
     }
   };
 

@@ -12,6 +12,7 @@ export default function ProfilePage() {
 
   const [activeTab, setActiveTab ] = useState<'info' | 'addresses' | 'history'>('info');
   const [saveMessage, setSaveMessage] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Profile Form State
@@ -81,9 +82,14 @@ export default function ProfilePage() {
       phone_number: editPhone
     });
     if (success) {
+      setSaveStatus('success');
       setSaveMessage(isRtl ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
-      setTimeout(() => setSaveMessage(''), 3000);
+      setTimeout(() => {
+        setSaveMessage('');
+        setSaveStatus(null);
+      }, 3000);
     } else {
+      setSaveStatus('error');
       setSaveMessage(isRtl ? 'فشل الحفظ' : 'Save failed');
     }
     setIsSaving(false);
@@ -209,8 +215,16 @@ export default function ProfilePage() {
                           </div>
                        </div>
 
-                       {!isAdmin && (
-                          <div style={{ marginTop: '20px', color: '#00b894', background: 'rgba(0,184,148,0.1)', padding: '12px', borderRadius: '10px', textAlign: 'center' }}>
+                       {saveMessage && (
+                          <div style={{ 
+                             marginTop: '20px', 
+                             color: saveStatus === 'success' ? '#00b894' : '#ff6b6b', 
+                             background: saveStatus === 'success' ? 'rgba(0,184,148,0.1)' : 'rgba(255,107,107,0.1)', 
+                             padding: '12px', 
+                             borderRadius: '10px', 
+                             textAlign: 'center',
+                             border: `1px solid ${saveStatus === 'success' ? 'rgba(0,184,148,0.2)' : 'rgba(255,107,107,0.2)'}`
+                          }}>
                              {saveMessage}
                           </div>
                        )}

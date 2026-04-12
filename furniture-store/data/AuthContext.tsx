@@ -78,7 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return false;
     } catch (err) {
-      console.error('Failed to update user profile:', err);
+      console.error('Failed to update user profile in Supabase:', err);
+      // If RLS is enabled but policy is missing, err.code will be 42501
       return false;
     }
   };

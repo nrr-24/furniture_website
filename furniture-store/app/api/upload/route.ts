@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     // Generate a unique filename to avoid collisions
     const uniqueName = `${Date.now()}-${filename}`;
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from('product-images')
       .upload(uniqueName, buffer, {
         cacheControl: '3600',
@@ -37,7 +37,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Get the public URL for the uploaded file
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = supabaseAdmin.storage
       .from('product-images')
       .getPublicUrl(data.path);
 

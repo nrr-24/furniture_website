@@ -1,5 +1,5 @@
 import { list } from '@vercel/blob';
-import { supabase } from '../../../lib/supabase';
+import { supabaseAdmin } from '../../../lib/supabase';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +33,7 @@ export async function GET() {
           category: item.category || null,
         }));
 
-        const { data, error } = await supabase.from('products').insert(rows).select();
+        const { data, error } = await supabaseAdmin.from('products').insert(rows).select();
         if (error) {
           results.errors.push(`Products insert error: ${error.message}`);
         } else {
@@ -55,7 +55,7 @@ export async function GET() {
           role: user.role || 'customer',
         }));
 
-        const { data, error } = await supabase.from('users').insert(rows).select();
+        const { data, error } = await supabaseAdmin.from('users').insert(rows).select();
         if (error) {
           results.errors.push(`Users insert error: ${error.message}`);
         } else {

@@ -8,7 +8,7 @@ import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
 
-const FALLBACK_IMAGE = 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.png';
+const FALLBACK_IMAGE = '/images/no-image.png';
 
 export default function ShopPage() {
   const { t, isRtl } = useLanguage();
@@ -366,7 +366,6 @@ export default function ShopPage() {
                 >
                   <div style={{ cursor: 'grab', color: 'var(--text-soft)', padding: '5px' }}><i className="bi bi-list" style={{ fontSize: '1.2rem' }}></i></div>
                   <div style={{ flex: 1 }}>
-                     <label className="small opacity-50 d-block mb-1" style={{ fontSize: '0.7rem' }}>{isRtl ? 'الاسم' : 'NAMES'}</label>
                      <div className="d-flex gap-2">
                        <input 
                          defaultValue={cat.name} 

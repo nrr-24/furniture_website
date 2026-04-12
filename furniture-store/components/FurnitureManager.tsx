@@ -75,7 +75,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
       ...formData,
       name: formData.name.trim() || 'Unnamed Item',
       nameAr: formData.nameAr.trim() || 'منتج غير مسمى',
-      image: formData.image.trim() || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80',
+      image: formData.image.trim() || '/images/no-image.png',
     };
 
     if (initialItem) {

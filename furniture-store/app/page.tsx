@@ -62,7 +62,7 @@ export default function HomePage() {
 
             <div style={{ position: 'absolute', bottom: '40px', left: '40px', color: 'rgba(255,255,255,0.9)' }}>
               <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>01 /</span>
-              <h3 style={{ fontSize: '2rem', fontWeight: 300, margin: 0 }}>{isRtl ? 'تميز لا يضاهى' : 'BESPOKE LUXURY'}</h3>
+              <h3 style={{ fontSize: '2rem', fontWeight: 300, margin: 0 }}>{isRtl ? 'مجموعة بيز' : 'BEEZ COLLECTION'}</h3>
             </div>
           </div>
         </div>

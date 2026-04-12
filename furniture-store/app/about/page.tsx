@@ -103,8 +103,8 @@ export default function AboutPage() {
           </div>
 
           <div style={{ flex: '1 1 400px' }} className="story-side-grid">
-            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20OFF-WHITE.jpg" alt="Factory" />
-            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20BLUE.jpg" alt="Wood Detail" />
+            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20YELLOW.jpg" alt="Factory" />
+            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20GREEN.jpg" alt="Wood Detail" />
             <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20OFF-WHITE.jpg" alt="Design" />
           </div>
         </div>

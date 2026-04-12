@@ -71,7 +71,7 @@ export default function HomePage() {
         <div className="split-right">
           <div className="split-right-img-container">
             <img
-              src="https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
+              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.png"
               alt={isRtl ? 'أثاث فاخر' : 'Luxury Furniture'}
               style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
             />

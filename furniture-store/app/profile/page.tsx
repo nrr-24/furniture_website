@@ -133,45 +133,46 @@ export default function ProfilePage() {
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column' }}>
       
-      <main style={{ maxWidth: '1200px', margin: '40px auto 100px', padding: '0 40px', flex: 1, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap' }}>
-          
-          {/* Sidebar Navigation */}
-          <aside style={{ width: '280px', flexShrink: 0 }}>
-             <div style={{ position: 'sticky', top: '140px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                   <div style={{ 
-                      width: '90px', height: '90px', borderRadius: '50%', 
-                      background: 'linear-gradient(135deg, var(--blue-main), var(--blue-deep))', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      margin: '0 auto 15px', fontSize: '2.2rem', color: 'white',
-                      boxShadow: '0 10px 30px rgba(13, 26, 99, 0.4)'
-                   }}>
-                      <i className="bi bi-person"></i>
-                   </div>
-                   <h2 style={{ fontSize: '1.4rem', margin: 0 }}>{user.full_name || user.email.split('@')[0]}</h2>
-                   <p style={{ opacity: 0.5, fontSize: '0.85rem', marginTop: '5px' }}>{user.email}</p>
-                </div>
+      <main style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, height: 'calc(100% - 40px)', overflow: 'hidden', padding: '0 20px' }}>
+        
+        {/* Sidebar Navigation - Fixed Width, Non-scrolling */}
+        <aside style={{ width: '320px', flexShrink: 0, padding: '40px 20px', borderRight: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column' }}>
+           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <div style={{ 
+                 width: '100px', height: '100px', borderRadius: '50%', 
+                 background: 'linear-gradient(135deg, var(--blue-main), var(--blue-deep))', 
+                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                 margin: '0 auto 20px', fontSize: '2.5rem', color: 'white',
+                 boxShadow: '0 15px 35px rgba(0,0,0,0.3)'
+              }}>
+                 <i className="bi bi-person"></i>
+              </div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>{user.full_name || user.email.split('@')[0]}</h2>
+              <p style={{ opacity: 0.5, fontSize: '0.9rem', marginTop: '6px' }}>{user.email}</p>
+           </div>
 
-                <div className="profile-tabs" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                   <button onClick={() => setActiveTab('info')} className={`profile-tab-btn ${activeTab === 'info' ? 'active' : ''}`}>
-                      <i className="bi bi-person-lines-fill"></i> {isRtl ? 'المعلومات الشخصية' : 'Personal Info'}
-                   </button>
-                   <button onClick={() => setActiveTab('addresses')} className={`profile-tab-btn ${activeTab === 'addresses' ? 'active' : ''}`}>
-                      <i className="bi bi-geo-alt"></i> {isRtl ? 'عنوان الشحن' : 'Shipping Addresses'}
-                   </button>
-                   <button onClick={() => setActiveTab('history')} className={`profile-tab-btn ${activeTab === 'history' ? 'active' : ''}`}>
-                      <i className="bi bi-clock-history"></i> {isRtl ? 'سجل الطلبات' : 'Order History'}
-                   </button>
-                   <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', marginTop: '20px' }}>
-                      <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
-                   </button>
-                </div>
-             </div>
-          </aside>
+           <div className="profile-tabs" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button onClick={() => setActiveTab('info')} className={`profile-tab-btn ${activeTab === 'info' ? 'active' : ''}`}>
+                 <i className="bi bi-person-lines-fill"></i> {isRtl ? 'المعلومات الشخصية' : 'Personal Info'}
+              </button>
+              <button onClick={() => setActiveTab('addresses')} className={`profile-tab-btn ${activeTab === 'addresses' ? 'active' : ''}`}>
+                 <i className="bi bi-geo-alt"></i> {isRtl ? 'عنوان الشحن' : 'Shipping Addresses'}
+              </button>
+              <button onClick={() => setActiveTab('history')} className={`profile-tab-btn ${activeTab === 'history' ? 'active' : ''}`}>
+                 <i className="bi bi-clock-history"></i> {isRtl ? 'سجل الطلبات' : 'Order History'}
+              </button>
+              
+              <div style={{ flex: 1 }}></div>
 
-          {/* Content Area */}
-          <section style={{ flex: 1, minWidth: '300px' }}>
+              <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', borderRadius: 0 }}>
+                 <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
+              </button>
+           </div>
+        </aside>
+
+        {/* Content Area - Independent Scrolling */}
+        <section style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
+           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
              
              {/* Info Tab */}
              {activeTab === 'info' && (
@@ -329,8 +330,8 @@ export default function ProfilePage() {
                 </div>
              )}
 
-          </section>
-        </div>
+           </div>
+        </section>
       </main>
 
       <style jsx>{`

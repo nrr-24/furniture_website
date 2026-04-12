@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 export default function Navbar() {
     const { language, setLanguage, isRtl, t } = useLanguage();
     const { user, logout, isAdmin } = useAuth();
-    const { cart, removeFromCart, updateQuantity, totalItems, isCartOpen, setIsCartOpen } = useCart();
+    const { cart, removeFromCart, updateQuantity, totalItems, totalPrice, isCartOpen, setIsCartOpen } = useCart();
     const pathname = usePathname();
 
     const isCustomer = !user || user.role === 'customer';

@@ -7,29 +7,27 @@ import { AuthProvider } from '../data/AuthContext';
 import { CartProvider } from '../data/CartContext';
 import { FurnitureProvider } from '../data/FurnitureContext';
 import { supabase } from '../lib/supabase';
-import { mapDbRowToItem } from '../data/furnitureData';
+import { mapDbRowToItem, mapDbRowToCategory } from '../data/furnitureData';
 
 export const metadata = {
   title: 'SmartWood | Luxury Furniture',
   description: 'Luxury furniture storefront frontend',
 };
 
-async function getInitialProducts() {
+async function getInitialData() {
   try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: true });
+    const [prodRes, catRes] = await Promise.all([
+      supabase.from('products').select('*').order('sort_order', { ascending: true }),
+      supabase.from('categories').select('*').order('sort_order', { ascending: true })
+    ]);
 
-    if (error) {
-      console.error('Server-side fetch error:', error.message);
-      return [];
-    }
-
-    return (data || []).map(mapDbRowToItem);
+    return {
+      products: (prodRes.data || []).map(mapDbRowToItem),
+      categories: (catRes.data || []).map(mapDbRowToCategory)
+    };
   } catch (error) {
     console.error('Server-side fetch failed:', error);
-    return [];
+    return { products: [], categories: [] };
   }
 }
 
@@ -38,13 +36,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialProducts = await getInitialProducts();
+  const { products, categories } = await getInitialData();
 
   return (
     <html lang="en">
       <body>
         <AuthProvider>
-          <FurnitureProvider initialItems={initialProducts}>
+          <FurnitureProvider initialItems={products} initialCategories={categories}>
             <CartProvider>
               <LanguageProvider>
                 <div className="monolithic-island">

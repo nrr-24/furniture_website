@@ -1,5 +1,12 @@
 
 
+export interface Category {
+  id: string;
+  name: string;
+  nameAr: string;
+  sortOrder: number;
+}
+
 export interface FurnitureItem {
   id: string;
   name: string;
@@ -8,7 +15,8 @@ export interface FurnitureItem {
   descriptionAr: string;
   image: string;
   price: number;
-  category: 'sofas' | 'bedrooms' | 'dining' | 'accents';
+  categoryId: string;
+  sortOrder: number;
 }
 
 /** Maps a Supabase DB row to the app-level FurnitureItem */
@@ -21,7 +29,8 @@ export function mapDbRowToItem(row: any): FurnitureItem {
     descriptionAr: row.description_ar || '',
     image: row.image_url || '',
     price: row.price || 0,
-    category: row.category || 'sofas',
+    categoryId: row.category_id || '',
+    sortOrder: row.sort_order || 0,
   };
 }
 
@@ -34,7 +43,18 @@ export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
     description_ar: item.descriptionAr,
     price: item.price,
     image_url: item.image,
-    category: item.category,
+    category_id: item.categoryId,
+    sort_order: item.sortOrder,
+  };
+}
+
+/** Maps a DB category row to app-level Category */
+export function mapDbRowToCategory(row: any): Category {
+  return {
+    id: row.id,
+    name: row.name,
+    nameAr: row.name_ar,
+    sortOrder: row.sort_order,
   };
 }
 

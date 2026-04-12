@@ -10,9 +10,15 @@ export async function POST(request: Request) {
   try {
     const item = await request.json();
     
+    // Ensure we use category_id and sort_order
+    const dbRow = {
+      ...item,
+      sort_order: item.sort_order || 0
+    };
+
     const { data, error } = await supabaseAdmin
       .from('products')
-      .insert([item])
+      .insert([dbRow])
       .select()
       .single();
 
@@ -30,8 +36,21 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { id, updates } = await request.json();
+    const body = await request.json();
     
+    // Support batch reorder
+    if (Array.isArray(body)) {
+      const promises = body.map(item => 
+        supabaseAdmin
+          .from('products')
+          .update({ sort_order: item.sort_order, category_id: item.category_id })
+          .eq('id', item.id)
+      );
+      await Promise.all(promises);
+      return NextResponse.json({ success: true });
+    }
+
+    const { id, updates } = body;
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
     const { data, error } = await supabaseAdmin
@@ -57,13 +76,19 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const ids = searchParams.get('ids')?.split(',');
     
-    if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    if (!id && !ids) return NextResponse.json({ error: 'ID or IDs required' }, { status: 400 });
 
-    const { error } = await supabaseAdmin
-      .from('products')
-      .delete()
-      .eq('id', id);
+    const query = supabaseAdmin.from('products').delete();
+    
+    if (ids) {
+      query.in('id', ids);
+    } else {
+      query.eq('id', id);
+    }
+
+    const { error } = await query;
 
     if (error) {
       console.error('Product deletion error:', error);

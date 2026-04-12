@@ -11,7 +11,7 @@ interface FurnitureManagerProps {
 }
 
 export default function FurnitureManager({ initialItem, onClose }: FurnitureManagerProps) {
-  const { deleteItem, addItem, updateItem } = useFurniture();
+  const { deleteItem, addItem, updateItem, categories } = useFurniture();
   const { t, isRtl } = useLanguage();
 
   const [formData, setFormData] = useState<Omit<FurnitureItem, 'id'>>({
@@ -21,7 +21,8 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     descriptionAr: initialItem?.descriptionAr || '',
     image: initialItem?.image || '',
     price: initialItem?.price || 0,
-    category: initialItem?.category || 'sofas'
+    categoryId: initialItem?.categoryId || (categories.length > 0 ? categories[0].id : ''),
+    sortOrder: initialItem?.sortOrder || 0
   });
 
   const [uploading, setUploading] = useState(false);
@@ -165,15 +166,19 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               />
             </div>
             <div className="col-md-4">
-              <label className="form-label">Category</label>
+              <label className="form-label">{isRtl ? 'الفئة' : 'Category'}</label>
               <select
                 className="form-select bg-dark text-white border-secondary"
-                value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value as any })}
+                value={formData.categoryId} 
+                onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                required
               >
-                <option value="sofas">Sofas</option>
-                <option value="bedrooms">Bedrooms</option>
-                <option value="dining">Dining</option>
-                <option value="accents">Accents</option>
+                <option value="" disabled>{isRtl ? 'اختر فئة' : 'Select category'}</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {isRtl ? cat.nameAr : cat.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-12 mt-4 d-flex gap-3">

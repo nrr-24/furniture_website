@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           .eq('user_id', user.id);
         
         if (data && !error) {
-          const dbItems: CartItem[] = data.map(row => ({
+          const dbItems: CartItem[] = (data as any[]).map((row: any) => ({
             id: row.products.id,
             name: row.products.name,
             price: row.products.price,

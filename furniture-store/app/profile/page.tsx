@@ -131,12 +131,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       
-      <main style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, height: 'calc(100% - 40px)', overflow: 'hidden', padding: '0 20px' }}>
+      <main style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 20px' }}>
         
-        {/* Sidebar Navigation - Fixed Width, Non-scrolling */}
-        <aside style={{ width: '320px', flexShrink: 0, padding: '40px 20px', borderRight: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column' }}>
+        {/* Sidebar Navigation - Separately scrollable if needed */}
+        <aside style={{ width: '320px', flexShrink: 0, padding: '40px 20px', borderRight: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
               <div style={{ 
                  width: '100px', height: '100px', borderRadius: '50%', 
@@ -162,17 +162,17 @@ export default function ProfilePage() {
                  <i className="bi bi-clock-history"></i> {isRtl ? 'سجل الطلبات' : 'Order History'}
               </button>
               
-              <div style={{ flex: 1 }}></div>
-
-              <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', borderRadius: 0 }}>
-                 <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
-              </button>
+              <div style={{ margin: 'auto 0 40px' }}>
+                 <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', borderRadius: 0 }}>
+                    <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
+                 </button>
+              </div>
            </div>
         </aside>
 
         {/* Content Area - Independent Scrolling */}
         <section style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
-           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+           <div style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '120px' }}>
              
              {/* Info Tab */}
              {activeTab === 'info' && (

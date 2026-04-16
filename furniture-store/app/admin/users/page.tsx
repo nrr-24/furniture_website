@@ -198,14 +198,14 @@ export default function AdminUsersPage() {
   );
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: 'clamp(24px, 5vw, 40px) clamp(16px, 5vw, 60px)', flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
         {/* Header Section */}
         <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <span className="section-kicker" style={{ fontSize: '0.8rem', opacity: 0.6, letterSpacing: '2px' }}>{isRtl ? 'نظام التحكم' : 'ACCESS CONTROL'}</span>
-            <h1 className="smartwood-title" style={{ fontSize: '3rem', margin: 0 }}>
+            <h1 className="smartwood-title" style={{ fontSize: 'clamp(1.8rem, 6vw, 3rem)', margin: 0 }}>
               {isRtl ? 'إدارة المستخدمين' : 'User Base'}
             </h1>
           </div>
@@ -449,6 +449,17 @@ export default function AdminUsersPage() {
         }
         .admin-input::placeholder {
            color: rgba(255, 255, 255, 0.4);
+        }
+        @media (max-width: 767px) {
+          .user-card .col-md-6 {
+            border-left: none !important;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 24px;
+          }
+          .user-card .col-md-6:first-child {
+            border-top: none;
+            padding-top: 0;
+          }
         }
       `}</style>
     </main>

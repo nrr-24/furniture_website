@@ -14,6 +14,12 @@ export const metadata = {
   description: 'Luxury furniture storefront frontend',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
+};
+
 async function getInitialData() {
   try {
     const [prodRes, catRes] = await Promise.all([

@@ -120,13 +120,14 @@ export default function AboutPage() {
             {/* Corner Text overlay inside the image */}
             <div style={{
               position: 'absolute',
-              bottom: '100px',
-              left: '60px',
+              bottom: 'clamp(24px, 6vw, 100px)',
+              left: 'clamp(20px, 5vw, 60px)',
+              right: 'clamp(20px, 5vw, 60px)',
               color: 'rgba(255,255,255,0.9)',
               textAlign: isRtl ? 'right' : 'left'
             }}>
               <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>02 /</span>
-              <h3 style={{ fontSize: '2.2rem', fontWeight: 300, margin: 0, lineHeight: 1.2 }}>
+              <h3 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', fontWeight: 300, margin: 0, lineHeight: 1.2 }}>
                 {isRtl ? 'صُنع في' : 'MADE IN'}<br />
                 <span style={{ fontWeight: 700 }}>{isRtl ? 'الكويت' : 'KUWAIT'}</span>
               </h3>

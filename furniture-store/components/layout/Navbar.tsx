@@ -102,9 +102,9 @@ export default function Navbar() {
                     onClick={() => setIsCartOpen(true)}
                     style={{
                         position: 'fixed',
-                        bottom: '30px',
-                        right: '30px',
-                        left: 'auto',
+                        bottom: 'max(24px, env(safe-area-inset-bottom))',
+                        right: isRtl ? 'auto' : 'max(24px, env(safe-area-inset-right))',
+                        left: isRtl ? 'max(24px, env(safe-area-inset-left))' : 'auto',
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
@@ -164,13 +164,15 @@ export default function Navbar() {
                     }}
                     onClick={() => setIsCartOpen(false)}
                 >
-                    <div 
+                    <div
+                        className="cart-sidebar-panel"
                         style={{
                             width: '450px',
-                            maxWidth: '90%',
+                            maxWidth: '100%',
                             backgroundColor: 'var(--bg-main)',
                             height: '100%',
                             padding: '30px',
+                            paddingBottom: 'max(30px, env(safe-area-inset-bottom))',
                             boxShadow: '-10px 0 40px rgba(0,0,0,0.4)',
                             overflowY: 'auto',
                             display: 'flex',
@@ -253,6 +255,19 @@ export default function Navbar() {
                     0% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0.4); }
                     70% { box-shadow: 0 0 0 20px rgba(13, 26, 99, 0); }
                     100% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0); }
+                }
+                @media (max-width: 600px) {
+                    .floating-cart-fab {
+                        width: 56px !important;
+                        height: 56px !important;
+                        font-size: 1.3rem !important;
+                    }
+                    .cart-sidebar-panel {
+                        padding: 20px !important;
+                    }
+                    .cart-sidebar-panel h3 {
+                        font-size: 1.2rem !important;
+                    }
                 }
             `}</style>
         </>

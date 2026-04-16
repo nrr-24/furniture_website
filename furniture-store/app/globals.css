@@ -84,6 +84,7 @@ body {
   border-radius: 40px;
   background-color: var(--bg-panel);
   height: calc(100vh - 40px);
+  height: calc(100dvh - 40px);
   margin: 20px;
   box-shadow: var(--shadow-main);
   border: 1px solid var(--line-soft);
@@ -106,12 +107,22 @@ main.app-content {
   display: flex;
 }
 
-/* For smaller screens, reduce massive padding */
 @media (max-width: 900px) {
   .monolithic-island {
     height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
     margin: 10px;
     border-radius: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .monolithic-island {
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    border: none;
   }
 }
 
@@ -141,11 +152,22 @@ img {
   flex-wrap: wrap;
   gap: 16px;
   padding: 20px 40px;
+  padding-left: max(40px, env(safe-area-inset-left));
+  padding-right: max(40px, env(safe-area-inset-right));
   z-index: 1000;
   background: transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 991px) {
+  #navbar {
+    padding: 16px 24px;
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+    gap: 12px;
+  }
 }
 
 
@@ -298,7 +320,7 @@ img {
 }
 
 .smartwood-title {
-  font-size: clamp(3.6rem, 8vw, 6.8rem);
+  font-size: clamp(2.4rem, 8vw, 6.8rem);
   line-height: 0.92;
   font-weight: 900;
   letter-spacing: -0.05em;
@@ -386,7 +408,7 @@ img {
 }
 
 .section-spacing {
-  padding: 90px 0;
+  padding: clamp(40px, 9vw, 90px) 0;
 }
 
 .section-heading-wrap {
@@ -403,8 +425,8 @@ img {
 }
 
 .section-title {
-  font-size: clamp(2rem, 4vw, 3.3rem);
-  line-height: 1;
+  font-size: clamp(1.6rem, 5vw, 3.3rem);
+  line-height: 1.1;
   font-weight: 800;
   margin-bottom: 14px;
 }
@@ -486,7 +508,7 @@ img {
   .homepage-left-panel {
     padding: 60px 40px 50px;
   }
-  
+
   .lumiere-nav {
     padding: 16px 20px;
   }
@@ -495,11 +517,11 @@ img {
   .homepage-right-visual {
     min-height: 700px;
   }
-  
+
   .lumiere-split {
     flex-direction: column;
   }
-  
+
   .split-left {
     padding: 40px 20px;
   }
@@ -507,6 +529,33 @@ img {
   .split-right {
     padding: 0;
     min-height: 50vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .split-left {
+    padding: 28px 20px;
+  }
+
+  .split-right {
+    min-height: 40vh;
+  }
+
+  .split-right-img-container {
+    border-radius: 18px;
+  }
+
+  .smartwood-description {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+
+  .hero-primary-btn,
+  .hero-secondary-btn {
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: 0.9rem;
   }
 }
 
@@ -530,46 +579,70 @@ img {
   }
 
   .smartwood-title {
-    font-size: clamp(3rem, 10vw, 5rem);
+    font-size: clamp(2.2rem, 8vw, 5rem);
   }
 }
 
 @media (max-width: 767px) {
-  .lumiere-nav {
+  #navbar {
     padding: 12px 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
     gap: 10px;
+  }
+
+  .brand-logo-img {
+    height: 26px !important;
   }
 
   .nav-center-pills {
     justify-content: center;
     gap: 12px;
+    order: 3;
+    flex-basis: 100%;
   }
 
   .nav-pill-link {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     letter-spacing: 0.05em;
   }
 
   .nav-right-actions {
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 8px;
   }
 
   .contact-cta-btn {
-    padding: 8px 16px;
-    font-size: 0.65rem;
+    padding: 8px 14px;
+    font-size: 0.7rem;
   }
 
   .nav-icon-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.75rem;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
+    font-size: 0.8rem;
+  }
+
+  .mini-gallery-strip {
+    gap: 8px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mini-gallery-strip::-webkit-scrollbar {
+    display: none;
   }
 
   .mini-gallery-strip img {
-    width: 86px;
-    height: 110px;
+    width: 70px;
+    height: 90px;
+    flex-shrink: 0;
   }
 
   .story-side-grid {
@@ -747,12 +820,12 @@ img {
 
 /* --- Timeline --- */
 .timeline-section {
-  padding: 80px 5% 40px;
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 5vw, 5%) clamp(24px, 5vw, 40px);
 }
 
 .timeline-section-header {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: clamp(40px, 8vw, 80px);
 }
 
 .timeline {
@@ -971,6 +1044,16 @@ img {
   position: relative;
   background: var(--bg-main);
   view-timeline: --gallery-scroll block;
+}
+
+@media (max-width: 900px) {
+  .exploding-gallery-container {
+    height: 200vh;
+  }
+
+  .exploding-grid {
+    --big-tile-size: clamp(240px, 90vmin, 500px) !important;
+  }
 }
 
 .sticky-wrapper {

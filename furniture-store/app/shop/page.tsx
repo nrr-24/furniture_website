@@ -108,7 +108,7 @@ export default function ShopPage() {
   };
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: '40px 60px', flex: 1, overflowY: 'auto' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
       <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
@@ -180,7 +180,7 @@ export default function ShopPage() {
 
                   return (
                     <div
-                      className="col-md-6 col-lg-4"
+                      className="col-12 col-sm-6 col-lg-4"
                       key={item.id}
                       draggable={isAdmin}
                       onDragStart={(e) => handleProductDragStart(e, group.id, idx, item.id)}
@@ -301,7 +301,11 @@ export default function ShopPage() {
             onClick={() => { setItemToEdit(null); setIsEditorOpen(true); }}
             className="fixed-add-btn"
             style={{
-              position: 'fixed', bottom: '40px', right: isRtl ? 'auto' : '40px', left: isRtl ? '40px' : 'auto', zIndex: 1000,
+              position: 'fixed',
+              bottom: 'max(24px, env(safe-area-inset-bottom))',
+              right: isRtl ? 'auto' : 'max(24px, env(safe-area-inset-right))',
+              left: isRtl ? 'max(24px, env(safe-area-inset-left))' : 'auto',
+              zIndex: 1000,
               background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50px',
               padding: '16px 32px', fontSize: '1.1rem', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px'
@@ -445,6 +449,10 @@ export default function ShopPage() {
       )}
 
       <style jsx global>{`
+        .shop-main { padding: 40px 60px; }
+        @media (max-width: 991px) { .shop-main { padding: 32px 24px; } }
+        @media (max-width: 600px) { .shop-main { padding: 20px 16px; } }
+
         .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
         .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
         .category-modal::-webkit-scrollbar { width: 6px; }
@@ -540,6 +548,46 @@ export default function ShopPage() {
         .details-modal-animated {
           animation: modalGrab 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
           box-shadow: 0 30px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1) !important;
+        }
+
+        /* Touch devices can't :hover, so reveal the card drawer by default. */
+        @media (hover: none) {
+          .card-hover-drawer {
+            max-height: 120px;
+            margin-top: 10px;
+            opacity: 1;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .shop-item-card {
+            height: 320px;
+            padding: 1.2em;
+          }
+          .card-title { font-size: 1.05rem; }
+          .hover-price { font-size: 1.2rem; }
+
+          .details-modal-animated {
+            flex-direction: column !important;
+            max-height: calc(100dvh - 24px);
+            overflow-y: auto;
+          }
+          .details-modal-animated > div:first-of-type:not(button) {
+            min-height: 240px !important;
+            max-height: 40vh;
+          }
+          .details-modal-animated > div:last-of-type {
+            padding: 24px !important;
+          }
+          .details-modal-animated h2 { font-size: 1.6rem !important; }
+          .details-modal-animated > div:last-of-type > span { font-size: 1.2rem !important; }
+
+          .fixed-add-btn {
+            bottom: max(20px, env(safe-area-inset-bottom)) !important;
+            right: max(20px, env(safe-area-inset-right)) !important;
+            padding: 12px 20px !important;
+            font-size: 0.9rem !important;
+          }
         }
       `}</style>
     </main>

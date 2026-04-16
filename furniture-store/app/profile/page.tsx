@@ -147,10 +147,10 @@ export default function ProfilePage() {
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       
-      <main style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden', padding: '0 20px' }}>
-        
+      <main className="profile-main" style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
         {/* Sidebar Navigation - Separately scrollable if needed */}
-        <aside style={{ width: '320px', flexShrink: 0, padding: '40px 20px', borderRight: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+        <aside className="profile-aside" style={{ width: '320px', flexShrink: 0, padding: '40px 20px', borderRight: '1px solid var(--line-soft)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
               <div style={{ 
                  width: '100px', height: '100px', borderRadius: '50%', 
@@ -185,7 +185,7 @@ export default function ProfilePage() {
         </aside>
 
         {/* Content Area - Independent Scrolling */}
-        <section style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
+        <section className="profile-content" style={{ flex: 1, padding: '40px 60px', overflowY: 'auto' }}>
            <div style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '120px' }}>
              
              {/* Info Tab */}
@@ -357,6 +357,7 @@ export default function ProfilePage() {
       </main>
 
       <style jsx>{`
+        .profile-main { padding: 0 20px; }
         .profile-tab-btn {
           display: flex;
           align-items: center;
@@ -391,6 +392,49 @@ export default function ProfilePage() {
         input::placeholder {
           color: white !important;
           opacity: 0.35 !important;
+        }
+
+        @media (max-width: 900px) {
+          .profile-main { flex-direction: column !important; padding: 0 !important; overflow-y: auto !important; }
+          .profile-aside {
+            width: 100% !important;
+            border-right: none !important;
+            border-bottom: 1px solid var(--line-soft);
+            padding: 24px 16px !important;
+            overflow-y: visible !important;
+          }
+          .profile-aside > div:first-child { margin-bottom: 20px !important; }
+          .profile-aside .profile-tabs {
+            flex-direction: row !important;
+            overflow-x: auto;
+            gap: 8px !important;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+          }
+          .profile-aside .profile-tabs::-webkit-scrollbar { display: none; }
+          .profile-aside .profile-tabs > button {
+            flex-shrink: 0;
+            padding: 10px 16px !important;
+            font-size: 0.85rem;
+          }
+          .profile-aside .profile-tabs > div {
+            margin: 0 !important;
+            flex-shrink: 0;
+          }
+          .profile-aside .profile-tabs > div > button {
+            border-top: none !important;
+            padding-top: 10px !important;
+          }
+          .profile-content { padding: 24px 16px !important; overflow-y: visible !important; }
+          .profile-content > div { padding-bottom: 40px !important; }
+        }
+        @media (max-width: 600px) {
+          .profile-aside > div:first-child > div:first-child {
+            width: 72px !important;
+            height: 72px !important;
+            font-size: 1.8rem !important;
+          }
+          .profile-aside h2 { font-size: 1.2rem !important; }
         }
       `}</style>
     </div>

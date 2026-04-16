@@ -6,14 +6,14 @@ export default function ContactPage() {
   const { t, isRtl } = useLanguage();
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center', alignItems: 'center', padding: '40px 60px' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center', alignItems: 'center', padding: 'clamp(24px, 6vw, 40px) clamp(16px, 5vw, 60px)' }}>
       <section id="contact" style={{ maxWidth: '1000px', width: '100%', background: 'transparent', textAlign: 'center' }}>
-        <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: '3.5rem' }}>{isRtl ? 'تواصل معنا' : 'Contact Us'}</h2>
-        <p style={{ color: 'var(--text-soft)', maxWidth: '600px', margin: '0 auto 60px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+        <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>{isRtl ? 'تواصل معنا' : 'Contact Us'}</h2>
+        <p style={{ color: 'var(--text-soft)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
           {isRtl ? 'نحن هنا لتحويل رؤيتك إلى واقع. تواصل معنا اليوم لتحصل على استشارتك.' : 'We are here to turn your vision into reality. Reach out to us today for a consultation.'}
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '60px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(24px, 6vw, 60px)', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', border: '1px solid var(--line-soft)' }}>
               <i className="bi bi-building" style={{ fontSize: '1.5rem' }}></i>

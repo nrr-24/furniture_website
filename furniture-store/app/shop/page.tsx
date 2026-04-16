@@ -112,7 +112,15 @@ export default function ShopPage() {
       <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)' }}>{t('collections')}</h1>
+          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px' }}>
+            <span className="text-showup" style={{ animationDelay: '0.1s' }}>{isRtl ? 'استكشف' : 'EXPLORE'}</span>
+            <br />
+            <span className="text-reveal" style={{ animationDelay: '0.6s' }}>
+              <span className="text-slidein" style={{ fontWeight: 600, animationDelay: '0.6s' }}>
+                 {isRtl ? 'المجموعات' : 'COLLECTIONS'}
+              </span>
+            </span>
+          </h1>
           <p className="section-text mx-auto" style={{ color: 'var(--text-soft)' }}>{t('collectionDesc')}</p>
 
           {isAdmin && (
@@ -181,89 +189,92 @@ export default function ShopPage() {
                       style={{ opacity: draggedItem?.type === 'product' && draggedItem.id === item.id ? 0.3 : 1 }}
                     >
                       <div
-                        className="furniture-card position-relative"
+                        className="shop-item-card group"
                         style={{ cursor: isAdmin ? 'default' : 'pointer' }}
                         onClick={() => !isAdmin && setSelectedItem(item)}
                       >
                         {isAdmin && (
-                          <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, display: 'flex', gap: '8px' }}>
-                            <div style={{ background: 'rgba(0,0,0,0.5)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab' }}>
+                          <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10 }}>
+                            <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '6px 12px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab' }}>
                               <i className="bi bi-list"></i>
                             </div>
                           </div>
                         )}
 
                         {isAdmin && (
-                          <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, display: 'flex', gap: '8px' }}>
+                          <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10, display: 'flex', gap: '8px' }}>
                             <button
                               onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
-                              className="admin-action-btn"
-                              style={{ background: 'var(--blue-deep)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '36px', height: '36px' }}
+                              className="admin-action-btn shadow-sm"
+                              style={{ background: 'white', color: 'black', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             ><i className="bi bi-pencil-fill"></i></button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setConfirmDelete({ type: 'product', id: item.id, name: isRtl ? item.nameAr : item.name }); }}
-                              className="admin-action-btn"
-                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px' }}
+                              className="admin-action-btn shadow-sm"
+                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             ><i className="bi bi-trash-fill"></i></button>
                           </div>
                         )}
 
-                        <div style={{ overflow: 'hidden', height: '280px' }}>
+                        <div className="card-bg-layer">
                           <img
                             src={item.image || FALLBACK_IMAGE}
                             alt={isRtl ? item.nameAr : item.name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
+                          <div className="card-overlay"></div>
                         </div>
-                        <div className="furniture-card-body d-flex flex-column" style={{ minHeight: '160px' }}>
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 'bold' }}>
+
+                        <div className="card-content">
+                          <div className="card-header">
+                            <h3 className="card-title">
                               {isRtl ? item.nameAr || item.name : item.name}
                             </h3>
-                            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-main)', paddingLeft: '8px' }}>
-                              ${item.price}
-                            </span>
                           </div>
-                          <p style={{ fontSize: '0.9rem', color: 'var(--text-soft)', flex: 1, marginBottom: '16px' }}>
-                            {isRtl ? item.descriptionAr || item.description : item.description}
-                          </p>
 
-                          {isCustomer && (
-                            <div className="mt-auto">
-                              {!inCart ? (
-                                <button
-                                  className="hero-primary-btn w-100"
-                                  style={{ border: 'none', padding: '10px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-                                  onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                                >
-                                  <i className="bi bi-cart-plus"></i> {isRtl ? 'إضافة' : 'Add to Cart'}
-                                </button>
-                              ) : (
-                                <div className="d-flex align-items-center justify-content-between" style={{ background: 'var(--blue-deep)', borderRadius: '8px', padding: '4px' }}>
+                          <div className="card-hover-drawer">
+                            {isCustomer ? (
+                              <div className="hover-inner">
+                                <span className="hover-price">${item.price}</span>
+                                {!inCart ? (
                                   <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (cartItem.quantity > 1) updateQuantity(item.id, cartItem.quantity - 1);
-                                      else removeFromCart(item.id);
-                                    }}
-                                    style={{ border: 'none', background: 'transparent', color: 'var(--text-main)', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    className="hero-primary-btn"
+                                    style={{ border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                                   >
-                                    {cartItem.quantity > 1 ? <i className="bi bi-dash"></i> : <i className="bi bi-trash"></i>}
+                                    <i className="bi bi-cart-plus"></i> {isRtl ? 'أضف' : 'Add'}
                                   </button>
-                                  <span style={{ fontWeight: 'bold', minWidth: '30px', textAlign: 'center' }}>{cartItem.quantity}</span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      updateQuantity(item.id, cartItem.quantity + 1);
-                                    }}
-                                    style={{ border: 'none', background: 'transparent', color: 'var(--text-main)', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                  >
-                                    <i className="bi bi-plus"></i>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                ) : (
+                                  <div className="d-flex align-items-center" style={{ background: 'white', borderRadius: '8px', padding: '4px', gap: '8px', color: 'black' }}>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (cartItem.quantity > 1) updateQuantity(item.id, cartItem.quantity - 1);
+                                        else removeFromCart(item.id);
+                                      }}
+                                      style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    >
+                                      {cartItem.quantity > 1 ? <i className="bi bi-dash"></i> : <i className="bi bi-trash"></i>}
+                                    </button>
+                                    <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{cartItem.quantity}</span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateQuantity(item.id, cartItem.quantity + 1);
+                                      }}
+                                      style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    >
+                                      <i className="bi bi-plus"></i>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                               <div className="hover-inner">
+                                  <span className="hover-price">${item.price}</span>
+                                  <span style={{ color: 'var(--text-soft)', fontSize: '0.9rem' }}>{isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}</span>
+                               </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -409,10 +420,10 @@ export default function ShopPage() {
 
       {/* Item Details Modal (Customer Only) */}
       {selectedItem && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedItem(null)}>
+        <div className="modal-overlay-animated" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedItem(null)}>
           <div
-            className="details-modal"
-            style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '24px', maxWidth: '900px', width: '100%', display: 'flex', flexDirection: isRtl ? 'row-reverse' : 'row', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', position: 'relative' }}
+            className="details-modal-animated"
+            style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '24px', maxWidth: '900px', width: '100%', display: 'flex', flexDirection: isRtl ? 'row-reverse' : 'row', overflow: 'hidden', position: 'relative' }}
             onClick={(e) => e.stopPropagation()}
           >
             <button onClick={() => setSelectedItem(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10 }}>&times;</button>
@@ -437,7 +448,99 @@ export default function ShopPage() {
         .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
         .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
         .category-modal::-webkit-scrollbar { width: 6px; }
-        .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); borderRadius: 10px; }
+        .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); border-radius: 10px; }
+
+        /* Shop Card Redesign */
+        .shop-item-card {
+          height: 440px;
+          border-radius: 1.5em;
+          position: relative;
+          display: flex;
+          justify-content: flex-end;
+          flex-direction: column;
+          padding: 1.5em;
+          z-index: 1;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.4s ease;
+        }
+        .shop-item-card:hover {
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .card-bg-layer {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          z-index: -1;
+        }
+        .card-bg-layer img {
+          width: 100%; height: 100%;
+          object-fit: cover;
+          transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .shop-item-card:hover .card-bg-layer img {
+          transform: scale(1.1);
+        }
+        .card-overlay {
+          position: absolute;
+          top: 0; left: 0; width: 100%; height: 100%;
+          background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
+        }
+        .card-content {
+          color: white;
+          z-index: 2;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5em;
+        }
+        .card-title {
+          font-size: 1.2rem;
+          margin: 0;
+          font-weight: bold;
+        }
+        
+        .card-hover-drawer {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1), margin-top 0.4s ease, opacity 0.4s ease;
+          opacity: 0;
+        }
+        .shop-item-card:hover .card-hover-drawer {
+          max-height: 120px;
+          margin-top: 10px;
+          opacity: 1;
+        }
+        .hover-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 100%;
+          padding-top: 5px;
+        }
+        .hover-price {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: white;
+        }
+
+        /* Smooth grab Modal Animation */
+        @keyframes modalOverlayFade {
+          0% { opacity: 0; backdrop-filter: blur(0px); }
+          100% { opacity: 1; backdrop-filter: blur(8px); }
+        }
+        @keyframes modalGrab {
+          0% { transform: scale(0.8) translateY(80px); opacity: 0; border-radius: 40px; }
+          100% { transform: scale(1) translateY(0); opacity: 1; border-radius: 24px; }
+        }
+        .modal-overlay-animated {
+          animation: modalOverlayFade 0.4s ease forwards;
+        }
+        .details-modal-animated {
+          animation: modalGrab 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+          box-shadow: 0 30px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1) !important;
+        }
       `}</style>
     </main>
   );

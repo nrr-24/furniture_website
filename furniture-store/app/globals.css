@@ -683,13 +683,13 @@ img {
 }
 
 @keyframes textRevealClip {
-  0% { clip-path: inset(0 100% 0 0); }
-  100% { clip-path: inset(0 0% 0 0); }
+  0% { clip-path: inset(-50px 100% -50px -50px); }
+  100% { clip-path: inset(-50px -50px -50px -50px); }
 }
 
 @keyframes textRevealClipRtl {
-  0% { clip-path: inset(0 0 0 100%); }
-  100% { clip-path: inset(0 0 0 0%); }
+  0% { clip-path: inset(-50px -50px -50px 100%); }
+  100% { clip-path: inset(-50px -50px -50px -50px); }
 }
 
 @keyframes textSlideinLtr {
@@ -710,18 +710,18 @@ img {
 
 .text-reveal {
   display: block;
-  clip-path: inset(0 100% 0 0);
+  clip-path: inset(-50px 100% -50px -50px);
   animation: textRevealClip 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .text-slidein {
-  display: inline;
+  display: inline-block;
   transform: translateX(-40px);
   animation: textSlideinLtr 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 [dir="rtl"] .text-reveal {
-  clip-path: inset(0 0 0 100%);
+  clip-path: inset(-50px -50px -50px 100%);
   animation-name: textRevealClipRtl;
 }
 

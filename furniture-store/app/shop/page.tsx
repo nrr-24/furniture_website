@@ -112,16 +112,13 @@ export default function ShopPage() {
       <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px' }}>
-            <span className="text-showup" style={{ animationDelay: '0.1s' }}>{isRtl ? 'استكشف' : 'EXPLORE'}</span>
-            <br />
-            <span className="text-reveal" style={{ animationDelay: '0.6s' }}>
-              <span className="text-slidein" style={{ fontWeight: 600, animationDelay: '0.6s' }}>
-                 {isRtl ? 'المجموعات' : 'COLLECTIONS'}
-              </span>
+          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px', textAlign: 'center' }}>
+            <span className="text-showup" style={{ animationDelay: '0.1s', display: 'block' }}>{isRtl ? 'استكشف' : 'EXPLORE'}</span>
+            <span className="text-reveal" style={{ animationDelay: '0.6s', textAlign: 'center', fontWeight: 600 }}>
+              {isRtl ? 'المجموعات' : 'COLLECTIONS'}
             </span>
           </h1>
-          <p className="section-text mx-auto" style={{ color: 'var(--text-soft)' }}>{t('collectionDesc')}</p>
+          <p className="section-text mx-auto" style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto' }}>{t('collectionDesc')}</p>
 
           {isAdmin && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
@@ -234,14 +231,15 @@ export default function ShopPage() {
                           <div className="card-hover-drawer">
                             {isCustomer ? (
                               <div className="hover-inner">
-                                <span className="hover-price">${item.price}</span>
+                                <span className="hover-price">{item.price} {t('currency')}</span>
                                 {!inCart ? (
                                   <button
                                     className="hero-primary-btn"
-                                    style={{ border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    aria-label={isRtl ? 'إضافة إلى العربة' : 'Add to cart'}
+                                    style={{ border: 'none', width: '40px', height: '40px', borderRadius: '50%', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                                     onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                                   >
-                                    <i className="bi bi-cart-plus"></i> {isRtl ? 'أضف' : 'Add'}
+                                    <i className="bi bi-cart-plus"></i>
                                   </button>
                                 ) : (
                                   <div className="d-flex align-items-center" style={{ background: 'white', borderRadius: '8px', padding: '4px', gap: '8px', color: 'black' }}>
@@ -270,7 +268,7 @@ export default function ShopPage() {
                               </div>
                             ) : (
                                <div className="hover-inner">
-                                  <span className="hover-price">${item.price}</span>
+                                  <span className="hover-price">{item.price} {t('currency')}</span>
                                   <span style={{ color: 'var(--text-soft)', fontSize: '0.9rem' }}>{isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}</span>
                                </div>
                             )}
@@ -436,7 +434,7 @@ export default function ShopPage() {
             </div>
             <div style={{ flex: '1', padding: '40px', display: 'flex', flexDirection: 'column' }}>
               <h2 style={{ fontSize: '2.4rem', marginBottom: '8px', color: 'var(--text-main)', fontWeight: 700 }}> {isRtl ? selectedItem.nameAr : selectedItem.name} </h2>
-              <span style={{ fontSize: '1.5rem', color: 'var(--text-soft)', marginBottom: '24px' }}> ${selectedItem.price} </span>
+              <span style={{ fontSize: '1.5rem', color: 'var(--text-soft)', marginBottom: '24px' }}> {selectedItem.price} {t('currency')} </span>
               <p style={{ color: 'var(--text-soft)', lineHeight: '1.8', marginBottom: 'auto' }}> {isRtl ? selectedItem.descriptionAr : selectedItem.description} </p>
               {isCustomer && (
                 <button className="hero-primary-btn w-100" style={{ marginTop: '30px', padding: '16px', fontSize: '1.1rem' }} onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}>

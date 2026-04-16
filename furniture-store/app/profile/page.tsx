@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
   const { user, updateUser, logout, isAdmin } = useAuth();
-  const { isRtl, language } = useLanguage();
+  const { isRtl, language, t } = useLanguage();
   const router = useRouter();
 
   const [activeTab, setActiveTab ] = useState<'info' | 'addresses' | 'history'>('info');
@@ -331,10 +331,10 @@ export default function ProfilePage() {
                                            <img src={item.products?.image_url} style={{ width: '50px', height: '50px', borderRadius: '12px', objectFit: 'cover' }} />
                                            <div>
                                               <div style={{ fontWeight: 600 }}>{item.products?.name}</div>
-                                              <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>x{item.quantity} @ ${item.price}</div>
+                                              <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>x{item.quantity} @ {item.price} {t('currency')}</div>
                                            </div>
                                         </div>
-                                        <div style={{ fontWeight: 600 }}>${item.price * item.quantity}</div>
+                                        <div style={{ fontWeight: 600 }}>{item.price * item.quantity} {t('currency')}</div>
                                      </div>
                                   ))}
                                </div>
@@ -342,7 +342,7 @@ export default function ProfilePage() {
                                <div style={{ borderTop: '1px solid var(--line-soft)', marginTop: '20px', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <span style={{ opacity: 0.5 }}>Expected Total</span>
                                   <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--blue-main)' }}>
-                                     ${calculateTotal(order)}
+                                     {calculateTotal(order)} {t('currency')}
                                   </span>
                                </div>
                             </div>

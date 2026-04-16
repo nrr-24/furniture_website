@@ -206,7 +206,7 @@ export default function Navbar() {
                                         <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
                                         <div style={{ flex: 1 }}>
                                             <h5 style={{ margin: '0 0 6px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
-                                            <p style={{ margin: 0, color: 'var(--blue-main)', fontSize: '1rem', fontWeight: 700 }}>${item.price}</p>
+                                            <p style={{ margin: 0, color: 'var(--blue-main)', fontSize: '1rem', fontWeight: 700 }}>{item.price} {t('currency')}</p>
                                         </div>
                                         <div className="d-flex flex-column align-items-center gap-2">
                                             <div className="d-flex align-items-center gap-3" style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '8px' }}>
@@ -231,7 +231,7 @@ export default function Navbar() {
                         <div style={{ paddingTop: '30px', borderTop: '1px solid var(--line-soft)', marginTop: '30px' }}>
                             <div className="d-flex justify-content-between mb-4">
                                 <span style={{ fontSize: '1.1rem', opacity: 0.7 }}>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
-                                <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>${totalPrice.toLocaleString()}</span>
+                                <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>{totalPrice.toLocaleString()} {t('currency')}</span>
                             </div>
                             <button className="hero-primary-btn w-100 shadow-lg" style={{ minHeight: '64px', fontSize: '1.1rem', borderRadius: '18px' }}>
                                 {isRtl ? 'إتمام الطلب' : 'CHECKOUT NOW'}

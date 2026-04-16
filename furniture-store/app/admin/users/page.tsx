@@ -6,7 +6,7 @@ import { useLanguage } from '../../../data/LanguageContext';
 
 export default function AdminUsersPage() {
   const { isAdmin, isCustomer } = useAuth();
-  const { isRtl } = useLanguage();
+  const { isRtl, t } = useLanguage();
 
   const [users, setUsers] = useState<User[]>([]);
   const [masterAdminId, setMasterAdminId] = useState<string | null>(null);
@@ -390,7 +390,7 @@ export default function AdminUsersPage() {
                                     <span style={{ opacity: 0.6 }}>{order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</span>
                                   </div>
                                   <div className="d-flex justify-content-between align-items-center">
-                                    <span style={{ color: 'var(--blue-main)', fontWeight: 700 }}>${order.order_items?.reduce((s: number, i: any) => s + (i.price * i.quantity), 0) || order.total_amount}</span>
+                                    <span style={{ color: 'var(--blue-main)', fontWeight: 700 }}>{order.order_items?.reduce((s: number, i: any) => s + (i.price * i.quantity), 0) || order.total_amount} {t('currency')}</span>
                                     <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}>{order.status}</span>
                                   </div>
                                 </div>

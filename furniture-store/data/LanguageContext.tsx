@@ -36,7 +36,8 @@ const translations = {
     aboutTitle: 'A Legacy of Quality',
     aboutDesc: 'Our focus is on pieces that feel polished, durable, and visually calm. Every item is a testament to our commitment to material, form, and the art of living well.',
     discoverOurStory: 'Discover Our Story',
-    switchLang: 'العربية'
+    switchLang: 'العربية',
+    currency: 'K.D'
   },
   ar: {
     home: 'الرئيسية',
@@ -62,7 +63,8 @@ const translations = {
     aboutTitle: 'إرث من الجودة',
     aboutDesc: 'تركيزنا ينصب على القطع التي تبدو صقيلة ومتينة وهادئة بصرياً. كل قطعة هي شهادة على التزامنا بالمواد والشكل وفن الحياة الطيبة.',
     discoverOurStory: 'اكتشف قصتنا',
-    switchLang: 'English'
+    switchLang: 'English',
+    currency: 'د.ك'
   }
 };
 

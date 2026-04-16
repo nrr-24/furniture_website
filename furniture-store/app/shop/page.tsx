@@ -235,9 +235,8 @@ export default function ShopPage() {
                                 <span className="hover-price">{item.price} {t('currency')}</span>
                                 {!inCart ? (
                                   <button
-                                    className="hero-primary-btn"
+                                    className="cart-fab-add"
                                     aria-label={isRtl ? 'إضافة إلى العربة' : 'Add to cart'}
-                                    style={{ border: 'none', width: '40px', height: '40px', borderRadius: '50%', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                                     onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                                   >
                                     <i className="bi bi-cart-plus"></i>
@@ -451,6 +450,39 @@ export default function ShopPage() {
         .shop-main { padding: 40px 60px; }
         @media (max-width: 991px) { .shop-main { padding: 32px 24px; } }
         @media (max-width: 600px) { .shop-main { padding: 20px 16px; } }
+
+        .cart-fab-add {
+          width: 48px;
+          height: 48px;
+          min-width: 48px;
+          flex-shrink: 0;
+          border: none;
+          padding: 0;
+          border-radius: 50%;
+          background: var(--text-main);
+          color: var(--bg-main);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.15rem;
+          cursor: pointer;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+          transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      box-shadow 0.25s ease,
+                      background 0.2s ease;
+        }
+        .cart-fab-add:hover {
+          transform: translateY(-3px) scale(1.06);
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(226, 218, 204, 0.18);
+          background: #fff;
+        }
+        .cart-fab-add:active {
+          transform: translateY(-1px) scale(0.96);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .cart-fab-add i {
+          line-height: 1;
+        }
 
         .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
         .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }

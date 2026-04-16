@@ -1,3 +1,6 @@
+@import "https://unpkg.com/open-props/open-props.min.css";
+@import "https://unpkg.com/open-props/normalize.min.css";
+
 @font-face {
   font-family: 'MontserratArabic';
   src: url('/fonts/Montserrat-Arabic Light 300.otf') format('opentype');
@@ -80,7 +83,6 @@ body {
 .monolithic-island {
   border-radius: 40px;
   background-color: var(--bg-panel);
-  /* Full screen minus a neat edge gap */
   height: calc(100vh - 40px);
   margin: 20px;
   box-shadow: var(--shadow-main);
@@ -89,6 +91,19 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+main.app-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-viewport {
+  min-height: 100%;
+  flex-shrink: 0;
+  display: flex;
 }
 
 /* For smaller screens, reduce massive padding */
@@ -948,4 +963,83 @@ img {
   [dir="rtl"] .timeline-item:nth-child(even) .timeline-content h3 {
     justify-content: flex-end;
   }
+}
+
+/* Exploding Scroll Gallery Style */
+.exploding-gallery-container {
+  height: 400vh; /* Extended space for meaningful scroll range */
+  position: relative;
+  background: var(--bg-main);
+  view-timeline: --gallery-scroll block;
+}
+
+.sticky-wrapper {
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 40px); /* Fit within monolithic frame */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.exploding-grid {
+  --big-tile-size: clamp(300px, 60vmin, 750px);
+  --scale: 0.25;
+  --rotation: 220deg;
+  --tile-size: calc(var(--big-tile-size) / 3);
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1vmin;
+  grid-template: repeat(9, var(--tile-size)) / repeat(9, var(--tile-size));
+  position: relative;
+  
+  /* Use the named view-timeline from the container section */
+  animation: grid-scale-up both linear;
+  animation-timeline: --gallery-scroll;
+  animation-range: entry 10% exit 90%;
+}
+
+@keyframes grid-scale-up {
+  0% { transform: scale(var(--scale)) rotate(0deg); opacity: 0.4; filter: blur(4px); }
+  20% { opacity: 1; filter: blur(0); }
+  100% { transform: scale(0.85) rotate(var(--rotation)); }
+}
+
+.exploding-grid li {
+  padding: 0;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-2);
+  overflow: hidden;
+  grid-column: var(--x1, auto) / var(--x2, auto);
+  grid-row: var(--y1, auto) / var(--y2, auto);
+}
+
+.exploding-grid img {
+  --img-rotation: calc(var(--rotation) * -1);
+  min-width: 150%;
+  height: 150%;
+  object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* Counter-rotate images so they stay level as the grid spins */
+  animation: img-counter-rotate both linear;
+  animation-timeline: --gallery-scroll;
+  animation-range: entry 10% exit 90%;
+}
+
+@keyframes img-counter-rotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(var(--img-rotation)); }
+}
+
+[dir="rtl"] .exploding-grid {
+  --rotation: -220deg;
 }

@@ -65,22 +65,22 @@ export default function AboutPage() {
   ];
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
+    <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
 
       {/* 1. Heritage Split Section — matches Home hero sizing with nav clearance */}
-      <section className="lumiere-split" style={{ height: '100vh', paddingTop: '100px', flexShrink: 0 }}>
+      <section className="lumiere-split hero-viewport">
         {/* Left Side: Copy & Info */}
         <div className="split-left" style={{ justifyContent: 'center' }}>
 
-          <span className="section-kicker animate-fade-up" style={{ marginBottom: '16px', display: 'block', animationDelay: '0.2s' }}>
+          {/* <span className="section-kicker animate-fade-up" style={{ marginBottom: '16px', display: 'block', animationDelay: '0.2s' }}>
             {isRtl ? 'التراث والابتكار' : 'The Heritage & Innovation'}
-          </span>
+          </span> */}
 
           <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px' }}>
-            <span className="text-showup" style={{ animationDelay: '0.4s' }}>{isRtl ? 'عن' : 'ABOUT'}</span>
+            <span className="text-showup" style={{ animationDelay: '0.05s' }}>{isRtl ? 'عن' : 'ABOUT'}</span>
             <br />
-            <span className="text-reveal" style={{ animationDelay: '0.9s' }}>
-              <span className="text-slidein" style={{ fontWeight: 600, animationDelay: '0.9s' }}>{isRtl ? 'سمارت وود' : 'SMARTWOOD'}</span>
+            <span className="text-reveal" style={{ animationDelay: '0.3s' }}>
+              <span className="text-slidein" style={{ fontWeight: 600, animationDelay: '0.3s' }}>{isRtl ? 'سمارت وود' : 'SMARTWOOD'}</span>
             </span>
           </h1>
 

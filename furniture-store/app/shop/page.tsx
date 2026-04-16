@@ -452,7 +452,7 @@ export default function ShopPage() {
 
         /* Shop Card Redesign */
         .shop-item-card {
-          height: 440px;
+          height: 360px;
           border-radius: 1.5em;
           position: relative;
           display: flex;

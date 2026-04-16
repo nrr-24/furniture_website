@@ -67,8 +67,8 @@ export default function AboutPage() {
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
 
-      {/* 1. Heritage Split Section — matches Home hero sizing */}
-      <section className="lumiere-split" style={{ height: 'calc(100vh - 120px)', flexShrink: 0 }}>
+      {/* 1. Heritage Split Section — matches Home hero sizing with nav clearance */}
+      <section className="lumiere-split" style={{ height: '100vh', paddingTop: '100px', flexShrink: 0 }}>
         {/* Left Side: Copy & Info */}
         <div className="split-left" style={{ justifyContent: 'center' }}>
 

@@ -32,7 +32,7 @@ export default function AboutPage() {
       description: isRtl
         ? 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.'
         : 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20YELLOW.jpg',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0003_030.jpg',
       step: '01',
     },
     {
@@ -41,7 +41,7 @@ export default function AboutPage() {
       description: isRtl
         ? 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع ودعم أفضل.'
         : 'A national brand committed to local excellence, faster delivery, and superior support.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20GREEN.jpg',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg',
       step: '02',
     },
     {
@@ -50,7 +50,7 @@ export default function AboutPage() {
       description: isRtl
         ? 'خشب مستدام تم اختباره لتحمل مناخ الخليج الفريد.'
         : 'Sourcing the finest sustainable woods tested to withstand the Gulf\'s unique climate.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20OFF-WHITE.jpg',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0024_009.jpg',
       step: '03',
     },
     {
@@ -59,7 +59,7 @@ export default function AboutPage() {
       description: isRtl
         ? 'سير عمل رقمي يضمن الشفافية والدقة والتسليم في الوقت المحدد.'
         : 'Digitalized production workflow guaranteeing transparency, precision, and on-time delivery.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0032_001.jpg',
       step: '04',
     },
   ];
@@ -110,7 +110,7 @@ export default function AboutPage() {
         <div className="split-right">
           <div className="split-right-img-container reveal-container">
             <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.jpg"
+              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0004_006.jpg"
               alt={isRtl ? 'صناعة الأثاث' : 'Furniture Crafting'}
               className="reveal-inner-img"
               style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
@@ -118,9 +118,9 @@ export default function AboutPage() {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.5) 0%, transparent 100%)' }}></div>
 
             {/* Corner Text overlay inside the image */}
-            <div style={{ 
-              position: 'absolute', 
-              bottom: '100px', 
+            <div style={{
+              position: 'absolute',
+              bottom: '100px',
               left: '60px',
               color: 'rgba(255,255,255,0.9)',
               textAlign: isRtl ? 'right' : 'left'

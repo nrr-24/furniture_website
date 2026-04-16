@@ -629,3 +629,104 @@ img {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(226, 218, 204, 0.6);
 }
+
+/* --- Animations --- */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes imageReveal {
+  from {
+    clip-path: inset(50% round 50%);
+  }
+  to {
+    clip-path: inset(0% round 0%);
+  }
+}
+
+@keyframes imageScale {
+  from {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-container {
+  clip-path: inset(50% round 50%);
+  animation: imageReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.reveal-inner-img {
+  transform: scale(1.2);
+  animation: imageScale 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Text entrance animations (showup + reveal + slidein) */
+@keyframes textShowup {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes textRevealClip {
+  0% { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes textRevealClipRtl {
+  0% { clip-path: inset(0 0 0 100%); }
+  100% { clip-path: inset(0 0 0 0%); }
+}
+
+@keyframes textSlideinLtr {
+  0% { transform: translateX(-40px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes textSlideinRtl {
+  0% { transform: translateX(40px); }
+  100% { transform: translateX(0); }
+}
+
+.text-showup {
+  display: inline-block;
+  opacity: 0;
+  animation: textShowup 0.8s ease forwards;
+}
+
+.text-reveal {
+  display: block;
+  clip-path: inset(0 100% 0 0);
+  animation: textRevealClip 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.text-slidein {
+  display: inline;
+  transform: translateX(-40px);
+  animation: textSlideinLtr 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[dir="rtl"] .text-reveal {
+  clip-path: inset(0 0 0 100%);
+  animation-name: textRevealClipRtl;
+}
+
+[dir="rtl"] .text-slidein {
+  transform: translateX(40px);
+  animation-name: textSlideinRtl;
+}
+

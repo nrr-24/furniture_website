@@ -76,22 +76,21 @@ export default function AboutPage() {
             {isRtl ? 'التراث والابتكار' : 'The Heritage & Innovation'}
           </span> */}
 
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px' }}>
-            <span className="text-showup" style={{ animationDelay: '0.05s' }}>{isRtl ? 'عن' : 'ABOUT'}</span>
-            <br />
-            <span className="text-reveal" style={{ animationDelay: '0.3s' }}>
-              <span className="text-slidein" style={{ fontWeight: 600, animationDelay: '0.3s' }}>{isRtl ? 'سمارت وود' : 'SMARTWOOD'}</span>
+          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px' }}>
+            <span className="text-showup" style={{ animationDelay: '0.05s', display: 'block' }}>{isRtl ? 'عن' : 'ABOUT'}</span>
+            <span className="text-reveal" style={{ animationDelay: '0.3s', fontWeight: 600 }}>
+              {isRtl ? 'سمارت وود' : 'SMARTWOOD'}
             </span>
           </h1>
 
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', color: 'var(--text-soft)', marginBottom: '20px', maxWidth: '600px', lineHeight: 1.8, animationDelay: '1.5s' }}>
+          <p className="smartwood-description animate-fade-up" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '20px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.5s' }}>
             {isRtl
               ? 'في سمارت وود، نحن لا نقوم فقط بتشكيل الخشب؛ نحن نصنع إرثاً. بصفتنا مصنعاً كويتياً رائداً، فقد وضعنا معياراً جديداً في صناعة النجارة والأخشاب.'
               : 'At Smartwood, we don\u2019t just process wood; we craft legacies. As a leading Kuwaiti factory, we have established a new benchmark in the joinery and woodworking industry.'
             }
           </p>
 
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.8, animationDelay: '1.7s' }}>
+          <p className="smartwood-description animate-fade-up" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '32px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.7s' }}>
             {isRtl
               ? 'من خلال دمج تكنولوجيا CNC الأكثر تقدماً في العالم مع نظام إدارة Odoo المتطور، نضمن رحلة سلسة من التصميم المبدئي إلى التنفيذ الخالي من العيوب. مهمتنا هي تزويد السوق الكويتي بحلول خشبية مستدامة وراقية تنافس المعايير العالمية.'
               : 'By integrating the world\u2019s most advanced CNC technology with the sophisticated Odoo management system, we ensure a seamless journey from conceptual design to flawless execution. Our mission is to provide the Kuwaiti market with sustainable, high-end wood solutions that rival international standards.'
@@ -99,7 +98,7 @@ export default function AboutPage() {
           </p>
 
           <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '1.9s' }}>
-            <a href="/shop" className="hero-secondary-btn" style={{ padding: '16px 40px', borderRadius: '12px' }}>
+            <a href="/shop" className="hero-secondary-btn" style={{ padding: 'clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px)', borderRadius: '12px' }}>
               {isRtl ? 'استكشف تصاميمنا' : 'DISCOVER DESIGNS'}
             </a>
           </div>

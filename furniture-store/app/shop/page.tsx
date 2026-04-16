@@ -112,9 +112,10 @@ export default function ShopPage() {
       <div className="container">
         <header style={{ marginBottom: '60px', textAlign: 'center' }}>
           <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-            <span className="text-showup" style={{ animationDelay: '0.1s' }}>{isRtl ? 'استكشف' : 'EXPLORE'}</span>
-            <span className="text-reveal" style={{ animationDelay: '0.6s', fontWeight: 600 }}>{isRtl ? 'المجموعات' : 'COLLECTIONS'}</span>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginTop: 0, marginBottom: '24px', textAlign: 'center', lineHeight: 1.1 }}>
+            {isRtl ? 'استكشف' : 'EXPLORE'}
+            <br />
+            <span style={{ fontWeight: 600 }}>{isRtl ? 'المجموعات' : 'COLLECTIONS'}</span>
           </h1>
           <p className="section-text mx-auto" style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto' }}>{t('collectionDesc')}</p>
 

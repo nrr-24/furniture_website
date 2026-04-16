@@ -730,3 +730,222 @@ img {
   animation-name: textSlideinRtl;
 }
 
+/* --- Timeline --- */
+.timeline-section {
+  padding: 80px 5% 40px;
+}
+
+.timeline-section-header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.timeline {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 0 0;
+}
+
+/* Central vertical line */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--line-soft) 5%, var(--line-soft) 90%, transparent);
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  margin-bottom: 100px;
+  position: relative;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.timeline-item:last-child {
+  margin-bottom: 20px;
+}
+
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.timeline-item:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+/* Node dot on the line */
+.timeline-node {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sand-soft);
+  z-index: 2;
+  box-shadow: 0 0 0 6px var(--bg-panel), 0 0 0 8px var(--line-soft);
+  transition: box-shadow 0.6s ease;
+  flex-shrink: 0;
+}
+
+.timeline-item.visible .timeline-node {
+  box-shadow: 0 0 0 6px var(--bg-panel), 0 0 0 8px var(--sand-soft), 0 0 24px rgba(226, 218, 204, 0.25);
+}
+
+/* Content card */
+.timeline-content {
+  flex: 1;
+  padding: 32px;
+  background: var(--bg-panel);
+  border-radius: 24px;
+  border: 1px solid var(--line-soft);
+}
+
+.timeline-step {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--sand-soft);
+  opacity: 0.12;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.timeline-content h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline-content h3 i {
+  color: var(--sand-soft);
+  font-size: 1.1rem;
+}
+
+.timeline-content p {
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* Image */
+.timeline-img-wrap {
+  flex: 1;
+}
+
+.timeline-img-wrap img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 24px;
+  border: 1px solid var(--line-soft);
+}
+
+/* Odd items: content on left, text aligns toward center */
+.timeline-item:nth-child(odd) .timeline-content {
+  text-align: right;
+}
+
+.timeline-item:nth-child(odd) .timeline-content h3 {
+  justify-content: flex-end;
+}
+
+/* Even items: content on right, text aligns toward center */
+.timeline-item:nth-child(even) .timeline-content {
+  text-align: left;
+}
+
+/* RTL overrides */
+[dir="rtl"] .timeline-item:nth-child(odd) .timeline-content {
+  text-align: left;
+}
+
+[dir="rtl"] .timeline-item:nth-child(odd) .timeline-content h3 {
+  justify-content: flex-start;
+}
+
+[dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
+  text-align: right;
+}
+
+[dir="rtl"] .timeline-item:nth-child(even) .timeline-content h3 {
+  justify-content: flex-end;
+}
+
+/* Mobile timeline */
+@media (max-width: 900px) {
+  .timeline::before {
+    left: 24px;
+  }
+
+  .timeline-item,
+  .timeline-item:nth-child(even) {
+    flex-direction: column;
+    padding-left: 56px;
+    gap: 20px;
+  }
+
+  .timeline-node {
+    left: 24px;
+    top: 32px;
+    transform: translateX(-50%);
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content,
+  .timeline-item:nth-child(even) .timeline-content {
+    text-align: left;
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content h3,
+  .timeline-item:nth-child(even) .timeline-content h3 {
+    justify-content: flex-start;
+  }
+
+  .timeline-img-wrap img {
+    height: 220px;
+  }
+
+  [dir="rtl"] .timeline-item,
+  [dir="rtl"] .timeline-item:nth-child(even) {
+    padding-left: 0;
+    padding-right: 56px;
+  }
+
+  [dir="rtl"] .timeline::before {
+    left: auto;
+    right: 24px;
+  }
+
+  [dir="rtl"] .timeline-node {
+    left: auto;
+    right: 24px;
+    transform: translateX(50%);
+  }
+
+  [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content,
+  [dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
+    text-align: right;
+  }
+
+  [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content h3,
+  [dir="rtl"] .timeline-item:nth-child(even) .timeline-content h3 {
+    justify-content: flex-end;
+  }
+}

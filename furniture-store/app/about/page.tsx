@@ -1,14 +1,74 @@
 'use client';
 
 import { useLanguage } from '../../data/LanguageContext';
+import { useEffect, useRef } from 'react';
 
 export default function AboutPage() {
   const { t, isRtl } = useLanguage();
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    const items = timelineRef.current?.querySelectorAll('.timeline-item');
+    items?.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const timelineData = [
+    {
+      icon: 'bi-cpu',
+      title: isRtl ? 'دقة CNC المتقدمة' : 'Advanced CNC Precision',
+      description: isRtl
+        ? 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.'
+        : 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20YELLOW.jpg',
+      step: '01',
+    },
+    {
+      icon: 'bi-geo-alt',
+      title: isRtl ? 'بفخر صُنع في الكويت' : 'Proudly Made in Kuwait',
+      description: isRtl
+        ? 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع ودعم أفضل.'
+        : 'A national brand committed to local excellence, faster delivery, and superior support.',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20GREEN.jpg',
+      step: '02',
+    },
+    {
+      icon: 'bi-tree',
+      title: isRtl ? 'مصادر مواد فاخرة' : 'Premium Material Sourcing',
+      description: isRtl
+        ? 'خشب مستدام تم اختباره لتحمل مناخ الخليج الفريد.'
+        : 'Sourcing the finest sustainable woods tested to withstand the Gulf\'s unique climate.',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20OFF-WHITE.jpg',
+      step: '03',
+    },
+    {
+      icon: 'bi-clock-history',
+      title: isRtl ? 'تجربة سلسة' : 'Streamlined Experience',
+      description: isRtl
+        ? 'سير عمل رقمي يضمن الشفافية والدقة والتسليم في الوقت المحدد.'
+        : 'Digitalized production workflow guaranteeing transparency, precision, and on-time delivery.',
+      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg',
+      step: '04',
+    },
+  ];
+
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
 
-      {/* 1. Heritage Split Section */}
-      <section className="lumiere-split" style={{ minHeight: 'calc(100vh - 80px)', flexShrink: 0 }}>
+      {/* 1. Heritage Split Section — matches Home hero sizing */}
+      <section className="lumiere-split" style={{ height: 'calc(100vh - 120px)', flexShrink: 0 }}>
         {/* Left Side: Copy & Info */}
         <div className="split-left" style={{ justifyContent: 'center' }}>
 
@@ -27,14 +87,14 @@ export default function AboutPage() {
           <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', color: 'var(--text-soft)', marginBottom: '20px', maxWidth: '600px', lineHeight: 1.8, animationDelay: '1.5s' }}>
             {isRtl
               ? 'في سمارت وود، نحن لا نقوم فقط بتشكيل الخشب؛ نحن نصنع إرثاً. بصفتنا مصنعاً كويتياً رائداً، فقد وضعنا معياراً جديداً في صناعة النجارة والأخشاب.'
-              : 'At Smartwood, we don’t just process wood; we craft legacies. As a leading Kuwaiti factory, we have established a new benchmark in the joinery and woodworking industry.'
+              : 'At Smartwood, we don\u2019t just process wood; we craft legacies. As a leading Kuwaiti factory, we have established a new benchmark in the joinery and woodworking industry.'
             }
           </p>
 
           <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px', lineHeight: 1.8, animationDelay: '1.7s' }}>
             {isRtl
               ? 'من خلال دمج تكنولوجيا CNC الأكثر تقدماً في العالم مع نظام إدارة Odoo المتطور، نضمن رحلة سلسة من التصميم المبدئي إلى التنفيذ الخالي من العيوب. مهمتنا هي تزويد السوق الكويتي بحلول خشبية مستدامة وراقية تنافس المعايير العالمية.'
-              : 'By integrating the world’s most advanced CNC technology with the sophisticated Odoo management system, we ensure a seamless journey from conceptual design to flawless execution. Our mission is to provide the Kuwaiti market with sustainable, high-end wood solutions that rival international standards.'
+              : 'By integrating the world\u2019s most advanced CNC technology with the sophisticated Odoo management system, we ensure a seamless journey from conceptual design to flawless execution. Our mission is to provide the Kuwaiti market with sustainable, high-end wood solutions that rival international standards.'
             }
           </p>
 
@@ -57,7 +117,7 @@ export default function AboutPage() {
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.5) 0%, transparent 100%)' }}></div>
 
-            {/* Corner Text overlay inside the image - Fixed to Left to avoid FAB collision */}
+            {/* Corner Text overlay inside the image */}
             <div style={{ 
               position: 'absolute', 
               bottom: '100px', 
@@ -75,50 +135,30 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 2. Why Smartwood? (The Competitive Edge) */}
-      <section style={{ padding: '100px 5%' }}>
-        <div className="smartwood-story-panel" style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
-          <div style={{ flex: '1 1 400px' }}>
-            <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'The Competitive Edge'}</span>
-            <h2 className="section-title" style={{ marginBottom: '30px' }}>{isRtl ? 'لماذا سمارت وود؟' : 'Why Smartwood?'}</h2>
+      {/* 2. Why Smartwood? — Timeline */}
+      <section className="timeline-section">
+        <div className="timeline-section-header">
+          <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'The Competitive Edge'}</span>
+          <h2 className="section-title" style={{ marginBottom: '0' }}>{isRtl ? 'لماذا سمارت وود؟' : 'Why Smartwood?'}</h2>
+        </div>
 
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <li style={{ display: 'flex', gap: '16px' }}>
-                <i className="bi bi-cpu" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
-                <div>
-                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'دقة CNC المتقدمة' : 'Advanced CNC Precision'}</h4>
-                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'آلات آلية بالكامل تضمن دقة 100٪.' : 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.'}</p>
-                </div>
-              </li>
-              <li style={{ display: 'flex', gap: '16px' }}>
-                <i className="bi bi-geo-alt" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
-                <div>
-                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'بفخر صُنع في الكويت' : 'Proudly Made in Kuwait'}</h4>
-                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع.' : 'A national brand committed to local excellence, faster delivery, and superior support.'}</p>
-                </div>
-              </li>
-              <li style={{ display: 'flex', gap: '16px' }}>
-                <i className="bi bi-tree" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
-                <div>
-                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'مصادر مواد فاخرة' : 'Premium Material'}</h4>
-                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'خشب مستدام تم اختباره لتحمل مناخ الخليج.' : 'Sourcing the finest sustainable woods tested to withstand the Gulf’s unique climate.'}</p>
-                </div>
-              </li>
-              <li style={{ display: 'flex', gap: '16px' }}>
-                <i className="bi bi-clock-history" style={{ fontSize: '1.5rem', color: 'var(--text-main)' }}></i>
-                <div>
-                  <h4 style={{ margin: '0 0 8px', fontSize: '1.2rem' }}>{isRtl ? 'تجربة سلسة' : 'Streamlined Experience'}</h4>
-                  <p style={{ margin: 0, color: 'var(--text-soft)', fontSize: '0.95rem' }}>{isRtl ? 'سير عمل رقمي يضمن الشفافية والدقة.' : 'Digitalized production workflow guaranteeing transparency, precision, and on-time delivery.'}</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div style={{ flex: '1 1 400px' }} className="story-side-grid">
-            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20YELLOW.jpg" alt="Factory" />
-            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/MIST%20GREEN.jpg" alt="Wood Detail" />
-            <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20OFF-WHITE.jpg" alt="Design" />
-          </div>
+        <div className="timeline" ref={timelineRef}>
+          {timelineData.map((item, index) => (
+            <div key={index} className="timeline-item">
+              <div className="timeline-node"></div>
+              <div className="timeline-content">
+                <span className="timeline-step">{item.step}</span>
+                <h3>
+                  <i className={`bi ${item.icon}`}></i>
+                  {item.title}
+                </h3>
+                <p>{item.description}</p>
+              </div>
+              <div className="timeline-img-wrap">
+                <img src={item.image} alt={item.title} />
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

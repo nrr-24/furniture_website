@@ -21,6 +21,7 @@ export default function Navbar() {
     };
 
     return (
+        <>
         <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
             <Link href="/" className="brand-link">
                 <img
@@ -92,8 +93,9 @@ export default function Navbar() {
                     </Link>
                 )}
             </div>
+        </nav>
 
-            {/* Floating Cart Button (FAB) */}
+            {/* Rendered outside <nav>: navbar's backdrop-filter creates a containing block for position:fixed in Safari/Firefox. */}
             {isCustomer && !isAdminView && (
                 <button
                     className="floating-cart-fab pulse"
@@ -152,6 +154,7 @@ export default function Navbar() {
                         inset: 0,
                         backgroundColor: 'rgba(0,0,0,0.5)',
                         backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
                         zIndex: 2000,
                         opacity: isCartOpen ? 1 : 0,
                         visibility: isCartOpen ? 'visible' : 'hidden',
@@ -252,6 +255,6 @@ export default function Navbar() {
                     100% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0); }
                 }
             `}</style>
-        </nav>
+        </>
     );
 }

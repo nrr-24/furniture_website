@@ -24,23 +24,21 @@ export default function HomePage() {
       {/* 1. Hero Section (The First Impression) */}
       <section className="lumiere-split hero-viewport">
         {/* Left Side: Copy, Gallery, Actions */}
-        <div className="split-left" style={{ justifyContent: 'center', alignItems: 'flex-start', textAlign: isRtl ? 'right' : 'left' }}>
+        <div className="split-left" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px', lineHeight: 1.1 }}>
-            <span className="text-showup" style={{ fontWeight: 800, animationDelay: '0.05s' }}>{isRtl ? 'سمارت وود:' : 'Smartwood:'}</span>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 24px', lineHeight: 1.1, textAlign: 'center' }}>
+            <span style={{ fontWeight: 800 }}>{isRtl ? 'سمارت وود:' : 'Smartwood:'}</span>
             <br />
-            <span className="text-reveal" style={{ animationDelay: '0.2s' }}>
-              <span className="text-slidein" style={{ animationDelay: '0.2s' }}>{isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.'}</span>
-            </span>
+            <span>{isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.'}</span>
           </h1>
 
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.2rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px', animationDelay: '0.5s' }}>
+          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.2rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px', animationDelay: '0.5s', textAlign: 'center' }}>
             {isRtl
               ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
               : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
           </p>
 
-          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.7s' }}>
+          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.7s', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/shop" className="hero-primary-btn" style={{ padding: '16px 40px', background: 'var(--text-main)', color: 'var(--bg-main)', borderRadius: '12px', textDecoration: 'none' }}>
               {isRtl ? 'استكشف الفن' : 'Explore the Art'}
             </Link>

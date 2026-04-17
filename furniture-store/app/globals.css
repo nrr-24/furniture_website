@@ -933,6 +933,11 @@ img {
   box-shadow: 0 0 0 6px var(--bg-panel), 0 0 0 8px var(--sand-soft), 0 0 24px rgba(226, 218, 204, 0.25);
 }
 
+/* On desktop the wrapper is invisible; mobile turns it into the actual card. */
+.timeline-card {
+  display: contents;
+}
+
 /* Content card */
 .timeline-content {
   flex: 1;
@@ -1018,54 +1023,112 @@ img {
   justify-content: flex-end;
 }
 
-/* Mobile timeline */
+/* Mobile timeline: each step is a single image-background card with text overlay. */
 @media (max-width: 900px) {
+  .timeline {
+    padding: 8px 0 0;
+  }
+
   .timeline::before {
     left: 24px;
   }
 
   .timeline-item,
   .timeline-item:nth-child(even) {
-    flex-direction: row;
-    align-items: stretch;
-    padding-left: 48px;
-    gap: 14px;
-    margin-bottom: 40px;
+    display: block;
+    padding-left: 0;
+    margin-bottom: 28px;
   }
 
-  .timeline-node {
-    left: 24px;
-    top: 32px;
-    transform: translateX(-50%);
+  .timeline-card {
+    display: block;
+    position: relative;
+    margin-left: 56px;
+    height: clamp(340px, 50vh, 460px);
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   }
 
-  .timeline-content,
+  /* Step number chip — top-left corner of the card */
+  .timeline-card::before {
+    content: attr(data-step);
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+    padding: 6px 14px;
+    background: rgba(13, 26, 99, 0.72);
+    color: var(--sand-soft);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(226, 218, 204, 0.25);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    line-height: 1;
+  }
+
+  /* Image fills the card as background */
   .timeline-img-wrap {
-    flex: 1 1 0;
-    min-width: 0;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
   }
 
+  .timeline-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+    border: none;
+    filter: brightness(0.65) saturate(0.95);
+  }
+
+  /* Text overlays at the bottom with a dark scrim */
   .timeline-content {
-    padding: 18px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 22px 22px 24px;
+    border: none;
+    border-radius: 0;
+    background: linear-gradient(
+      to top,
+      rgba(13, 26, 99, 0.95) 0%,
+      rgba(13, 26, 99, 0.82) 35%,
+      rgba(13, 26, 99, 0.4) 70%,
+      rgba(13, 26, 99, 0) 100%
+    );
+    text-align: left;
   }
 
+  /* Hide the desktop watermark step number — the chip replaces it */
   .timeline-step {
-    font-size: 1.6rem;
+    display: none;
   }
 
   .timeline-content h3 {
-    font-size: 1rem;
-    flex-wrap: wrap;
-    gap: 6px;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    justify-content: flex-start;
+    margin: 0 0 8px;
   }
 
   .timeline-content h3 i {
-    font-size: 1rem;
+    color: var(--sand-soft);
+    font-size: 1.05rem;
   }
 
   .timeline-content p {
-    font-size: 0.85rem;
-    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin: 0;
   }
 
   .timeline-item:nth-child(odd) .timeline-content,
@@ -1078,20 +1141,22 @@ img {
     justify-content: flex-start;
   }
 
-  .timeline-img-wrap {
-    display: flex;
+  /* Node centered vertically next to the card */
+  .timeline-node {
+    left: 24px;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
-  .timeline-img-wrap img {
-    height: 100%;
-    min-height: 160px;
-    border-radius: 18px;
+  /* RTL mirror */
+  [dir="rtl"] .timeline-card {
+    margin-left: 0;
+    margin-right: 56px;
   }
 
-  [dir="rtl"] .timeline-item,
-  [dir="rtl"] .timeline-item:nth-child(even) {
-    padding-left: 0;
-    padding-right: 48px;
+  [dir="rtl"] .timeline-card::before {
+    left: auto;
+    right: 16px;
   }
 
   [dir="rtl"] .timeline::before {
@@ -1102,9 +1167,10 @@ img {
   [dir="rtl"] .timeline-node {
     left: auto;
     right: 24px;
-    transform: translateX(50%);
+    transform: translate(50%, -50%);
   }
 
+  [dir="rtl"] .timeline-content,
   [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content,
   [dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
     text-align: right;
@@ -1117,69 +1183,61 @@ img {
 }
 
 @media (max-width: 600px) {
-  .timeline {
-    padding: 8px 0 0;
+  .timeline-card {
+    margin-left: 40px;
+    height: clamp(300px, 46vh, 400px);
+    border-radius: 18px;
   }
 
-  .timeline-item,
-  .timeline-item:nth-child(even) {
-    padding-left: 32px;
-    margin-bottom: 28px;
-    gap: 10px;
-  }
-
-  .timeline::before {
-    left: 10px;
-  }
-
-  .timeline-node {
-    left: 10px;
-    width: 10px;
-    height: 10px;
-    box-shadow: 0 0 0 3px var(--bg-panel), 0 0 0 5px var(--line-soft);
-  }
-
-  .timeline-item.visible .timeline-node {
-    box-shadow: 0 0 0 3px var(--bg-panel), 0 0 0 5px var(--sand-soft), 0 0 12px rgba(226, 218, 204, 0.25);
+  .timeline-card::before {
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    font-size: 0.72rem;
   }
 
   .timeline-content {
-    padding: 14px;
-  }
-
-  .timeline-step {
-    font-size: 1.3rem;
+    padding: 18px 18px 20px;
   }
 
   .timeline-content h3 {
-    font-size: 0.9rem;
-  }
-
-  .timeline-content h3 i {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .timeline-content p {
-    font-size: 0.78rem;
-    line-height: 1.55;
+    font-size: 0.84rem;
+    line-height: 1.5;
   }
 
-  .timeline-img-wrap img {
-    min-height: 140px;
-    border-radius: 14px;
+  .timeline::before {
+    left: 16px;
   }
 
-  [dir="rtl"] .timeline-item,
-  [dir="rtl"] .timeline-item:nth-child(even) {
-    padding-right: 32px;
+  .timeline-node {
+    left: 16px;
+    width: 11px;
+    height: 11px;
+    box-shadow: 0 0 0 4px var(--bg-panel), 0 0 0 6px var(--line-soft);
+  }
+
+  .timeline-item.visible .timeline-node {
+    box-shadow: 0 0 0 4px var(--bg-panel), 0 0 0 6px var(--sand-soft), 0 0 14px rgba(226, 218, 204, 0.3);
+  }
+
+  [dir="rtl"] .timeline-card {
+    margin-right: 40px;
+  }
+
+  [dir="rtl"] .timeline-card::before {
+    right: 12px;
   }
 
   [dir="rtl"] .timeline::before {
-    right: 10px;
+    right: 16px;
   }
 
   [dir="rtl"] .timeline-node {
-    right: 10px;
+    right: 16px;
   }
 }
 

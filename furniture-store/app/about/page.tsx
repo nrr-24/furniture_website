@@ -144,16 +144,18 @@ export default function AboutPage() {
           {timelineData.map((item, index) => (
             <div key={index} className="timeline-item">
               <div className="timeline-node"></div>
-              <div className="timeline-content">
-                <span className="timeline-step">{item.step}</span>
-                <h3>
-                  <i className={`bi ${item.icon}`}></i>
-                  {item.title}
-                </h3>
-                <p>{item.description}</p>
-              </div>
-              <div className="timeline-img-wrap">
-                <img src={item.image} alt={item.title} />
+              <div className="timeline-card" data-step={item.step}>
+                <div className="timeline-img-wrap">
+                  <img src={item.image} alt={item.title} />
+                </div>
+                <div className="timeline-content">
+                  <span className="timeline-step">{item.step}</span>
+                  <h3>
+                    <i className={`bi ${item.icon}`}></i>
+                    {item.title}
+                  </h3>
+                  <p>{item.description}</p>
+                </div>
               </div>
             </div>
           ))}

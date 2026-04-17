@@ -2,6 +2,7 @@
 
 import { useLanguage } from '../../data/LanguageContext';
 import { useEffect, useRef } from 'react';
+import Footer from '../../components/layout/Footer';
 
 export default function AboutPage() {
   const { t, isRtl } = useLanguage();
@@ -160,6 +161,7 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <Footer />
     </main>
   );
 }

@@ -1,12 +1,14 @@
 'use client';
 
 import { useLanguage } from '../../data/LanguageContext';
+import Footer from '../../components/layout/Footer';
 
 export default function ContactPage() {
   const { t, isRtl } = useLanguage();
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center', alignItems: 'center', padding: 'clamp(24px, 6vw, 40px) clamp(16px, 5vw, 60px)' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} className="app-content" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(48px, 8vw, 80px) clamp(16px, 5vw, 60px)' }}>
       <section id="contact" style={{ maxWidth: '1000px', width: '100%', background: 'transparent', textAlign: 'center' }}>
         <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>{isRtl ? 'تواصل معنا' : 'Contact Us'}</h2>
         <p style={{ color: 'var(--text-soft)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
@@ -39,6 +41,8 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      </div>
+      <Footer />
     </main>
   );
 }

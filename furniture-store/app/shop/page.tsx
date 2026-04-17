@@ -7,6 +7,7 @@ import { useFurniture } from '../../data/FurnitureContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
+import Footer from '../../components/layout/Footer';
 
 const FALLBACK_IMAGE = '/images/LOGO/image.png';
 
@@ -621,6 +622,7 @@ export default function ShopPage() {
           }
         }
       `}</style>
+      <Footer />
     </main>
   );
 }

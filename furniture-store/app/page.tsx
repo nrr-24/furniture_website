@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
@@ -17,7 +17,31 @@ export default function HomePage() {
   const [showManager, setShowManager] = useState(false);
   const [selectedItem, setSelectedItem] = useState<FurnitureItem | null>(null);
 
+  const heroPart1 = isRtl ? 'سمارت وود:' : 'Smartwood:';
+  const heroPart2 = isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.';
+  const heroTotal = heroPart1.length + heroPart2.length;
+  const [typed, setTyped] = useState(0);
+
+  useEffect(() => {
+    setTyped(0);
+    const id = setInterval(() => {
+      setTyped(c => {
+        if (c + 1 >= heroTotal) {
+          clearInterval(id);
+          return heroTotal;
+        }
+        return c + 1;
+      });
+    }, 70);
+    return () => clearInterval(id);
+  }, [heroTotal]);
+
   if (!initialized) return null;
+
+  const shown1 = heroPart1.slice(0, Math.min(typed, heroPart1.length));
+  const shown2 = heroPart2.slice(0, Math.max(0, typed - heroPart1.length));
+  const part1Done = typed >= heroPart1.length;
+  const typing = typed < heroTotal;
 
   return (
     <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -26,10 +50,18 @@ export default function HomePage() {
         {/* Left Side: Copy, Gallery, Actions */}
         <div className="split-left" style={{ justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 
-          <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 24px', lineHeight: 1.1, textAlign: 'center' }}>
-            <span style={{ fontWeight: 800 }}>{isRtl ? 'سمارت وود:' : 'Smartwood:'}</span>
-            <br />
-            <span>{isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.'}</span>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 24px', lineHeight: 1.1, textAlign: 'center', minHeight: '2.2em' }}>
+            <span style={{ fontWeight: 800 }}>
+              {shown1}
+              {!part1Done && typing && <span className="type-cursor" aria-hidden="true" />}
+            </span>
+            {part1Done && <br />}
+            {part1Done && (
+              <span>
+                {shown2}
+                {typing && <span className="type-cursor" aria-hidden="true" />}
+              </span>
+            )}
           </h1>
 
           <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.2rem', color: 'var(--text-soft)', marginBottom: '40px', maxWidth: '600px', animationDelay: '0.5s', textAlign: 'center' }}>

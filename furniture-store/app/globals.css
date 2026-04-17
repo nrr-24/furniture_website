@@ -811,6 +811,22 @@ img {
   animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Typewriter cursor for the landing hero title */
+.type-cursor {
+  display: inline-block;
+  width: 0.08em;
+  height: 0.9em;
+  margin-left: 0.05em;
+  background: currentColor;
+  vertical-align: -0.08em;
+  animation: type-blink 0.8s step-end infinite;
+}
+
+@keyframes type-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
 .reveal-container {
   clip-path: inset(50% round 50%);
   animation: imageReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
@@ -908,9 +924,9 @@ img {
 
 .timeline-item {
   display: flex;
-  align-items: center;
-  gap: 60px;
-  margin-bottom: 100px;
+  align-items: flex-start;
+  gap: 28px;
+  margin-bottom: 72px;
   position: relative;
   counter-increment: timeline-step;
   opacity: 0;
@@ -932,29 +948,31 @@ img {
   flex-direction: row-reverse;
 }
 
-/* Node dot on the line */
+/* Node dot on the line — sits at the starting edge of the image/card row */
 .timeline-node {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
+  top: 28px;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--sand-soft);
   z-index: 2;
-  box-shadow: 0 0 0 6px var(--bg-panel), 0 0 0 8px var(--line-soft);
+  box-shadow: 0 0 0 3px var(--bg-main);
   transition: box-shadow 0.6s ease;
   flex-shrink: 0;
 }
 
 .timeline-item.visible .timeline-node {
-  box-shadow: 0 0 0 6px var(--bg-panel), 0 0 0 8px var(--sand-soft), 0 0 24px rgba(226, 218, 204, 0.25);
+  box-shadow: 0 0 0 3px var(--bg-main), 0 0 16px rgba(226, 218, 204, 0.45);
 }
 
 /* Content card */
 .timeline-content {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(50% - 14px);
   padding: 36px 40px;
   background: var(--bg-panel);
   border-radius: 24px;
@@ -1010,16 +1028,18 @@ img {
 
 /* Image */
 .timeline-img-wrap {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(50% - 14px);
 }
 
 .timeline-img-wrap img {
   width: 100%;
-  height: 340px;
+  height: 260px;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 18px;
   border: 2px solid var(--line-soft);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 /* RTL: mirror the text alignment on both sides */
@@ -1087,6 +1107,7 @@ img {
     z-index: 0;
     flex: unset;
     min-width: unset;
+    max-width: none;
     display: block;
   }
 
@@ -1119,6 +1140,7 @@ img {
     );
     flex: unset;
     min-width: unset;
+    max-width: none;
     text-align: left;
   }
 
@@ -1129,11 +1151,14 @@ img {
 
   .timeline-content h3 {
     font-size: 1.1rem;
+    font-style: normal;
+    font-weight: 700;
     color: var(--text-main);
     justify-content: flex-start;
     margin: 0 0 8px;
     flex-wrap: wrap;
     gap: 8px;
+    opacity: 1;
   }
 
   .timeline-content h3 i {

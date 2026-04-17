@@ -864,31 +864,6 @@ img {
   padding: clamp(40px, 8vw, 80px) clamp(16px, 5vw, 5%) clamp(24px, 5vw, 40px);
 }
 
-/* On mobile, fade the hero's deep-blue scrim into this section instead of an abrupt color edge. */
-@media (max-width: 991px) {
-  .timeline-section {
-    position: relative;
-    padding-top: 120px;
-  }
-
-  .timeline-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 90px;
-    background: linear-gradient(
-      to bottom,
-      rgba(13, 26, 99, 1) 0%,
-      rgba(13, 26, 99, 0.5) 50%,
-      rgba(13, 26, 99, 0) 100%
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
-}
-
 .timeline-section-header {
   text-align: center;
   margin-bottom: clamp(40px, 8vw, 80px);

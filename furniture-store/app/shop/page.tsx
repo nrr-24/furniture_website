@@ -110,17 +110,82 @@ export default function ShopPage() {
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
-      {/* Promotional Banner */}
-      <div className="shop-promo-banner">
-        <div className="promo-content">
-          <span className="promo-badge">{isRtl ? 'عرض خاص' : 'SPECIAL OFFER'}</span>
-          <h2 className="promo-title">{isRtl ? 'خصم حصري على مجموعات مختارة' : 'Exclusive Discounts on Select Collections'}</h2>
-          <p className="promo-subtitle">{isRtl ? 'اكتشف أحدث التصاميم بأسعار استثنائية — لفترة محدودة فقط.' : 'Discover the latest designs at exceptional prices — limited time only.'}</p>
+      {/* 1. Hero Section (Matched exactly to homepage structure) */}
+      <section className="lumiere-split hero-viewport home-hero">
+        {/* Left Side: Copy, Gallery, Actions */}
+        <div className="split-left" style={{ justifyContent: 'center', alignItems: 'flex-start', textAlign: 'left' }}>
+
+          <h1 style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.8rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px', lineHeight: 1, textAlign: 'left', minHeight: '2.2em' }}>
+            {isRtl ? (
+              <>انسجام مثالي:<br />راحة وأناقة</>
+            ) : (
+              <>Perfect Harmony:<br />Comfort &amp; Style</>
+            )}
+          </h1>
+
+          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', marginBottom: '36px', maxWidth: '540px', animationDelay: '0.1s', textAlign: 'left', lineHeight: 1.55 }}>
+            {isRtl
+              ? 'اكتشف أثاثاً يجمع بين الراحة والأناقة لترتقي بمساحتك.'
+              : 'Explore furniture that harmoniously combines comfort and style to elevate your home'}
+          </p>
+
+          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.2s', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+            <button 
+              className="hero-primary-btn" 
+              style={{ textDecoration: 'none', border: 'none', cursor: 'pointer' }}
+              onClick={() => {
+                const el = document.getElementById(`category-${categories[0]?.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              {isRtl ? 'استكشف العروض' : 'Explore Offers'}
+            </button>
+          </div>
+
+          <div className="promo-features-row animate-fade-up" style={{ marginTop: 'auto', paddingTop: '40px', animationDelay: '0.3s' }}>
+            <div className="promo-features-group">
+              <div className="promo-feature-item">
+                <span className="pf-label">{isRtl ? 'الراحة' : 'Comfort'}</span>
+                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'جلوس مريح' : 'Cozy Seating'}</span>
+              </div>
+              <div className="promo-feature-item">
+                <span className="pf-label">{isRtl ? 'ضمان الجودة' : 'Quality Assurance'}</span>
+                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'جلوس مريح' : 'Cozy Seating'}</span>
+              </div>
+              <div className="promo-feature-item">
+                <span className="pf-label">{isRtl ? 'شحن مجاني' : 'Free Shipping'}</span>
+                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'توصيل بلا تكلفة' : 'No-Cost Delivery'}</span>
+              </div>
+            </div>
+            <div className="promo-features-divider"></div>
+            <div className="promo-features-group">
+              <div className="promo-feature-item">
+                <span className="pf-label">{isRtl ? 'دفع آمن' : 'Secure Checkout'}</span>
+                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'مدفوعات آمنة' : 'Secure Payments'}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div className="promo-decoration">
-          <i className="bi bi-stars" style={{ fontSize: '4rem', opacity: 0.15 }}></i>
+
+        {/* Right Side: Vast Edge Image */}
+        <div className="split-right">
+          <div className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%', cursor: 'pointer' }}>
+            <img
+              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
+              alt="Luxury furniture"
+              className="reveal-inner-img desktop-hero-img"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+            />
+            <img
+              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
+              alt="Luxury furniture mobile"
+              className="mobile-hero-img"
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.3) 0%, transparent 100%)' }}></div>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div className="container">
         <header style={{ marginBottom: '28px', textAlign: 'center' }}>
@@ -502,60 +567,49 @@ export default function ShopPage() {
         @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
         @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
 
-        /* Promotional Banner */
-        .shop-promo-banner {
-          background: linear-gradient(135deg, #1a2ca3 0%, #0d1a63 50%, #2251a4 100%);
-          padding: 28px 40px;
+        /* Feature badges row (Overrides for the shop hero) */
+        .home-hero .promo-features-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 20px;
+        }
+        .home-hero .promo-features-group {
+          display: flex;
+          gap: 18px;
+        }
+        .home-hero .promo-features-divider {
+          width: 1px;
+          background: #ddd;
+          align-self: stretch;
+          flex-shrink: 0;
+        }
+        .home-hero .promo-feature-item {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .home-hero .pf-label {
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          letter-spacing: 0.01em;
+        }
+        .home-hero .pf-sub {
+          font-size: 0.62rem;
+          color: #999;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          position: relative;
-          overflow: hidden;
-          margin-bottom: 28px;
+          gap: 3px;
         }
-        .shop-promo-banner::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -10%;
-          width: 300px;
-          height: 300px;
-          background: radial-gradient(circle, rgba(226,218,204,0.08) 0%, transparent 70%);
-          border-radius: 50%;
-        }
-        .promo-content { position: relative; z-index: 1; }
-        .promo-badge {
-          display: inline-block;
-          background: var(--sand-soft);
-          color: var(--bg-main);
+        .home-hero .pf-sub i {
           font-size: 0.65rem;
-          font-weight: 800;
-          letter-spacing: 0.15em;
-          padding: 4px 12px;
-          border-radius: 999px;
-          margin-bottom: 10px;
+          color: #aaa;
         }
-        .promo-title {
-          font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-          font-weight: 700;
-          color: var(--text-main);
-          margin: 0 0 6px;
-          line-height: 1.2;
-        }
-        .promo-subtitle {
-          font-size: 0.82rem;
-          color: var(--text-soft);
-          margin: 0;
-          max-width: 500px;
-        }
-        .promo-decoration {
-          position: relative;
-          z-index: 1;
-          color: var(--sand-soft);
-        }
-        @media (max-width: 600px) {
-          .shop-promo-banner { padding: 20px; }
-          .promo-decoration { display: none; }
+
+        @media (max-width: 768px) {
+          .home-hero .promo-features-row { gap: 12px; flex-wrap: wrap; }
+          .home-hero .promo-features-group { gap: 12px; flex-wrap: wrap; }
+          .home-hero .promo-features-divider { display: none; }
         }
 
         /* Category Pills with Icons */

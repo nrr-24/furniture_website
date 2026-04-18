@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
@@ -10,6 +10,17 @@ import { useFurniture } from '../data/FurnitureContext';
 import FurnitureManager from '../components/FurnitureManager';
 import Footer from '../components/layout/Footer';
 
+const HERO_BANNERS = [
+  {
+    id: 'beez',
+    titleEn: 'BEEZ COLLECTION',
+    titleAr: 'مجموعة بيز',
+    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg',
+    mobileImage: '/images/home/hero-mobile.png',
+    link: '/shop'
+  }
+];
+
 export default function HomePage() {
   const { t, isRtl } = useLanguage();
   const { isAdmin, isCustomer } = useAuth();
@@ -18,10 +29,30 @@ export default function HomePage() {
   const [showManager, setShowManager] = useState(false);
   const [selectedItem, setSelectedItem] = useState<FurnitureItem | null>(null);
 
+  const currentHero = HERO_BANNERS[0]; // Easily swap index or find by ID
+
   const heroPart1 = isRtl ? 'سمارت وود:' : 'Smartwood:';
   const heroPart2 = isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.';
   const heroTotal = heroPart1.length + heroPart2.length;
   const [typed, setTyped] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll logic for slider
+  useEffect(() => {
+    if (!sliderRef.current) return;
+    const interval = setInterval(() => {
+      if (sliderRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+        // If we are at the end, scroll to beginning safely, else scroll by one item width
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          sliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          sliderRef.current.scrollBy({ left: 350, behavior: 'smooth' });
+        }
+      }
+    }, 1000); // Trigger every 2s
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setTyped(0);
@@ -84,80 +115,51 @@ export default function HomePage() {
 
         {/* Right Side: Vast Edge Image */}
         <div className="split-right">
-          <div className="split-right-img-container reveal-container">
+          <Link href={currentHero.link} className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%', cursor: 'pointer' }}>
             <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
-              alt={isRtl ? 'أثاث فاخر' : 'Luxury Furniture'}
+              src={currentHero.image}
+              alt={isRtl ? currentHero.titleAr : currentHero.titleEn}
               className="reveal-inner-img desktop-hero-img"
               style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
             />
             <img
-              src="/images/home/hero-mobile.png"
-              alt={isRtl ? 'داخلية سمارت وود' : 'Smartwood interior'}
+              src={currentHero.mobileImage}
+              alt={isRtl ? currentHero.titleAr : currentHero.titleEn}
               className="mobile-hero-img"
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.3) 0%, transparent 100%)' }}></div>
 
             <div style={{ position: 'absolute', bottom: 'clamp(20px, 4vw, 40px)', left: 'clamp(20px, 4vw, 40px)', right: 'clamp(20px, 4vw, 40px)', color: 'rgba(255,255,255,0.9)' }}>
               <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>01 /</span>
-              <h3 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 300, margin: 0 }}>{isRtl ? 'مجموعة بيز' : 'BEEZ COLLECTION'}</h3>
+              <h3 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 300, margin: 0 }}>{isRtl ? currentHero.titleAr : currentHero.titleEn}</h3>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
-      {/* 2. Exploding Scroll Gallery (The New Grid) */}
-      <section className="exploding-gallery-container">
-        <div className="sticky-wrapper">
-          <ul className="exploding-grid">
-            <li style={{ '--x1': 2, '--x2': 6, '--y1': 1, '--y2': 4 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0001_001.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 6, '--x2': 8, '--y1': 2, '--y2': 4 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0028_005.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 1, '--x2': 4, '--y1': 4, '--y2': 7 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0002_014.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 4, '--x2': 7, '--y1': 4, '--y2': 7 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0025_008.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 7, '--x2': 9, '--y1': 4, '--y2': 6 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 2, '--x2': 4, '--y1': 7, '--y2': 9 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 4, '--x2': 7, '--y1': 7, '--y2': 10 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 7, '--x2': 10, '--y1': 6, '--y2': 9 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg" alt="" />
-            </li>
-
-            {/* Extra images for increased density */}
-            <li style={{ '--x1': 1, '--x2': 2, '--y1': 1, '--y2': 4 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0004_006.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 6, '--x2': 10, '--y1': 1, '--y2': 2 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0004_029.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 8, '--x2': 10, '--y1': 2, '--y2': 6 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0006_004.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 1, '--x2': 2, '--y1': 7, '--y2': 10 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0006_010.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 2, '--x2': 4, '--y1': 9, '--y2': 10 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0026_007.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 7, '--x2': 10, '--y1': 9, '--y2': 10 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0009_024.jpg" alt="" />
-            </li>
-            <li style={{ '--x1': 1, '--x2': 2, '--y1': 4, '--y2': 7 } as React.CSSProperties}>
-              <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0003_013.jpg" alt="" />
-            </li>
-          </ul>
+      {/* 2. Horizontal Scroll Gallery (The New Slider) */}
+      <section className="horizontal-slider-section">
+        <div className="slider-header">
+          <span className="section-kicker">{isRtl ? 'تصاميمنا المذهلة' : 'Our Stunning Designs'}</span>
+          <h2 className="section-title">{isRtl ? 'معرض الصور' : 'Gallery Experience'}</h2>
+        </div>
+        <div className="slider-track" ref={sliderRef} style={{ scrollBehavior: 'smooth' }}>
+          {[
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0001_001.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0028_005.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0002_014.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0025_008.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg", link: "/shop" }
+          ].map((item, i) => (
+            <div key={i} className="slider-item">
+              <Link href={item.link} style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', inset: 0, zIndex: 10 }} aria-label="View product" />
+              <img src={item.src} alt="" loading="lazy" />
+              <div className="slider-overlay" />
+            </div>
+          ))}
         </div>
       </section>
 

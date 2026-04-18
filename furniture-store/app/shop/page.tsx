@@ -110,24 +110,36 @@ export default function ShopPage() {
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
+      {/* Promotional Banner */}
+      <div className="shop-promo-banner">
+        <div className="promo-content">
+          <span className="promo-badge">{isRtl ? 'عرض خاص' : 'SPECIAL OFFER'}</span>
+          <h2 className="promo-title">{isRtl ? 'خصم حصري على مجموعات مختارة' : 'Exclusive Discounts on Select Collections'}</h2>
+          <p className="promo-subtitle">{isRtl ? 'اكتشف أحدث التصاميم بأسعار استثنائية — لفترة محدودة فقط.' : 'Discover the latest designs at exceptional prices — limited time only.'}</p>
+        </div>
+        <div className="promo-decoration">
+          <i className="bi bi-stars" style={{ fontSize: '4rem', opacity: 0.15 }}></i>
+        </div>
+      </div>
+
       <div className="container">
-        <header style={{ marginBottom: '60px', textAlign: 'center' }}>
-          <span className="section-kicker" style={{ fontSize: '1rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
+        <header style={{ marginBottom: '28px', textAlign: 'center' }}>
+          <span className="section-kicker" style={{ fontSize: '0.85rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
           <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 24px', textAlign: 'center', lineHeight: 1.1 }}>
+            <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 14px', textAlign: 'center', lineHeight: 1.1 }}>
               {isRtl ? 'استكشف' : 'EXPLORE'}
               <br />
               <span style={{ fontWeight: 600 }}>{isRtl ? 'المجموعات' : 'COLLECTIONS'}</span>
             </h1>
           </div>
-          <p className="section-text mx-auto" style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto' }}>{t('collectionDesc')}</p>
+          <p className="section-text mx-auto" style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto', fontSize: '0.88rem' }}>{t('collectionDesc')}</p>
 
           {isAdmin && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '14px' }}>
               <button
                 onClick={() => setIsCategoryManagerOpen(true)}
                 className="hero-secondary-btn py-2 px-4 shadow-sm"
-                style={{ fontSize: '0.9rem', borderRadius: '12px' }}
+                style={{ fontSize: '0.85rem', borderRadius: '12px' }}
               >
                 <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
               </button>
@@ -135,51 +147,87 @@ export default function ShopPage() {
           )}
         </header>
 
-        {/* Category Jump Pills */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '60px' }}>
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                const el = document.getElementById(`category-${cat.id}`);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="px-4 py-2 rounded-pill shadow-sm"
-              style={{
-                background: 'var(--blue-deep)', color: 'var(--text-main)', border: '1px solid var(--blue-accent)',
-                cursor: 'pointer', transition: 'all 0.3s ease', fontWeight: 'bold'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              {isRtl ? cat.nameAr : cat.name}
-            </button>
-          ))}
+        {/* Category Jump Pills with Icons */}
+        <div className="shop-category-pills">
+          {categories.map(cat => {
+            const iconMap: Record<string, string> = {
+              'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
+              'kitchen': 'bi-cup-hot', 'مطبخ': 'bi-cup-hot', 'مطابخ': 'bi-cup-hot',
+              'bed': 'bi-moon-stars', 'سرير': 'bi-moon-stars', 'bedroom': 'bi-moon-stars', 'غرف': 'bi-moon-stars',
+              'living': 'bi-lamp', 'معيشة': 'bi-lamp', 'صالون': 'bi-lamp',
+              'office': 'bi-briefcase', 'مكتب': 'bi-briefcase',
+              'dining': 'bi-egg-fried', 'طعام': 'bi-egg-fried', 'سفرة': 'bi-egg-fried',
+              'wardrobe': 'bi-archive', 'خزانة': 'bi-archive', 'closet': 'bi-archive',
+              'shelf': 'bi-bookshelf', 'رف': 'bi-bookshelf', 'display': 'bi-bookshelf',
+              'table': 'bi-grid-3x3', 'طاولة': 'bi-grid-3x3',
+              'chair': 'bi-person-workspace', 'كرسي': 'bi-person-workspace',
+              'tv': 'bi-tv', 'تلفزيون': 'bi-tv', 'entertainment': 'bi-tv',
+              'bathroom': 'bi-droplet', 'حمام': 'bi-droplet',
+              'outdoor': 'bi-tree', 'خارجي': 'bi-tree',
+            };
+            const catWords = `${cat.name} ${cat.nameAr}`.toLowerCase().split(/\s+/);
+            const matchedIcon = catWords.find(w => iconMap[w]);
+            const icon = matchedIcon ? iconMap[matchedIcon] : 'bi-grid';
+
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  const el = document.getElementById(`category-${cat.id}`);
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className="shop-category-pill"
+              >
+                <i className={`bi ${icon}`}></i>
+                <span>{isRtl ? cat.nameAr : cat.name}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {groupedItems.map((group, groupIdx) => (
+        {groupedItems.map((group, groupIdx) => {
+          const iconMap2: Record<string, string> = {
+            'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
+            'kitchen': 'bi-cup-hot', 'مطبخ': 'bi-cup-hot', 'مطابخ': 'bi-cup-hot',
+            'bed': 'bi-moon-stars', 'سرير': 'bi-moon-stars', 'bedroom': 'bi-moon-stars', 'غرف': 'bi-moon-stars',
+            'living': 'bi-lamp', 'معيشة': 'bi-lamp', 'صالون': 'bi-lamp',
+            'office': 'bi-briefcase', 'مكتب': 'bi-briefcase',
+            'dining': 'bi-egg-fried', 'طعام': 'bi-egg-fried', 'سفرة': 'bi-egg-fried',
+            'wardrobe': 'bi-archive', 'خزانة': 'bi-archive', 'closet': 'bi-archive',
+            'table': 'bi-grid-3x3', 'طاولة': 'bi-grid-3x3',
+            'tv': 'bi-tv', 'تلفزيون': 'bi-tv',
+          };
+          const catWords2 = `${group.name} ${group.nameAr}`.toLowerCase().split(/\s+/);
+          const matchedIcon2 = catWords2.find(w => iconMap2[w]);
+          const sectionIcon = matchedIcon2 ? iconMap2[matchedIcon2] : 'bi-grid';
+
+          return (
           <section
             id={`category-${group.id}`}
             key={group.id}
             style={{
-              marginBottom: '80px',
-              scrollMarginTop: '160px'
+              marginBottom: '48px',
+              scrollMarginTop: '120px'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
+            <div className="shop-section-header">
+              <div className="shop-section-icon">
+                <i className={`bi ${sectionIcon}`}></i>
+              </div>
               <h2 className="section-title" style={{ margin: 0 }}>{isRtl ? group.nameAr : group.name}</h2>
               <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
+              <span className="shop-section-count">{group.products.length} {isRtl ? 'منتج' : 'items'}</span>
             </div>
 
             {group.products.length > 0 ? (
-              <div className="row g-4">
+              <div className="row g-3">
                 {group.products.map((item, idx) => {
                   const cartItem = cart.find(i => i.id === item.id);
                   const inCart = !!cartItem;
 
                   return (
                     <div
-                      className="col-12 col-sm-6 col-lg-4"
+                      className="col-6 col-sm-6 col-lg-4 col-xl-3"
                       key={item.id}
                       draggable={isAdmin}
                       onDragStart={(e) => handleProductDragStart(e, group.id, idx, item.id)}
@@ -193,24 +241,24 @@ export default function ShopPage() {
                         onClick={() => !isAdmin && setSelectedItem(item)}
                       >
                         {isAdmin && (
-                          <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10 }}>
-                            <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '6px 12px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab' }}>
+                          <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
+                            <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab', fontSize: '0.85rem' }}>
                               <i className="bi bi-list"></i>
                             </div>
                           </div>
                         )}
 
                         {isAdmin && (
-                          <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10, display: 'flex', gap: '8px' }}>
+                          <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, display: 'flex', gap: '6px' }}>
                             <button
                               onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
                               className="admin-action-btn shadow-sm"
-                              style={{ background: 'white', color: 'black', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              style={{ background: 'white', color: 'black', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
                             ><i className="bi bi-pencil-fill"></i></button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setConfirmDelete({ type: 'product', id: item.id, name: isRtl ? item.nameAr : item.name }); }}
                               className="admin-action-btn shadow-sm"
-                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
                             ><i className="bi bi-trash-fill"></i></button>
                           </div>
                         )}
@@ -270,7 +318,7 @@ export default function ShopPage() {
                             ) : (
                                <div className="hover-inner">
                                   <span className="hover-price">{item.price} {t('currency')}</span>
-                                  <span style={{ color: 'var(--text-soft)', fontSize: '0.9rem' }}>{isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}</span>
+                                  <span style={{ color: 'var(--text-soft)', fontSize: '0.8rem' }}>{isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}</span>
                                </div>
                             )}
                           </div>
@@ -282,17 +330,18 @@ export default function ShopPage() {
               </div>
             ) : (
               <div
-                style={{ padding: '40px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--line-soft)' }}
+                style={{ padding: '30px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--line-soft)' }}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleProductDrop(e, group.id, 0)}
               >
-                <p style={{ color: 'var(--text-soft)', fontStyle: 'italic', margin: 0 }}>
+                <p style={{ color: 'var(--text-soft)', fontStyle: 'italic', margin: 0, fontSize: '0.88rem' }}>
                   {isRtl ? 'لا توجد منتجات في هذا القسم حالياً' : 'No products found in this category yet.'}
                 </p>
               </div>
             )}
           </section>
-        ))}
+          );
+        })}
 
         {/* Global Admin Floating Add Button */}
         {isAdmin && !isEditorOpen && (
@@ -448,9 +497,129 @@ export default function ShopPage() {
       )}
 
       <style jsx global>{`
-        .shop-main { padding: 40px 60px; }
-        @media (max-width: 991px) { .shop-main { padding: 32px 24px; } }
-        @media (max-width: 600px) { .shop-main { padding: 20px 16px; } }
+        .shop-main { padding: 0; }
+        .shop-main .container { padding: 0 40px; }
+        @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
+        @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
+
+        /* Promotional Banner */
+        .shop-promo-banner {
+          background: linear-gradient(135deg, #1a2ca3 0%, #0d1a63 50%, #2251a4 100%);
+          padding: 28px 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          position: relative;
+          overflow: hidden;
+          margin-bottom: 28px;
+        }
+        .shop-promo-banner::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          right: -10%;
+          width: 300px;
+          height: 300px;
+          background: radial-gradient(circle, rgba(226,218,204,0.08) 0%, transparent 70%);
+          border-radius: 50%;
+        }
+        .promo-content { position: relative; z-index: 1; }
+        .promo-badge {
+          display: inline-block;
+          background: var(--sand-soft);
+          color: var(--bg-main);
+          font-size: 0.65rem;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+          padding: 4px 12px;
+          border-radius: 999px;
+          margin-bottom: 10px;
+        }
+        .promo-title {
+          font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+          font-weight: 700;
+          color: var(--text-main);
+          margin: 0 0 6px;
+          line-height: 1.2;
+        }
+        .promo-subtitle {
+          font-size: 0.82rem;
+          color: var(--text-soft);
+          margin: 0;
+          max-width: 500px;
+        }
+        .promo-decoration {
+          position: relative;
+          z-index: 1;
+          color: var(--sand-soft);
+        }
+        @media (max-width: 600px) {
+          .shop-promo-banner { padding: 20px; }
+          .promo-decoration { display: none; }
+        }
+
+        /* Category Pills with Icons */
+        .shop-category-pills {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 36px;
+        }
+        .shop-category-pill {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: var(--bg-main);
+          color: var(--text-main);
+          border: 1px solid var(--line-soft);
+          padding: 8px 18px;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 600;
+          font-size: 0.82rem;
+        }
+        .shop-category-pill i {
+          font-size: 1rem;
+          opacity: 0.7;
+        }
+        .shop-category-pill:hover {
+          background: var(--blue-deep);
+          border-color: var(--blue-accent);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .shop-category-pill:hover i {
+          opacity: 1;
+        }
+
+        /* Section Header with Icon */
+        .shop-section-header {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 20px;
+        }
+        .shop-section-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: rgba(226,218,204,0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.1rem;
+          color: var(--sand-soft);
+          flex-shrink: 0;
+        }
+        .shop-section-count {
+          font-size: 0.75rem;
+          color: var(--text-soft);
+          letter-spacing: 0.05em;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
 
         .cart-fab-add {
           width: 48px;
@@ -492,20 +661,20 @@ export default function ShopPage() {
 
         /* Shop Card Redesign */
         .shop-item-card {
-          height: 360px;
-          border-radius: 1.5em;
+          height: 300px;
+          border-radius: 1.2em;
           position: relative;
           display: flex;
           justify-content: flex-end;
           flex-direction: column;
-          padding: 1.5em;
+          padding: 1.2em;
           z-index: 1;
           overflow: hidden;
           box-shadow: 0 8px 24px rgba(0,0,0,0.3);
           transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.4s ease;
         }
         .shop-item-card:hover {
-          transform: translateY(-8px) scale(1.02);
+          transform: translateY(-6px) scale(1.02);
           box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
         }
         .card-bg-layer {

@@ -15,7 +15,7 @@ const translations = {
   en: {
     home: 'Home',
     collections: 'Collections',
-    craftsmanship: 'Craftsmanship',
+    craftsmanship: 'About Us',
     shopCollections: 'Shop Collections',
     premiumCollections: 'Premium Furniture Collections',
     craftedLiving: 'Crafted for Refined Living',
@@ -42,7 +42,7 @@ const translations = {
   ar: {
     home: 'الرئيسية',
     collections: 'المجموعات',
-    craftsmanship: 'الحرفية',
+    craftsmanship: 'من نحن',
     shopCollections: 'تسوق المجموعات',
     premiumCollections: 'مجموعات أثاث فاخرة',
     craftedLiving: 'صُمم لحياة راقية',

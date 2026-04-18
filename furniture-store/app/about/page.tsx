@@ -78,8 +78,8 @@ export default function AboutPage() {
           </span> */}
 
           <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <span className="text-showup" style={{ animationDelay: '0.05s' }}>{isRtl ? 'عن' : 'ABOUT'}</span>
-            <span className="text-reveal" style={{ animationDelay: '0.3s', fontWeight: 600 }}>{isRtl ? 'سمارت وود' : 'SMARTWOOD'}</span>
+            <span className="text-showup" style={{ animationDelay: '0.05s' }}>{isRtl ? 'من' : 'ABOUT'}</span>
+            <span className="text-reveal" style={{ animationDelay: '0.3s', fontWeight: 600 }}>{isRtl ? 'نحن' : 'US'}</span>
           </h1>
 
           <p className="smartwood-description animate-fade-up" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '20px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.5s' }}>

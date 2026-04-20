@@ -250,6 +250,36 @@ export default function ShopPage() {
           })}
         </div>
 
+        {/* Featured Products Horizontal Row */}
+        {items && items.length > 0 && (
+          <section className="featured-section" style={{ marginBottom: '50px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+              <div className="shop-section-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem' }}>
+                <i className="bi bi-star-fill"></i>
+              </div>
+              <h2 className="section-title" style={{ margin: 0, fontSize: '1.4rem' }}>{isRtl ? 'منتجات مميزة' : 'Featured Products'}</h2>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
+            </div>
+            
+            <div className="featured-carousel-container">
+              <div className="featured-carousel">
+                {items.slice(0, 8).map((item) => (
+                  <div key={item.id} className="compact-card" onClick={() => !isAdmin && setSelectedItem(item)}>
+                    <div className="compact-img-wrapper">
+                      <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                      <div className="compact-tag">{isRtl ? 'جديد' : 'New'}</div>
+                    </div>
+                    <div className="compact-info">
+                      <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
+                      <span className="compact-price">{item.price} {t('currency')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {groupedItems.map((group, groupIdx) => {
           const iconMap2: Record<string, string> = {
             'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
@@ -566,6 +596,109 @@ export default function ShopPage() {
         .shop-main .container { padding: 0 40px; }
         @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
         @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
+
+        /* Featured Products Carousel */
+        .featured-carousel-container {
+          margin: 0 -40px;
+          padding: 0 40px;
+        }
+        @media (max-width: 991px) {
+          .featured-carousel-container { margin: 0 -24px; padding: 0 24px; }
+        }
+        @media (max-width: 600px) {
+          .featured-carousel-container { margin: 0 -16px; padding: 0 16px; }
+        }
+        .featured-carousel {
+          display: flex;
+          gap: 16px;
+          overflow-x: auto;
+          padding-bottom: 16px;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+        }
+        .featured-carousel::-webkit-scrollbar {
+          height: 6px;
+        }
+        .featured-carousel::-webkit-scrollbar-track {
+          background: rgba(0,0,0,0.02);
+          border-radius: 10px;
+        }
+        .featured-carousel::-webkit-scrollbar-thumb {
+          background: rgba(0,0,0,0.1);
+          border-radius: 10px;
+        }
+        .featured-carousel::-webkit-scrollbar-thumb:hover {
+          background: rgba(0,0,0,0.2);
+        }
+
+        .compact-card {
+          flex: 0 0 auto;
+          width: 180px;
+          scroll-snap-align: start;
+          background: #fff;
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+          border: 1px solid rgba(0,0,0,0.03);
+          cursor: pointer;
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+        .compact-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .compact-img-wrapper {
+          position: relative;
+          width: 100%;
+          height: 140px;
+          overflow: hidden;
+          background: #f8f8f8;
+        }
+        .compact-img-wrapper img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+        .compact-card:hover .compact-img-wrapper img {
+          transform: scale(1.05);
+        }
+        .compact-tag {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background: var(--text-main);
+          color: #fff;
+          font-size: 0.6rem;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 999px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+        .compact-info {
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .compact-title {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-main);
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .compact-price {
+          font-size: 0.75rem;
+          color: var(--text-soft);
+          font-weight: 500;
+        }
 
         /* Feature badges row (Overrides for the shop hero) */
         .home-hero .promo-features-row {

@@ -17,6 +17,7 @@ export interface FurnitureItem {
   price: number;
   categoryId: string;
   sortOrder: number;
+  isFeatured?: boolean;
 }
 
 /** Maps a Supabase DB row to the app-level FurnitureItem */
@@ -31,6 +32,7 @@ export function mapDbRowToItem(row: any): FurnitureItem {
     price: row.price || 0,
     categoryId: row.category_id || '',
     sortOrder: row.sort_order || 0,
+    isFeatured: row.is_featured || false,
   };
 }
 
@@ -45,6 +47,7 @@ export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
     image_url: item.image,
     category_id: item.categoryId,
     sort_order: item.sortOrder,
+    is_featured: item.isFeatured || false,
   };
 }
 

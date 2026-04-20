@@ -22,7 +22,8 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     image: initialItem?.image || '',
     price: initialItem?.price || 0,
     categoryId: initialItem?.categoryId || (categories.length > 0 ? categories[0].id : ''),
-    sortOrder: initialItem?.sortOrder || 0
+    sortOrder: initialItem?.sortOrder || 0,
+    isFeatured: initialItem?.isFeatured || false
   });
 
   const [uploading, setUploading] = useState(false);
@@ -187,6 +188,20 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="col-md-3 d-flex align-items-end">
+              <div className="form-check form-switch mb-1">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`featured-${initialItem?.id || 'new'}`}
+                  checked={formData.isFeatured}
+                  onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                />
+                <label className="form-check-label small opacity-75 ms-2" htmlFor={`featured-${initialItem?.id || 'new'}`}>
+                  {isRtl ? 'منتج مميز' : 'Featured Product'}
+                </label>
+              </div>
             </div>
             <div className="col-12 mt-3 d-flex gap-2">
               <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px', border: 'none' }}>

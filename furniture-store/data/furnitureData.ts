@@ -17,6 +17,11 @@ export interface FurnitureItem {
   price: number;
   categoryId: string;
   sortOrder: number;
+  originalPrice?: number | null;
+  salePrice?: number | null;
+  colors?: string[];
+  types?: string[];
+  gallery?: string[];
 }
 
 /** Maps a Supabase DB row to the app-level FurnitureItem */
@@ -28,9 +33,14 @@ export function mapDbRowToItem(row: any): FurnitureItem {
     description: row.description || '',
     descriptionAr: row.description_ar || '',
     image: row.image_url || '',
-    price: row.price || 0,
+    price: Number(row.price) || 0,
     categoryId: row.category_id || '',
     sortOrder: row.sort_order || 0,
+    originalPrice: row.original_price != null ? Number(row.original_price) : null,
+    salePrice: row.sale_price != null ? Number(row.sale_price) : null,
+    colors: Array.isArray(row.colors) ? row.colors : [],
+    types: Array.isArray(row.types) ? row.types : [],
+    gallery: Array.isArray(row.gallery) ? row.gallery : [],
   };
 }
 
@@ -45,6 +55,11 @@ export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
     image_url: item.image,
     category_id: item.categoryId,
     sort_order: item.sortOrder,
+    original_price: item.originalPrice ?? null,
+    sale_price: item.salePrice ?? null,
+    colors: item.colors || [],
+    types: item.types || [],
+    gallery: item.gallery || [],
   };
 }
 

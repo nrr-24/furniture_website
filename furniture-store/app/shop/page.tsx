@@ -1,15 +1,39 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useLanguage } from '../../data/LanguageContext';
 import { FurnitureItem, Category } from '../../data/furnitureData';
 import { useFurniture } from '../../data/FurnitureContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
+import ProductModal from '../../components/ProductModal';
 import Footer from '../../components/layout/Footer';
 
 const FALLBACK_IMAGE = '/images/LOGO/image.png';
+
+const CATEGORY_ICON_MAP: Record<string, string> = {
+  'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
+  'kitchen': 'bi-cup-hot', 'مطبخ': 'bi-cup-hot', 'مطابخ': 'bi-cup-hot',
+  'bed': 'bi-moon-stars', 'سرير': 'bi-moon-stars', 'bedroom': 'bi-moon-stars', 'غرف': 'bi-moon-stars',
+  'living': 'bi-lamp', 'معيشة': 'bi-lamp', 'صالون': 'bi-lamp',
+  'office': 'bi-briefcase', 'مكتب': 'bi-briefcase',
+  'dining': 'bi-egg-fried', 'طعام': 'bi-egg-fried', 'سفرة': 'bi-egg-fried',
+  'wardrobe': 'bi-archive', 'خزانة': 'bi-archive', 'closet': 'bi-archive',
+  'shelf': 'bi-bookshelf', 'رف': 'bi-bookshelf', 'display': 'bi-bookshelf',
+  'table': 'bi-grid-3x3', 'طاولة': 'bi-grid-3x3',
+  'chair': 'bi-person-workspace', 'كرسي': 'bi-person-workspace',
+  'tv': 'bi-tv', 'تلفزيون': 'bi-tv', 'entertainment': 'bi-tv',
+  'bathroom': 'bi-droplet', 'حمام': 'bi-droplet',
+  'outdoor': 'bi-tree', 'خارجي': 'bi-tree',
+  'wood': 'bi-tree-fill', 'خشب': 'bi-tree-fill',
+};
+
+function getCategoryIcon(name: string, nameAr: string): string {
+  const words = `${name} ${nameAr}`.toLowerCase().split(/\s+/);
+  const match = words.find(w => CATEGORY_ICON_MAP[w]);
+  return match ? CATEGORY_ICON_MAP[match] : 'bi-grid';
+}
 
 export default function ShopPage() {
   const { t, isRtl } = useLanguage();
@@ -32,6 +56,47 @@ export default function ShopPage() {
 
   // Confirmation Modals
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'product' | 'category', id?: string, count?: number, name?: string } | null>(null);
+
+  // Rotating hero showcase state
+  const heroSlides = useMemo(() => {
+    return categories
+      .map(cat => {
+        const catItems = items
+          .filter(i => i.categoryId === cat.id)
+          .sort((a, b) => a.sortOrder - b.sortOrder);
+        return {
+          id: cat.id,
+          name: cat.name,
+          nameAr: cat.nameAr,
+          image: catItems[0]?.image || '',
+          count: catItems.length,
+        };
+      })
+      .filter(c => !!c.image)
+      .slice(0, 5);
+  }, [categories, items]);
+
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [slidesPaused, setSlidesPaused] = useState(false);
+
+  useEffect(() => {
+    if (heroSlides.length < 2 || slidesPaused) return;
+    const interval = setInterval(() => {
+      setActiveSlide(i => (i + 1) % heroSlides.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [heroSlides.length, slidesPaused]);
+
+  useEffect(() => {
+    if (activeSlide >= heroSlides.length && heroSlides.length > 0) {
+      setActiveSlide(0);
+    }
+  }, [heroSlides.length, activeSlide]);
+
+  const scrollToCategory = (id: string) => {
+    const el = document.getElementById(`category-${id}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   if (!initialized) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-soft)' }}>Loading Collections...</div>;
 
@@ -110,80 +175,106 @@ export default function ShopPage() {
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
-      {/* 1. Hero Section (Matched exactly to homepage structure) */}
-      <section className="lumiere-split hero-viewport home-hero">
-        {/* Left Side: Copy, Gallery, Actions */}
-        <div className="split-left" style={{ justifyContent: 'center', alignItems: 'flex-start', textAlign: 'left' }}>
+      {/* 1. Rotating Collection Showcase */}
+      <section
+        className="shop-showcase"
+        onMouseEnter={() => setSlidesPaused(true)}
+        onMouseLeave={() => setSlidesPaused(false)}
+        dir={isRtl ? 'rtl' : 'ltr'}
+      >
+        <div className="shop-showcase-media">
+          {heroSlides.length > 0 ? (
+            heroSlides.map((slide, i) => (
+              <button
+                key={slide.id}
+                type="button"
+                onClick={() => scrollToCategory(slide.id)}
+                className={`shop-showcase-slide ${i === activeSlide ? 'is-active' : ''}`}
+                aria-label={isRtl ? `تصفح ${slide.nameAr}` : `Browse ${slide.name}`}
+                tabIndex={i === activeSlide ? 0 : -1}
+              >
+                <img src={slide.image} alt="" aria-hidden="true" />
+              </button>
+            ))
+          ) : (
+            <div className="shop-showcase-slide is-active" aria-hidden="true">
+              <img
+                src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
+                alt=""
+              />
+            </div>
+          )}
+          <div className="shop-showcase-scrim" />
+        </div>
 
-          <h1 style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.8rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px', lineHeight: 1, textAlign: 'left', minHeight: '2.2em' }}>
-            {isRtl ? (
-              <>انسجام مثالي:<br />راحة وأناقة</>
+        <div className="shop-showcase-content">
+          <span className="shop-showcase-kicker">{isRtl ? 'المجموعات' : 'COLLECTIONS'}</span>
+
+          <h1 className="shop-showcase-title">
+            {heroSlides.length > 0 ? (
+              heroSlides.map((slide, i) => (
+                <span
+                  key={slide.id}
+                  className={`shop-showcase-word ${i === activeSlide ? 'is-active' : ''}`}
+                  aria-hidden={i !== activeSlide}
+                >
+                  <span className="shop-showcase-word-name">
+                    {isRtl ? slide.nameAr || slide.name : slide.name}
+                  </span>
+                  <span className="shop-showcase-word-sub">
+                    {isRtl ? 'مجموعة' : 'Collection'}
+                  </span>
+                </span>
+              ))
             ) : (
-              <>Perfect Harmony:<br />Comfort &amp; Style</>
+              <span className="shop-showcase-word is-active">
+                <span className="shop-showcase-word-name">
+                  {isRtl ? 'المجموعات' : 'Our Collections'}
+                </span>
+              </span>
             )}
           </h1>
 
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', marginBottom: '36px', maxWidth: '540px', animationDelay: '0.1s', textAlign: 'left', lineHeight: 1.55 }}>
-            {isRtl
-              ? 'اكتشف أثاثاً يجمع بين الراحة والأناقة لترتقي بمساحتك.'
-              : 'Explore furniture that harmoniously combines comfort and style to elevate your home'}
+          <p className="shop-showcase-sub">
+            {heroSlides[activeSlide]
+              ? (isRtl
+                  ? `${heroSlides[activeSlide].count} قطعة مختارة بعناية`
+                  : `${heroSlides[activeSlide].count} piece${heroSlides[activeSlide].count === 1 ? '' : 's'} curated for your space`)
+              : (isRtl
+                  ? 'اكتشف أثاثاً يجمع بين الراحة والأناقة.'
+                  : 'Explore furniture that harmoniously combines comfort and style.')}
           </p>
 
-          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.2s', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-            <button 
-              className="hero-primary-btn" 
-              style={{ textDecoration: 'none', border: 'none', cursor: 'pointer' }}
-              onClick={() => {
-                const el = document.getElementById(`category-${categories[0]?.id}`);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            >
-              {isRtl ? 'استكشف العروض' : 'Explore Offers'}
-            </button>
-          </div>
+          <button
+            className="shop-showcase-cta"
+            onClick={() => {
+              const target = heroSlides[activeSlide] || heroSlides[0];
+              if (target) scrollToCategory(target.id);
+              else if (categories[0]) scrollToCategory(categories[0].id);
+            }}
+          >
+            {heroSlides[activeSlide]
+              ? (isRtl ? `تصفح ${heroSlides[activeSlide].nameAr || heroSlides[activeSlide].name}` : `Browse ${heroSlides[activeSlide].name}`)
+              : (isRtl ? 'استكشف العروض' : 'Browse All')}
+            <i className={`bi bi-arrow-${isRtl ? 'left' : 'right'}`} />
+          </button>
 
-          <div className="promo-features-row animate-fade-up" style={{ marginTop: 'auto', paddingTop: '40px', animationDelay: '0.3s' }}>
-            <div className="promo-features-group">
-              <div className="promo-feature-item">
-                <span className="pf-label">{isRtl ? 'الراحة' : 'Comfort'}</span>
-                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'جلوس مريح' : 'Cozy Seating'}</span>
-              </div>
-              <div className="promo-feature-item">
-                <span className="pf-label">{isRtl ? 'ضمان الجودة' : 'Quality Assurance'}</span>
-                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'جلوس مريح' : 'Cozy Seating'}</span>
-              </div>
-              <div className="promo-feature-item">
-                <span className="pf-label">{isRtl ? 'شحن مجاني' : 'Free Shipping'}</span>
-                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'توصيل بلا تكلفة' : 'No-Cost Delivery'}</span>
-              </div>
+          {heroSlides.length > 1 && (
+            <div className="shop-showcase-dots" role="tablist" aria-label={isRtl ? 'المجموعات' : 'Collections'}>
+              {heroSlides.map((slide, i) => (
+                <button
+                  key={slide.id}
+                  role="tab"
+                  aria-selected={i === activeSlide}
+                  aria-label={isRtl ? slide.nameAr : slide.name}
+                  className={`shop-showcase-dot ${i === activeSlide ? 'is-active' : ''}`}
+                  onClick={() => { setActiveSlide(i); setSlidesPaused(false); }}
+                >
+                  <span>{isRtl ? slide.nameAr : slide.name}</span>
+                </button>
+              ))}
             </div>
-            <div className="promo-features-divider"></div>
-            <div className="promo-features-group">
-              <div className="promo-feature-item">
-                <span className="pf-label">{isRtl ? 'دفع آمن' : 'Secure Checkout'}</span>
-                <span className="pf-sub"><i className="bi bi-check2"></i> {isRtl ? 'مدفوعات آمنة' : 'Secure Payments'}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Right Side: Vast Edge Image */}
-        <div className="split-right">
-          <div className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%', cursor: 'pointer' }}>
-            <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
-              alt="Luxury furniture"
-              className="reveal-inner-img desktop-hero-img"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
-            />
-            <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg"
-              alt="Luxury furniture mobile"
-              className="mobile-hero-img"
-            />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.3) 0%, transparent 100%)' }}></div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -214,57 +305,20 @@ export default function ShopPage() {
 
         {/* Category Jump Pills with Icons */}
         <div className="shop-category-pills">
-          {categories.map(cat => {
-            const iconMap: Record<string, string> = {
-              'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
-              'kitchen': 'bi-cup-hot', 'مطبخ': 'bi-cup-hot', 'مطابخ': 'bi-cup-hot',
-              'bed': 'bi-moon-stars', 'سرير': 'bi-moon-stars', 'bedroom': 'bi-moon-stars', 'غرف': 'bi-moon-stars',
-              'living': 'bi-lamp', 'معيشة': 'bi-lamp', 'صالون': 'bi-lamp',
-              'office': 'bi-briefcase', 'مكتب': 'bi-briefcase',
-              'dining': 'bi-egg-fried', 'طعام': 'bi-egg-fried', 'سفرة': 'bi-egg-fried',
-              'wardrobe': 'bi-archive', 'خزانة': 'bi-archive', 'closet': 'bi-archive',
-              'shelf': 'bi-bookshelf', 'رف': 'bi-bookshelf', 'display': 'bi-bookshelf',
-              'table': 'bi-grid-3x3', 'طاولة': 'bi-grid-3x3',
-              'chair': 'bi-person-workspace', 'كرسي': 'bi-person-workspace',
-              'tv': 'bi-tv', 'تلفزيون': 'bi-tv', 'entertainment': 'bi-tv',
-              'bathroom': 'bi-droplet', 'حمام': 'bi-droplet',
-              'outdoor': 'bi-tree', 'خارجي': 'bi-tree',
-            };
-            const catWords = `${cat.name} ${cat.nameAr}`.toLowerCase().split(/\s+/);
-            const matchedIcon = catWords.find(w => iconMap[w]);
-            const icon = matchedIcon ? iconMap[matchedIcon] : 'bi-grid';
-
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  const el = document.getElementById(`category-${cat.id}`);
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className="shop-category-pill"
-              >
-                <i className={`bi ${icon}`}></i>
-                <span>{isRtl ? cat.nameAr : cat.name}</span>
-              </button>
-            );
-          })}
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => scrollToCategory(cat.id)}
+              className="shop-category-pill"
+            >
+              <i className={`bi ${getCategoryIcon(cat.name, cat.nameAr)}`}></i>
+              <span>{isRtl ? cat.nameAr : cat.name}</span>
+            </button>
+          ))}
         </div>
 
         {groupedItems.map((group, groupIdx) => {
-          const iconMap2: Record<string, string> = {
-            'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',
-            'kitchen': 'bi-cup-hot', 'مطبخ': 'bi-cup-hot', 'مطابخ': 'bi-cup-hot',
-            'bed': 'bi-moon-stars', 'سرير': 'bi-moon-stars', 'bedroom': 'bi-moon-stars', 'غرف': 'bi-moon-stars',
-            'living': 'bi-lamp', 'معيشة': 'bi-lamp', 'صالون': 'bi-lamp',
-            'office': 'bi-briefcase', 'مكتب': 'bi-briefcase',
-            'dining': 'bi-egg-fried', 'طعام': 'bi-egg-fried', 'سفرة': 'bi-egg-fried',
-            'wardrobe': 'bi-archive', 'خزانة': 'bi-archive', 'closet': 'bi-archive',
-            'table': 'bi-grid-3x3', 'طاولة': 'bi-grid-3x3',
-            'tv': 'bi-tv', 'تلفزيون': 'bi-tv',
-          };
-          const catWords2 = `${group.name} ${group.nameAr}`.toLowerCase().split(/\s+/);
-          const matchedIcon2 = catWords2.find(w => iconMap2[w]);
-          const sectionIcon = matchedIcon2 ? iconMap2[matchedIcon2] : 'bi-grid';
+          const sectionIcon = getCategoryIcon(group.name, group.nameAr);
 
           return (
           <section
@@ -535,30 +589,13 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Item Details Modal (Customer Only) */}
+      {/* Item Details Modal */}
       {selectedItem && (
-        <div className="modal-overlay-animated" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedItem(null)}>
-          <div
-            className="details-modal-animated"
-            style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '24px', maxWidth: '900px', width: '100%', display: 'flex', flexDirection: isRtl ? 'row-reverse' : 'row', overflow: 'hidden', position: 'relative' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button onClick={() => setSelectedItem(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10 }}>&times;</button>
-            <div style={{ flex: '1', minHeight: '400px' }}>
-              <img src={selectedItem.image} alt={selectedItem.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <div style={{ flex: '1', padding: '40px', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={{ fontSize: '2.4rem', marginBottom: '8px', color: 'var(--text-main)', fontWeight: 700 }}> {isRtl ? selectedItem.nameAr : selectedItem.name} </h2>
-              <span style={{ fontSize: '1.5rem', color: 'var(--text-soft)', marginBottom: '24px' }}> {selectedItem.price} {t('currency')} </span>
-              <p style={{ color: 'var(--text-soft)', lineHeight: '1.8', marginBottom: 'auto' }}> {isRtl ? selectedItem.descriptionAr : selectedItem.description} </p>
-              {isCustomer && (
-                <button className="hero-primary-btn w-100" style={{ marginTop: '30px', padding: '16px', fontSize: '1.1rem' }} onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}>
-                  <i className="bi bi-cart-plus me-2"></i> {isRtl ? 'إضافة إلى العربة' : 'Add to Cart'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <ProductModal
+          item={selectedItem}
+          category={categories.find(c => c.id === selectedItem.categoryId) || null}
+          onClose={() => setSelectedItem(null)}
+        />
       )}
 
       <style jsx global>{`
@@ -567,49 +604,229 @@ export default function ShopPage() {
         @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
         @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
 
-        /* Feature badges row (Overrides for the shop hero) */
-        .home-hero .promo-features-row {
-          display: flex;
-          align-items: flex-start;
-          gap: 20px;
-        }
-        .home-hero .promo-features-group {
-          display: flex;
-          gap: 18px;
-        }
-        .home-hero .promo-features-divider {
-          width: 1px;
-          background: #ddd;
-          align-self: stretch;
-          flex-shrink: 0;
-        }
-        .home-hero .promo-feature-item {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .home-hero .pf-label {
-          font-size: 0.68rem;
-          font-weight: 700;
-          color: #1a1a1a;
-          letter-spacing: 0.01em;
-        }
-        .home-hero .pf-sub {
-          font-size: 0.62rem;
-          color: #999;
-          display: flex;
-          align-items: center;
-          gap: 3px;
-        }
-        .home-hero .pf-sub i {
-          font-size: 0.65rem;
-          color: #aaa;
+        /* Rotating Collection Showcase (self-contained, full-bleed image + scrim) */
+        .shop-showcase {
+          position: relative;
+          width: 100%;
+          min-height: min(640px, 80vh);
+          overflow: hidden;
+          isolation: isolate;
+          background: #0a0f2e;
         }
 
-        @media (max-width: 768px) {
-          .home-hero .promo-features-row { gap: 12px; flex-wrap: wrap; }
-          .home-hero .promo-features-group { gap: 12px; flex-wrap: wrap; }
-          .home-hero .promo-features-divider { display: none; }
+        .shop-showcase-media {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .shop-showcase-slide {
+          position: absolute;
+          inset: 0;
+          border: none;
+          padding: 0;
+          margin: 0;
+          background: transparent;
+          cursor: pointer;
+          opacity: 0;
+          transition: opacity 0.9s ease;
+          overflow: hidden;
+        }
+        .shop-showcase-slide.is-active { opacity: 1; z-index: 1; }
+        .shop-showcase-slide img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transform: scale(1.02);
+          transition: transform 6s ease;
+        }
+        .shop-showcase-slide.is-active img { transform: scale(1.08); }
+
+        .shop-showcase-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: none;
+          background: linear-gradient(180deg,
+            rgba(6,10,35,0.72) 0%,
+            rgba(6,10,35,0.45) 40%,
+            rgba(6,10,35,0.82) 100%);
+        }
+
+        .shop-showcase-content {
+          position: relative;
+          z-index: 3;
+          min-height: inherit;
+          padding: clamp(48px, 9vw, 96px) clamp(24px, 6vw, 64px);
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          color: #fff;
+          text-align: center;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+        }
+        .shop-showcase-content > * { pointer-events: auto; }
+
+        .shop-showcase-kicker {
+          font-size: 0.78rem;
+          letter-spacing: 0.32em;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.8);
+        }
+
+        .shop-showcase-title {
+          position: relative;
+          margin: 0;
+          width: 100%;
+          min-height: clamp(5rem, 10vw, 7.5rem);
+          line-height: 1;
+        }
+        .shop-showcase-word {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: inherit;
+          justify-content: center;
+          gap: 4px;
+          opacity: 0;
+          transform: translateY(14px);
+          transition: opacity 0.6s ease, transform 0.6s ease;
+          pointer-events: none;
+        }
+        .shop-showcase-word.is-active { opacity: 1; transform: translateY(0); }
+        .shop-showcase-word-name {
+          font-size: clamp(1.9rem, 3.8vw, 3.4rem);
+          font-weight: 800;
+          letter-spacing: -0.025em;
+          color: #fff;
+          line-height: 1.08;
+          max-width: 100%;
+          overflow-wrap: break-word;
+          word-break: normal;
+          hyphens: auto;
+        }
+        .shop-showcase-word-sub {
+          font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+          font-weight: 300;
+          letter-spacing: 0.02em;
+          color: rgba(255,255,255,0.75);
+        }
+
+        .shop-showcase-sub {
+          font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+          color: rgba(255,255,255,0.85);
+          margin: 0;
+          max-width: 520px;
+        }
+
+        .shop-showcase-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 28px;
+          margin-top: 6px;
+          background: #fff;
+          color: #0a0f2e;
+          border: none;
+          border-radius: 999px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+          box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+        }
+        .shop-showcase-cta:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 14px 36px rgba(0,0,0,0.45);
+        }
+        .shop-showcase-cta i { font-size: 0.9rem; }
+
+        .shop-showcase-dots {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 14px;
+          max-width: 100%;
+        }
+        .shop-showcase-dot {
+          background: rgba(255,255,255,0.08);
+          color: rgba(255,255,255,0.8);
+          border: 1px solid rgba(255,255,255,0.25);
+          padding: 6px 14px;
+          border-radius: 999px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          backdrop-filter: blur(4px);
+        }
+        .shop-showcase-dot:hover {
+          background: rgba(255,255,255,0.18);
+          border-color: rgba(255,255,255,0.55);
+          color: #fff;
+        }
+        .shop-showcase-dot.is-active {
+          background: #fff;
+          color: #0a0f2e;
+          border-color: #fff;
+        }
+        .shop-showcase-dot span {
+          display: inline-block;
+          max-width: 16ch;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          vertical-align: middle;
+        }
+
+        /* Desktop: constrain content to the left half, softer horizontal scrim */
+        @media (min-width: 992px) {
+          .shop-showcase { min-height: min(620px, 78vh); }
+          .shop-showcase-content {
+            align-items: flex-start;
+            text-align: left;
+            max-width: min(640px, 55%);
+            padding-right: clamp(40px, 5vw, 64px);
+          }
+          .shop-showcase-dots { justify-content: flex-start; }
+          .shop-showcase-scrim {
+            background: linear-gradient(90deg,
+              rgba(6,10,35,0.82) 0%,
+              rgba(6,10,35,0.6) 35%,
+              rgba(6,10,35,0.2) 65%,
+              rgba(6,10,35,0.05) 100%);
+          }
+          [dir="rtl"] .shop-showcase-content {
+            align-items: flex-end;
+            text-align: right;
+            margin-left: auto;
+            padding-right: clamp(24px, 6vw, 64px);
+            padding-left: clamp(40px, 5vw, 64px);
+          }
+          [dir="rtl"] .shop-showcase-dots { justify-content: flex-end; }
+          [dir="rtl"] .shop-showcase-scrim {
+            background: linear-gradient(270deg,
+              rgba(6,10,35,0.82) 0%,
+              rgba(6,10,35,0.6) 35%,
+              rgba(6,10,35,0.2) 65%,
+              rgba(6,10,35,0.05) 100%);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .shop-showcase-word,
+          .shop-showcase-slide,
+          .shop-showcase-slide img { transition: none !important; }
+          .shop-showcase-slide.is-active img { transform: none; }
         }
 
         /* Category Pills with Icons */

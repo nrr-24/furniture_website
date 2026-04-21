@@ -28,6 +28,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     colors: initialItem?.colors || [],
     types: initialItem?.types || [],
     gallery: initialItem?.gallery || [],
+    isFeatured: initialItem?.isFeatured ?? false,
   });
 
   const [uploading, setUploading] = useState(false);
@@ -35,25 +36,51 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
+    const files = Array.from(e.target.files);
     setGalleryUploading(true);
-    try {
-      const uploadedUrls: string[] = [];
-      for (const file of Array.from(e.target.files)) {
+
+    const uploadOne = async (file: File): Promise<{ url?: string; error?: string; name: string }> => {
+      try {
         const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
           method: 'POST',
           body: file,
         });
-        if (!response.ok) continue;
-        const blob = await response.json();
-        if (blob.url) uploadedUrls.push(blob.url);
+        const text = await response.text();
+        let json: any = {};
+        try { json = JSON.parse(text); } catch { /* non-JSON response */ }
+        if (!response.ok) {
+          return { error: json.error || `${response.status}: ${text.slice(0, 120)}`, name: file.name };
+        }
+        if (!json.url) return { error: 'Response missing url field', name: file.name };
+        return { url: json.url, name: file.name };
+      } catch (err) {
+        return { error: err instanceof Error ? err.message : String(err), name: file.name };
       }
-      setFormData(prev => ({ ...prev, gallery: [...(prev.gallery || []), ...uploadedUrls] }));
-      e.target.value = '';
+    };
+
+    try {
+      // Parallel uploads — much faster than sequential for multi-file selections
+      const results = await Promise.all(files.map(uploadOne));
+      const succeeded = results.filter(r => r.url).map(r => r.url as string);
+      const failed = results.filter(r => r.error);
+
+      if (succeeded.length > 0) {
+        setFormData(prev => ({ ...prev, gallery: [...(prev.gallery || []), ...succeeded] }));
+      }
+
+      if (failed.length > 0) {
+        // console.warn instead of .error so Next's dev overlay doesn't
+        // mistake a handled failure for a code crash.
+        console.warn('Gallery upload failures:', failed);
+        const msg = failed.map(f => `• ${f.name}: ${f.error}`).join('\n');
+        alert(`${succeeded.length}/${files.length} uploaded.\n\nFailed:\n${msg}`);
+      }
     } catch (err) {
       console.error('Gallery upload error:', err);
-      alert('Gallery upload failed.');
+      alert('Gallery upload failed unexpectedly — see console.');
     } finally {
       setGalleryUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -350,6 +377,23 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               />
             </div>
 
+            <div className="col-12">
+              <label
+                className="d-inline-flex align-items-center gap-2"
+                style={{ cursor: 'pointer', padding: '8px 14px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.25)', borderRadius: '10px' }}
+              >
+                <input
+                  type="checkbox"
+                  checked={!!formData.isFeatured}
+                  onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                />
+                <i className={`bi ${formData.isFeatured ? 'bi-star-fill' : 'bi-star'}`} style={{ color: '#ffd700', fontSize: '1rem' }}></i>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                  {isRtl ? 'عرض كمنتج مميّز على صفحة المجموعات' : 'Featured on Collections page'}
+                </span>
+              </label>
+            </div>
             <div className="col-12 mt-3 d-flex gap-2">
               <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px', border: 'none' }}>
                 {initialItem ? (isRtl ? 'تحديث' : 'Update Item') : (isRtl ? 'حفظ' : 'Save Item')}

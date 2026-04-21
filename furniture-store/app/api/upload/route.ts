@@ -26,8 +26,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'File body is empty' }, { status: 400 });
     }
 
-    // Generate a unique filename to avoid collisions
-    const uniqueName = `${Date.now()}-${filename.replace(/\s+/g, '_')}`;
+    // Generate a unique filename to avoid collisions (e.g., multiple parallel
+    // uploads of the same filename arriving in the same millisecond).
+    const rand = (globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)).slice(0, 8);
+    const safeName = filename.replace(/\s+/g, '_');
+    const uniqueName = `${Date.now()}-${rand}-${safeName}`;
 
     console.log(`Uploading ${filename} as ${uniqueName} (${buffer.length} bytes)...`);
 

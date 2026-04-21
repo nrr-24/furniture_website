@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { FurnitureItem, Category, mapDbRowToItem, mapItemToDbRow, mapDbRowToCategory } from './furnitureData';
+import { FurnitureItem, Category, mapDbRowToItem, mapItemToDbRow, mapPartialItemToDbRow, mapDbRowToCategory } from './furnitureData';
 import { supabase } from '../lib/supabase';
 
 interface FurnitureContextType {
@@ -87,28 +87,35 @@ export function FurnitureProvider({
   };
 
   const updateItem = async (id: string, updates: Partial<FurnitureItem>) => {
-    // Build partial DB row from the updates
-    const dbUpdates: any = {};
-    if (updates.name !== undefined) dbUpdates.name = updates.name;
-    if (updates.nameAr !== undefined) dbUpdates.name_ar = updates.nameAr;
-    if (updates.description !== undefined) dbUpdates.description = updates.description;
-    if (updates.descriptionAr !== undefined) dbUpdates.description_ar = updates.descriptionAr;
-    if (updates.price !== undefined) dbUpdates.price = updates.price;
-    if (updates.image !== undefined) dbUpdates.image_url = updates.image;
-    if (updates.categoryId !== undefined) dbUpdates.category_id = updates.categoryId;
-    if (updates.sortOrder !== undefined) dbUpdates.sort_order = updates.sortOrder;
+    // Map ALL provided fields (camelCase → snake_case). Any new FurnitureItem
+    // field added to ITEM_DB_COLUMNS automatically flows through here.
+    const dbUpdates = mapPartialItemToDbRow(updates);
+
+    if (Object.keys(dbUpdates).length === 0) {
+      console.warn('updateItem called with no mappable fields', updates);
+      return;
+    }
 
     // Optimistic update
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
 
-    const { data, error } = await fetch('/api/products', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, updates: dbUpdates }),
-    }).then(res => res.json());
-
-    if (error) {
-      console.error('API update error:', error);
+    try {
+      const res = await fetch('/api/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, updates: dbUpdates }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        console.error('API update error:', res.status, json.error || json);
+        return;
+      }
+      if (json.data) {
+        // Reconcile with the canonical row from DB so the UI reflects truth
+        setItems(prev => prev.map(i => i.id === id ? mapDbRowToItem(json.data) : i));
+      }
+    } catch (err) {
+      console.error('updateItem request failed:', err);
     }
   };
 

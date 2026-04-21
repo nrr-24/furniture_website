@@ -5,16 +5,23 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
 export interface CartItem {
-  id: string;
+  id: string;              // composite line key: `${productId}::${color}::${type}`
+  productId: string;
   name: string;
   price: number;
   image: string;
   quantity: number;
+  selectedColor?: string | null;
+  selectedType?: string | null;
+}
+
+export function makeCartLineId(productId: string, color?: string | null, type?: string | null): string {
+  return `${productId}::${color ?? ''}::${type ?? ''}`;
 }
 
 interface CartContextProps {
   cart: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  addToCart: (item: Omit<CartItem, 'quantity' | 'id'>) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -26,6 +33,18 @@ interface CartContextProps {
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
+// Match a cart_items row by variant identity (product_id + selected_color + selected_type).
+// Handles NULL-vs-string correctly via .is(null) / .eq().
+function applyVariantMatch(
+  q: any,
+  selectedColor?: string | null,
+  selectedType?: string | null
+) {
+  q = selectedColor ? q.eq('selected_color', selectedColor) : q.is('selected_color', null);
+  q = selectedType ? q.eq('selected_type', selectedType) : q.is('selected_type', null);
+  return q;
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -36,54 +55,86 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
-        // Fetch from DB
         const { data, error } = await supabase
           .from('cart_items')
-          .select('quantity, products(*)')
+          .select('quantity, selected_color, selected_type, products(*)')
           .eq('user_id', user.id);
-        
+
         if (data && !error) {
           const dbItems: CartItem[] = (data as any[]).map((row: any) => ({
-            id: row.products.id,
+            id: makeCartLineId(row.products.id, row.selected_color, row.selected_type),
+            productId: row.products.id,
             name: row.products.name,
             price: row.products.price,
             image: row.products.image_url,
-            quantity: row.quantity
+            quantity: row.quantity,
+            selectedColor: row.selected_color ?? null,
+            selectedType: row.selected_type ?? null,
           }));
 
-          // Merge with Local Storage if guest items exist
+          // Merge with any guest cart in localStorage
           const saved = localStorage.getItem('smartwood_cart');
           if (saved) {
-            const localItems: CartItem[] = JSON.parse(saved);
-            const merged = [...dbItems];
-            localItems.forEach(li => {
-              const existing = merged.find(mi => mi.id === li.id);
-              if (existing) {
-                existing.quantity += li.quantity;
-              } else {
-                merged.push(li);
+            try {
+              const localItems: CartItem[] = JSON.parse(saved);
+              const merged = [...dbItems];
+              for (const li of localItems) {
+                const existing = merged.find(mi => mi.id === li.id);
+                if (existing) {
+                  existing.quantity += li.quantity;
+                } else {
+                  merged.push(li);
+                }
               }
-            });
-            
-            // Persist the merge to DB
-            for (const item of localItems) {
-               await supabase.from('cart_items').upsert({
-                 user_id: user.id,
-                 product_id: item.id,
-                 quantity: item.quantity // simplified merge logic
-               }, { onConflict: 'user_id,product_id' });
+
+              // Persist local additions to DB (variant-aware find-or-insert)
+              for (const li of localItems) {
+                const baseQuery = supabase.from('cart_items').select('id, quantity')
+                  .eq('user_id', user.id)
+                  .eq('product_id', li.productId);
+                const { data: existingRow } = await applyVariantMatch(baseQuery, li.selectedColor, li.selectedType).maybeSingle();
+
+                if (existingRow) {
+                  await supabase.from('cart_items')
+                    .update({ quantity: existingRow.quantity + li.quantity })
+                    .eq('id', existingRow.id);
+                } else {
+                  await supabase.from('cart_items').insert({
+                    user_id: user.id,
+                    product_id: li.productId,
+                    quantity: li.quantity,
+                    selected_color: li.selectedColor ?? null,
+                    selected_type: li.selectedType ?? null,
+                  });
+                }
+              }
+
+              setCart(merged);
+              localStorage.removeItem('smartwood_cart');
+            } catch (err) {
+              console.error('Cart merge error:', err);
+              setCart(dbItems);
             }
-            
-            setCart(merged);
-            localStorage.removeItem('smartwood_cart');
           } else {
             setCart(dbItems);
           }
         }
       } else {
-        // Load from Local Storage (Guest)
         const saved = localStorage.getItem('smartwood_cart');
-        if (saved) setCart(JSON.parse(saved));
+        if (saved) {
+          try {
+            const parsed: CartItem[] = JSON.parse(saved);
+            // Backfill composite id for carts written before this change
+            const normalized = parsed.map(i => ({
+              ...i,
+              productId: i.productId ?? i.id,
+              id: i.id && i.id.includes('::') ? i.id : makeCartLineId(i.productId ?? i.id, i.selectedColor, i.selectedType),
+            }));
+            setCart(normalized);
+          } catch {
+            setCart([]);
+          }
+        }
       }
       setInitialized(true);
     };
@@ -98,49 +149,74 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, initialized, user]);
 
-  const addToCart = async (item: Omit<CartItem, 'quantity'>) => {
-    if (user) {
-      const existing = cart.find(i => i.id === item.id);
-      const newQty = existing ? existing.quantity + 1 : 1;
-      
-      const { error } = await supabase.from('cart_items').upsert({
-        user_id: user.id,
-        product_id: item.id,
-        quantity: newQty
-      }, { onConflict: 'user_id,product_id' });
+  const addToCart = async (item: Omit<CartItem, 'quantity' | 'id'>) => {
+    const color = item.selectedColor ?? null;
+    const type = item.selectedType ?? null;
+    const lineId = makeCartLineId(item.productId, color, type);
 
-      if (error) console.error('Failed to sync cart to DB:', error);
+    if (user) {
+      const baseQuery = supabase.from('cart_items').select('id, quantity')
+        .eq('user_id', user.id)
+        .eq('product_id', item.productId);
+      const { data: existingRow, error: selErr } = await applyVariantMatch(baseQuery, color, type).maybeSingle();
+      if (selErr) console.error('Cart select error:', selErr.message, selErr);
+
+      if (existingRow) {
+        const { error } = await supabase.from('cart_items')
+          .update({ quantity: existingRow.quantity + 1 })
+          .eq('id', existingRow.id);
+        if (error) console.error('Cart update error:', error.message, error);
+      } else {
+        const { error } = await supabase.from('cart_items').insert({
+          user_id: user.id,
+          product_id: item.productId,
+          quantity: 1,
+          selected_color: color,
+          selected_type: type,
+        });
+        if (error) console.error('Cart insert error:', error.message, error);
+      }
     }
 
     setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const existing = prev.find((i) => i.id === lineId);
       if (existing) {
-        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
+        return prev.map((i) => (i.id === lineId ? { ...i, quantity: i.quantity + 1 } : i));
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, id: lineId, quantity: 1, selectedColor: color, selectedType: type }];
     });
   };
 
   const removeFromCart = async (id: string) => {
-    if (user) {
-      await supabase.from('cart_items').delete().eq('user_id', user.id).eq('product_id', id);
+    const entry = cart.find(i => i.id === id);
+    if (user && entry) {
+      const baseQuery = supabase.from('cart_items').delete()
+        .eq('user_id', user.id)
+        .eq('product_id', entry.productId);
+      const { error } = await applyVariantMatch(baseQuery, entry.selectedColor, entry.selectedType);
+      if (error) console.error('Cart remove error:', error.message, error);
     }
     setCart((prev) => prev.filter((i) => i.id !== id));
   };
 
   const updateQuantity = async (id: string, quantity: number) => {
     if (quantity < 1) return removeFromCart(id);
-    
-    if (user) {
-      await supabase.from('cart_items').update({ quantity }).eq('user_id', user.id).eq('product_id', id);
+
+    const entry = cart.find(i => i.id === id);
+    if (user && entry) {
+      const baseQuery = supabase.from('cart_items').update({ quantity })
+        .eq('user_id', user.id)
+        .eq('product_id', entry.productId);
+      const { error } = await applyVariantMatch(baseQuery, entry.selectedColor, entry.selectedType);
+      if (error) console.error('Cart qty update error:', error.message, error);
     }
-    
+
     setCart((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)));
   };
 
   const clearCart = async () => {
     if (user) {
-       await supabase.from('cart_items').delete().eq('user_id', user.id);
+      await supabase.from('cart_items').delete().eq('user_id', user.id);
     }
     setCart([]);
   };

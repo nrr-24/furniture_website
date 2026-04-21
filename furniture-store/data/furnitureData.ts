@@ -22,6 +22,7 @@ export interface FurnitureItem {
   colors?: string[];
   types?: string[];
   gallery?: string[];
+  isFeatured?: boolean;
 }
 
 /** Maps a Supabase DB row to the app-level FurnitureItem */
@@ -41,10 +42,32 @@ export function mapDbRowToItem(row: any): FurnitureItem {
     colors: Array.isArray(row.colors) ? row.colors : [],
     types: Array.isArray(row.types) ? row.types : [],
     gallery: Array.isArray(row.gallery) ? row.gallery : [],
+    isFeatured: !!row.is_featured,
   };
 }
 
-/** Maps a FurnitureItem to a Supabase DB row (for insert/update) */
+/**
+ * Canonical mapping from FurnitureItem keys → Supabase column names.
+ * Single source of truth — extend this when adding a new product field.
+ */
+export const ITEM_DB_COLUMNS: Record<Exclude<keyof FurnitureItem, 'id'>, string> = {
+  name: 'name',
+  nameAr: 'name_ar',
+  description: 'description',
+  descriptionAr: 'description_ar',
+  image: 'image_url',
+  price: 'price',
+  categoryId: 'category_id',
+  sortOrder: 'sort_order',
+  originalPrice: 'original_price',
+  salePrice: 'sale_price',
+  colors: 'colors',
+  types: 'types',
+  gallery: 'gallery',
+  isFeatured: 'is_featured',
+};
+
+/** Maps a FurnitureItem to a Supabase DB row (for insert). Full row. */
 export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
   return {
     name: item.name,
@@ -60,7 +83,35 @@ export function mapItemToDbRow(item: Omit<FurnitureItem, 'id'>) {
     colors: item.colors || [],
     types: item.types || [],
     gallery: item.gallery || [],
+    is_featured: !!item.isFeatured,
   };
+}
+
+/**
+ * Maps a partial FurnitureItem (update payload) to a Supabase DB row.
+ * Only includes fields that are explicitly present in `updates` so the
+ * API PATCH doesn't overwrite unmentioned columns. Uses ITEM_DB_COLUMNS
+ * so any new field on FurnitureItem automatically flows through.
+ */
+export function mapPartialItemToDbRow(updates: Partial<FurnitureItem>): Record<string, any> {
+  const out: Record<string, any> = {};
+  for (const key of Object.keys(updates) as (keyof FurnitureItem)[]) {
+    if (key === 'id') continue;
+    const col = ITEM_DB_COLUMNS[key as Exclude<keyof FurnitureItem, 'id'>];
+    if (!col) continue;
+    const value = (updates as any)[key];
+    // Normalize nullable/array fields
+    if (key === 'originalPrice' || key === 'salePrice') {
+      out[col] = value ?? null;
+    } else if (key === 'colors' || key === 'types' || key === 'gallery') {
+      out[col] = Array.isArray(value) ? value : [];
+    } else if (key === 'isFeatured') {
+      out[col] = !!value;
+    } else {
+      out[col] = value;
+    }
+  }
+  return out;
 }
 
 /** Maps a DB category row to app-level Category */

@@ -201,11 +201,28 @@ export default function Navbar() {
                             </div>
                         ) : (
                             <div className="d-flex flex-column gap-4">
-                                {cart.map((item) => (
+                                {cart.map((item) => {
+                                    const hasVariant = !!(item.selectedColor || item.selectedType);
+                                    const isCssColor = !!item.selectedColor && /^(#|rgb|hsl|[a-zA-Z]+$)/.test(item.selectedColor);
+                                    return (
                                     <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--line-soft)' }}>
                                         <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
-                                        <div style={{ flex: 1 }}>
-                                            <h5 style={{ margin: '0 0 6px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <h5 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
+                                            {hasVariant && (
+                                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', margin: '0 0 6px', fontSize: '0.78rem', color: 'var(--text-soft)', opacity: 0.85 }}>
+                                                    {item.selectedType && <span>{item.selectedType}</span>}
+                                                    {item.selectedType && item.selectedColor && <span style={{ opacity: 0.5 }}>•</span>}
+                                                    {item.selectedColor && (
+                                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                                            {isCssColor && (
+                                                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.selectedColor, border: '1px solid rgba(255,255,255,0.2)' }} />
+                                                            )}
+                                                            <span>{item.selectedColor}</span>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
                                             <p style={{ margin: 0, color: 'var(--blue-main)', fontSize: '1rem', fontWeight: 700 }}>{item.price} {t('currency')}</p>
                                         </div>
                                         <div className="d-flex flex-column align-items-center gap-2">
@@ -222,7 +239,8 @@ export default function Navbar() {
                                             </button>
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

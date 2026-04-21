@@ -318,34 +318,38 @@ export default function ShopPage() {
         </div>
 
         {/* Featured Products Horizontal Row */}
-        {items && items.length > 0 && (
-          <section className="featured-section" style={{ marginBottom: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
-              <div className="shop-section-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem' }}>
-                <i className="bi bi-star-fill"></i>
+        {(() => {
+          const featuredItems = items.filter(i => i.isFeatured);
+          if (featuredItems.length === 0) return null;
+          return (
+            <section className="featured-section" style={{ marginBottom: '50px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                <div className="shop-section-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem' }}>
+                  <i className="bi bi-star-fill"></i>
+                </div>
+                <h2 className="section-title" style={{ margin: 0, fontSize: '1.4rem' }}>{isRtl ? 'منتجات مميزة' : 'Featured Products'}</h2>
+                <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
               </div>
-              <h2 className="section-title" style={{ margin: 0, fontSize: '1.4rem' }}>{isRtl ? 'منتجات مميزة' : 'Featured Products'}</h2>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
-            </div>
-            
-            <div className="featured-carousel-container">
-              <div className="featured-carousel">
-                {items.slice(0, 8).map((item) => (
-                  <div key={item.id} className="compact-card" onClick={() => !isAdmin && setSelectedItem(item)}>
-                    <div className="compact-img-wrapper">
-                      <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
-                      <div className="compact-tag">{isRtl ? 'جديد' : 'New'}</div>
+
+              <div className="featured-carousel-container">
+                <div className="featured-carousel">
+                  {featuredItems.map((item) => (
+                    <div key={item.id} className="compact-card" onClick={() => setSelectedItem(item)}>
+                      <div className="compact-img-wrapper">
+                        <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                        <div className="compact-tag">{isRtl ? 'مميّز' : 'Featured'}</div>
+                      </div>
+                      <div className="compact-info">
+                        <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
+                        <span className="compact-price">{item.price} {t('currency')}</span>
+                      </div>
                     </div>
-                    <div className="compact-info">
-                      <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
-                      <span className="compact-price">{item.price} {t('currency')}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          );
+        })()}
 
         {groupedItems.map((group, groupIdx) => {
           const sectionIcon = getCategoryIcon(group.name, group.nameAr);
@@ -371,7 +375,13 @@ export default function ShopPage() {
             {group.products.length > 0 ? (
               <div className="row g-3">
                 {group.products.map((item, idx) => {
-                  const cartItem = cart.find(i => i.id === item.id);
+                  const defaultColor = item.colors?.[0] ?? null;
+                  const defaultType = item.types?.[0] ?? null;
+                  const cartItem = cart.find(i =>
+                    i.productId === item.id &&
+                    (i.selectedColor ?? null) === defaultColor &&
+                    (i.selectedType ?? null) === defaultType
+                  );
                   const inCart = !!cartItem;
 
                   return (
@@ -386,12 +396,15 @@ export default function ShopPage() {
                     >
                       <div
                         className="shop-item-card group"
-                        style={{ cursor: isAdmin ? 'default' : 'pointer' }}
-                        onClick={() => !isAdmin && setSelectedItem(item)}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => setSelectedItem(item)}
                       >
                         {isAdmin && (
                           <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
-                            <div style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab', fontSize: '0.85rem' }}>
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab', fontSize: '0.85rem' }}
+                            >
                               <i className="bi bi-list"></i>
                             </div>
                           </div>
@@ -399,6 +412,13 @@ export default function ShopPage() {
 
                         {isAdmin && (
                           <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, display: 'flex', gap: '6px' }}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); updateItem(item.id, { isFeatured: !item.isFeatured }); }}
+                              className="admin-action-btn shadow-sm"
+                              aria-label={item.isFeatured ? (isRtl ? 'إلغاء التمييز' : 'Unfeature') : (isRtl ? 'تمييز' : 'Feature')}
+                              title={item.isFeatured ? (isRtl ? 'إلغاء التمييز' : 'Unfeature') : (isRtl ? 'عرض كمميّز' : 'Mark as featured')}
+                              style={{ background: item.isFeatured ? '#ffd700' : 'white', color: item.isFeatured ? '#1a1a1a' : '#b58a00', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
+                            ><i className={`bi ${item.isFeatured ? 'bi-star-fill' : 'bi-star'}`}></i></button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
                               className="admin-action-btn shadow-sm"
@@ -435,7 +455,17 @@ export default function ShopPage() {
                                   <button
                                     className="cart-fab-add"
                                     aria-label={isRtl ? 'إضافة إلى العربة' : 'Add to cart'}
-                                    onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      addToCart({
+                                        productId: item.id,
+                                        name: isRtl ? item.nameAr || item.name : item.name,
+                                        price: item.salePrice ?? item.price,
+                                        image: item.image,
+                                        selectedColor: defaultColor,
+                                        selectedType: defaultType,
+                                      });
+                                    }}
                                   >
                                     <i className="bi bi-cart-plus"></i>
                                   </button>
@@ -444,24 +474,34 @@ export default function ShopPage() {
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (cartItem.quantity > 1) updateQuantity(item.id, cartItem.quantity - 1);
-                                        else removeFromCart(item.id);
+                                        if (cartItem!.quantity > 1) updateQuantity(cartItem!.id, cartItem!.quantity - 1);
+                                        else removeFromCart(cartItem!.id);
                                       }}
                                       style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                                     >
-                                      {cartItem.quantity > 1 ? <i className="bi bi-dash"></i> : <i className="bi bi-trash"></i>}
+                                      {cartItem!.quantity > 1 ? <i className="bi bi-dash"></i> : <i className="bi bi-trash"></i>}
                                     </button>
-                                    <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{cartItem.quantity}</span>
+                                    <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{cartItem!.quantity}</span>
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        updateQuantity(item.id, cartItem.quantity + 1);
+                                        updateQuantity(cartItem!.id, cartItem!.quantity + 1);
                                       }}
                                       style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                                     >
                                       <i className="bi bi-plus"></i>
                                     </button>
                                   </div>
+                                )}
+                              </div>
+                            ) : isAdmin ? (
+                              <div className="hover-inner">
+                                <span className="hover-price">{item.price} {t('currency')}</span>
+                                {item.isFeatured && (
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,215,0,0.15)', color: '#ffd700', fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: '999px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                    <i className="bi bi-star-fill"></i>
+                                    {isRtl ? 'مميّز' : 'Featured'}
+                                  </span>
                                 )}
                               </div>
                             ) : (
@@ -625,6 +665,14 @@ export default function ShopPage() {
           item={selectedItem}
           category={categories.find(c => c.id === selectedItem.categoryId) || null}
           onClose={() => setSelectedItem(null)}
+          onEdit={isAdmin ? () => {
+            setItemToEdit(selectedItem);
+            setSelectedItem(null);
+            setIsEditorOpen(true);
+          } : undefined}
+          onToggleFeatured={isAdmin ? () => {
+            updateItem(selectedItem.id, { isFeatured: !selectedItem.isFeatured });
+          } : undefined}
         />
       )}
 
@@ -959,6 +1007,108 @@ export default function ShopPage() {
         .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
         .category-modal::-webkit-scrollbar { width: 6px; }
         .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); border-radius: 10px; }
+
+        /* Featured Products Carousel */
+        .featured-carousel-container {
+          margin: 0 -40px;
+          padding: 0 40px;
+        }
+        @media (max-width: 991px) {
+          .featured-carousel-container { margin: 0 -24px; padding: 0 24px; }
+        }
+        @media (max-width: 600px) {
+          .featured-carousel-container { margin: 0 -16px; padding: 0 16px; }
+        }
+        .featured-carousel {
+          display: flex;
+          gap: 16px;
+          overflow-x: auto;
+          padding-bottom: 16px;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+        }
+        .featured-carousel::-webkit-scrollbar { height: 6px; }
+        .featured-carousel::-webkit-scrollbar-track {
+          background: rgba(255,255,255,0.04);
+          border-radius: 10px;
+        }
+        .featured-carousel::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.15);
+          border-radius: 10px;
+        }
+        .featured-carousel::-webkit-scrollbar-thumb:hover {
+          background: rgba(255,255,255,0.28);
+        }
+
+        .compact-card {
+          flex: 0 0 auto;
+          width: 180px;
+          scroll-snap-align: start;
+          background: var(--bg-panel);
+          border-radius: 14px;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          border: 1px solid var(--line-soft);
+          cursor: pointer;
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+        .compact-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 26px rgba(0,0,0,0.4);
+        }
+        .compact-img-wrapper {
+          position: relative;
+          width: 100%;
+          height: 140px;
+          overflow: hidden;
+          background: rgba(255,255,255,0.04);
+        }
+        .compact-img-wrapper img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+        .compact-card:hover .compact-img-wrapper img {
+          transform: scale(1.05);
+        }
+        .compact-tag {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background: var(--text-main);
+          color: var(--bg-main);
+          font-size: 0.6rem;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 999px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+        [dir="rtl"] .compact-tag { left: auto; right: 10px; }
+        .compact-info {
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .compact-title {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-main);
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .compact-price {
+          font-size: 0.75rem;
+          color: var(--text-soft);
+          font-weight: 500;
+        }
 
         /* Shop Card Redesign */
         .shop-item-card {

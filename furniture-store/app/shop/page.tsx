@@ -317,6 +317,36 @@ export default function ShopPage() {
           ))}
         </div>
 
+        {/* Featured Products Horizontal Row */}
+        {items && items.length > 0 && (
+          <section className="featured-section" style={{ marginBottom: '50px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+              <div className="shop-section-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem' }}>
+                <i className="bi bi-star-fill"></i>
+              </div>
+              <h2 className="section-title" style={{ margin: 0, fontSize: '1.4rem' }}>{isRtl ? 'منتجات مميزة' : 'Featured Products'}</h2>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
+            </div>
+            
+            <div className="featured-carousel-container">
+              <div className="featured-carousel">
+                {items.slice(0, 8).map((item) => (
+                  <div key={item.id} className="compact-card" onClick={() => !isAdmin && setSelectedItem(item)}>
+                    <div className="compact-img-wrapper">
+                      <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                      <div className="compact-tag">{isRtl ? 'جديد' : 'New'}</div>
+                    </div>
+                    <div className="compact-info">
+                      <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
+                      <span className="compact-price">{item.price} {t('currency')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {groupedItems.map((group, groupIdx) => {
           const sectionIcon = getCategoryIcon(group.name, group.nameAr);
 

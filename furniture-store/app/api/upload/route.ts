@@ -85,3 +85,78 @@ function getContentType(filename: string): string {
   };
   return types[ext || ''] || 'application/octet-stream';
 }
+
+const STORAGE_BUCKET = 'product-images';
+const STORAGE_PUBLIC_PREFIX = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+
+/**
+ * Pull the storage path (filename inside the bucket) out of a Supabase
+ * public URL. Returns null for any URL that's NOT one of our uploads —
+ * external image URLs, hand-typed paths, etc. — so we never accidentally
+ * try to delete something we don't own.
+ */
+function extractStoragePath(rawUrl: string): string | null {
+  try {
+    const u = new URL(rawUrl);
+    const idx = u.pathname.indexOf(STORAGE_PUBLIC_PREFIX);
+    if (idx === -1) return null;
+    const path = decodeURIComponent(u.pathname.slice(idx + STORAGE_PUBLIC_PREFIX.length));
+    return path || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * DELETE /api/upload?url=<full public URL>
+ *
+ * Removes the file from the product-images bucket. Used when an admin
+ * deletes an image from a product so we don't accumulate orphaned storage.
+ *
+ * - URL must be a Supabase public URL pointing into our bucket; external
+ *   URLs return 200 with `skipped: true` (nothing to delete on our side).
+ * - File-not-found is treated as success (idempotent — already gone).
+ */
+export async function DELETE(request: Request): Promise<NextResponse> {
+  const guard = await requireAdmin(request);
+  if (!guard.ok) return guard.response;
+
+  const { searchParams } = new URL(request.url);
+  const rawUrl = searchParams.get('url');
+  if (!rawUrl) {
+    return NextResponse.json({ error: 'url is required' }, { status: 400 });
+  }
+
+  const path = extractStoragePath(rawUrl);
+  if (!path) {
+    // Not one of our uploads — say so but don't 4xx; the caller can move on.
+    return NextResponse.json({ skipped: true, reason: 'not a Supabase storage URL' });
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .remove([path]);
+
+    if (error) {
+      // "Object not found" → already gone, treat as success (idempotent).
+      const msg = error.message || '';
+      if (/not.found/i.test(msg)) {
+        return NextResponse.json({ ok: true, alreadyGone: true });
+      }
+      console.error('Storage delete error:', error);
+      return NextResponse.json(
+        { error: msg || 'Failed to delete image', detail: (error as any).statusCode || null },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, removed: data?.length ?? 0 });
+  } catch (err) {
+    console.error('Storage delete unexpected:', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Failed to delete image' },
+      { status: 500 }
+    );
+  }
+}

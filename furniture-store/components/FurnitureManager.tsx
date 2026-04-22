@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FurnitureItem } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
 import { useLanguage } from '../data/LanguageContext';
@@ -11,6 +11,19 @@ import { authHeaders } from '../lib/authClient';
 const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 const ACCEPTED_MIME_RE = /^image\/(jpeg|jpg|png|gif|webp|avif|heic|heif|svg\+xml)$/;
 const ACCEPTED_EXT_RE = /\.(jpe?g|png|gif|webp|avif|heic|heif|svg)$/i;
+
+// Best-effort storage cleanup. Skips quietly if the URL isn't one of our
+// uploads — server returns { skipped: true } for external URLs.
+async function deleteStorageFile(url: string): Promise<void> {
+  try {
+    await fetch(`/api/upload?url=${encodeURIComponent(url)}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+  } catch (err) {
+    console.warn('Storage delete failed for', url, err);
+  }
+}
 
 function validateImageFile(file: File): string | null {
   // Some environments/browsers leave file.type empty for uncommon formats,
@@ -59,6 +72,16 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
   const [uploading, setUploading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
 
+  // Deletion tracking — refs so re-renders don't reset them.
+  // pendingDeletes: URLs that already exist on the saved item; we only fire
+  //   the storage delete after the product save succeeds (so a Cancel
+  //   leaves both the DB and storage untouched).
+  // sessionUploads: URLs uploaded *this session*. If the admin removes one
+  //   before saving, we can delete it from storage immediately — it was
+  //   never persisted to the DB so there's no risk of a broken reference.
+  const pendingDeletesRef = useRef<Set<string>>(new Set());
+  const sessionUploadsRef = useRef<Set<string>>(new Set());
+
   /**
    * Unified images list — the first entry is the product's main image
    * (persisted to `products.image_url`), everything after is the gallery
@@ -90,13 +113,29 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
   };
 
   const removeImageAt = (idx: number) => {
+    const removedUrl = allImages[idx];
     setAllImages(allImages.filter((_, i) => i !== idx));
+
+    if (!removedUrl) return;
+    if (sessionUploadsRef.current.has(removedUrl)) {
+      // Uploaded this session and never saved to a product → delete now,
+      // no broken-reference risk.
+      sessionUploadsRef.current.delete(removedUrl);
+      pendingDeletesRef.current.delete(removedUrl);
+      deleteStorageFile(removedUrl);
+    } else {
+      // Already on the saved item → defer until the product save commits,
+      // so a Cancel doesn't strand the DB pointing at a missing file.
+      pendingDeletesRef.current.add(removedUrl);
+    }
   };
 
   const addUrlImage = () => {
     const v = urlInput.trim();
     if (!v) return;
     if (allImages.includes(v)) { setUrlInput(''); return; }
+    // Re-adding a URL the admin had queued for deletion cancels that delete.
+    pendingDeletesRef.current.delete(v);
     setAllImages([...allImages, v]);
     setUrlInput('');
   };
@@ -156,6 +195,12 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
       // Use the functional updater so we append to the CURRENT images
       // list, not a stale snapshot captured when the upload started.
       if (succeeded.length > 0) {
+        // Track these as session uploads so a remove-before-save can
+        // delete them from storage immediately.
+        succeeded.forEach(u => {
+          sessionUploadsRef.current.add(u);
+          pendingDeletesRef.current.delete(u); // re-adding cancels a queued delete
+        });
         setFormData(prev => {
           const cur = [prev.image, ...((prev.gallery || []).filter(g => g && g !== prev.image))].filter(Boolean) as string[];
           const next = Array.from(new Set([...cur, ...succeeded]));
@@ -212,11 +257,22 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     } else {
       addItem(finalData);
     }
+
+    // Save committed → flush queued storage deletes for any images the
+    // admin removed during this session. Best-effort; failures just log.
+    const toDelete = Array.from(pendingDeletesRef.current);
+    pendingDeletesRef.current.clear();
+    toDelete.forEach(url => deleteStorageFile(url));
+
     if (onClose) onClose();
   };
 
   const handleDelete = () => {
     if (initialItem && window.confirm('Are you sure you want to delete this item?')) {
+      // Wipe ALL of this product's storage images from the bucket too
+      // (otherwise the files orphan when the row is gone).
+      const allUrls = [initialItem.image, ...(initialItem.gallery || [])].filter(Boolean) as string[];
+      allUrls.forEach(url => deleteStorageFile(url));
       deleteItem(initialItem.id);
       if (onClose) onClose();
     }

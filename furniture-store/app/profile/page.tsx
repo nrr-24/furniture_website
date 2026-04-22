@@ -32,6 +32,37 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
+  // Delete Account
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const handleDeleteAccount = async () => {
+    if (!user || isDeleting) return;
+    setIsDeleting(true);
+    setDeleteError('');
+    try {
+      const res = await fetch('/api/auth/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDeleteError(data.error || `Error ${res.status}`);
+        return;
+      }
+      // Wipe local session and bounce to home — user no longer exists.
+      logout();
+      router.push('/');
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Request failed');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) {
       router.push('/admin/users');
@@ -179,6 +210,9 @@ export default function ProfilePage() {
               <div style={{ margin: 'auto 0 40px' }}>
                  <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', borderRadius: 0 }}>
                     <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
+                 </button>
+                 <button onClick={() => setShowDeleteConfirm(true)} className="profile-tab-btn" style={{ color: '#ff4d4d', width: '100%', opacity: 0.85, fontSize: '0.85rem' }}>
+                    <i className="bi bi-trash3"></i> {isRtl ? 'حذف الحساب' : 'Delete Account'}
                  </button>
               </div>
            </div>
@@ -355,6 +389,66 @@ export default function ProfilePage() {
            </div>
         </section>
       </main>
+
+      {/* Delete account confirmation — requires typing the literal word
+          DELETE so it's not triggerable by an accidental Enter press. */}
+      {showDeleteConfirm && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(4px)' }}
+          onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+        >
+          <div
+            style={{ background: 'var(--bg-panel)', borderRadius: '24px', padding: '36px', maxWidth: '460px', width: '100%', textAlign: 'center', border: '1px solid rgba(255,77,77,0.4)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,77,77,0.12)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              <i className="bi bi-exclamation-triangle-fill" style={{ fontSize: '1.8rem', color: '#ff4d4d' }} />
+            </div>
+            <h3 style={{ margin: '0 0 12px', fontSize: '1.4rem', fontWeight: 700 }}>
+              {isRtl ? 'حذف حسابك؟' : 'Delete your account?'}
+            </h3>
+            <p style={{ color: 'var(--text-soft)', margin: '0 auto 20px', fontSize: '0.92rem', lineHeight: 1.55, maxWidth: '380px' }}>
+              {isRtl
+                ? 'سيتم حذف حسابك وعنوانك وعربة التسوق وسجل الطلبات نهائياً. لا يمكن التراجع.'
+                : "Your account, addresses, cart, and order history will be permanently deleted. This can't be undone."}
+            </p>
+            <p style={{ color: 'var(--text-soft)', margin: '0 0 8px', fontSize: '0.82rem', textAlign: isRtl ? 'right' : 'left' }}>
+              {isRtl ? 'اكتب DELETE للتأكيد' : 'Type DELETE to confirm'}
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              autoFocus
+              placeholder="DELETE"
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,77,77,0.4)', background: 'rgba(0,0,0,0.25)', color: 'white', marginBottom: '16px', fontFamily: 'monospace', letterSpacing: '0.15em', textAlign: 'center', fontSize: '1rem' }}
+            />
+            {deleteError && (
+              <div style={{ background: 'rgba(255,77,77,0.1)', color: '#ff6b6b', padding: '10px', borderRadius: '8px', marginBottom: '14px', fontSize: '0.85rem' }}>
+                {deleteError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(''); }}
+                disabled={isDeleting}
+                style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '10px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                {isRtl ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={isDeleting || deleteConfirmText !== 'DELETE'}
+                style={{ flex: 1, padding: '12px', background: deleteConfirmText === 'DELETE' ? '#ff4d4d' : 'rgba(255,77,77,0.4)', border: 'none', color: 'white', borderRadius: '10px', fontWeight: 700, cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'not-allowed', opacity: isDeleting ? 0.7 : 1 }}
+              >
+                {isDeleting ? (isRtl ? 'جاري الحذف...' : 'Deleting...') : (isRtl ? 'حذف نهائي' : 'Delete forever')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .profile-main { padding: 0 20px; }

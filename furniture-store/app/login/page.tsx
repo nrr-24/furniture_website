@@ -43,12 +43,15 @@ export default function LoginPage() {
   };
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: 'var(--bg-main)', overflowY: 'auto' }}>
-      <div style={{ maxWidth: '400px', width: '100%', background: 'var(--bg-panel)', padding: '40px', borderRadius: '24px', boxShadow: 'var(--shadow-main)', margin: 'auto' }}>
-        <h1 className="smartwood-title" style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '8px' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} className="auth-page" style={{ background: 'var(--bg-main)' }}>
+      <div className="auth-page-bg" aria-hidden="true" />
+      <div className="auth-page-scrim" aria-hidden="true" />
+      <div className="auth-page-scroll">
+      <div className="auth-card" style={{ maxWidth: '400px', width: '100%', padding: '40px', borderRadius: '24px', margin: 'auto' }}>
+        <h1 className="smartwood-title" style={{ fontSize: '2rem', textAlign: 'center', margin: '0 auto 8px' }}>
           {isRtl ? 'تسجيل الدخول' : 'Log In'}
         </h1>
-        <p style={{ color: 'var(--text-soft)', textAlign: 'center', marginBottom: '32px' }}>
+        <p style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto 32px' }}>
           {isRtl ? 'مرحباً بعودتك إلى سمارت وود' : 'Welcome back to Smartwood'}
         </p>
 
@@ -87,6 +90,7 @@ export default function LoginPage() {
         <p style={{ textAlign: 'center', marginTop: '24px', color: 'var(--text-soft)' }}>
           {isRtl ? 'ليس لديك حساب؟' : 'Don\'t have an account?'} <Link href="/signup" style={{ color: 'var(--text-main)', fontWeight: 'bold' }}>{isRtl ? 'سجل هنا' : 'Sign Up'}</Link>
         </p>
+      </div>
       </div>
     </main>
   );

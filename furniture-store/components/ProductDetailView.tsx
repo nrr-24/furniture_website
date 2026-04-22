@@ -137,6 +137,22 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
                 <div className="pd-counter" aria-live="polite">
                   {activeIdx + 1} / {allImages.length}
                 </div>
+                {/* Dot pagination — only renders on small screens (CSS controls
+                    visibility). Mirrors activeIdx and clicking a dot jumps
+                    to that slide, same as the thumb strip on desktop. */}
+                <div className="pd-dots" role="tablist" aria-label={isRtl ? 'الصور' : 'Images'}>
+                  {allImages.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeIdx === i}
+                      aria-label={`${isRtl ? 'صورة' : 'Image'} ${i + 1}`}
+                      className={`pd-dot ${activeIdx === i ? 'is-active' : ''}`}
+                      onClick={() => setActiveIdx(i)}
+                    />
+                  ))}
+                </div>
               </>
             )}
           </div>
@@ -368,6 +384,40 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           .pd-nav { opacity: 0.9; }
         }
 
+        /* Dot pagination — hidden by default; mobile breakpoint below
+           swaps it in for the thumbnail strip. */
+        .pd-dots {
+          display: none;
+          position: absolute;
+          left: 50%;
+          bottom: 14px;
+          transform: translateX(-50%);
+          z-index: 5;
+          gap: 8px;
+          padding: 6px 12px;
+          background: rgba(0, 0, 0, 0.32);
+          backdrop-filter: blur(4px);
+          border-radius: 999px;
+          pointer-events: auto;
+        }
+        .pd-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          border: none;
+          padding: 0;
+          background: rgba(255, 255, 255, 0.45);
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.2s ease, width 0.25s ease;
+        }
+        .pd-dot:hover { background: rgba(255, 255, 255, 0.75); }
+        .pd-dot.is-active {
+          background: #fff;
+          /* Stretch the active dot horizontally for a clearer "you are here" cue. */
+          width: 22px;
+          border-radius: 999px;
+        }
+
         .pd-details {
           flex: 1;
           padding: 44px 40px;
@@ -513,13 +563,68 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           text-align: center; color: var(--pd-ink-soft); font-size: 0.9rem; padding: 14px;
         }
 
-        @media (max-width: 820px) {
-          .pd-card { flex-direction: column !important; min-height: auto; }
-          .pd-images { min-height: 300px; max-height: 60vh; }
-          .pd-thumbs { flex-direction: row; max-height: none; max-width: 100%; padding: 8px; }
-          .pd-thumb { width: 56px; height: 56px; }
-          .pd-details { padding: 28px 24px; }
-          .pd-title { font-size: 1.6rem; }
+        /* Tablet-down: card stacks (image on top, details below). The image
+           block's internal layout flips so the main image sits above a
+           horizontal thumbnail strip — much better than the awkward
+           thumbs-on-left + main-on-right that gets squashed on narrow widths. */
+        /* Tablet-down: card stacks (image on top, details below). The image
+           block's internal layout flips so the main image sits above a
+           horizontal thumbnail strip — much better than the awkward
+           thumbs-on-left + main-on-right that gets squashed on narrow widths. */
+        @media (max-width: 960px) {
+          .pd-card {
+            flex-direction: column !important;
+            min-height: auto;
+            border-radius: 20px;
+          }
+          .pd-images {
+            min-height: auto;
+          }
+          .pd-main-img {
+            aspect-ratio: 16 / 11;
+            min-height: 0;
+            max-height: 44vh;
+          }
+          /* Drop the thumbnail strip on small screens — replaced by the
+             dot pagination overlay inside the main image. */
+          .pd-thumbs { display: none !important; }
+          .pd-dots { display: inline-flex; }
+          /* Move the counter to the top corner so it doesn't collide with
+             the dots that now sit at the bottom-center. */
+          .pd-counter { top: 12px; bottom: auto; right: 12px; }
+          [dir="rtl"] .pd-counter { right: auto; left: 12px; }
+          .pd-details { padding: 22px 22px; }
+          .pd-title { font-size: clamp(1.25rem, 3.6vw, 1.55rem); }
+          .pd-title-underline,
+          .pd-desc-underline { margin-bottom: 14px; width: 48px; }
+          .pd-price-row { gap: 10px; margin-bottom: 16px; }
+          .pd-regular-price { font-size: 1.2rem; }
+          .pd-sale-price { font-size: 1.3rem; }
+          .pd-regular-price-strike { font-size: 0.9rem; }
+          .pd-description { font-size: 0.88rem; line-height: 1.55; }
+          .pd-selector-row { gap: 14px; margin-bottom: 12px; padding-bottom: 10px; }
+          .pd-selector-label { font-size: 0.7rem; letter-spacing: 0.12em; min-width: 50px; }
+          .pd-type-pill { padding: 6px 12px; font-size: 0.78rem; }
+          .pd-color-swatch { width: 28px; height: 28px; }
+          .pd-footer { padding-top: 18px; gap: 10px; }
+          .pd-cta { padding: 14px; font-size: 0.95rem; }
+          .pd-feature-toggle { font-size: 0.82rem; padding: 10px 14px; }
+        }
+        @media (max-width: 600px) {
+          .pd-card { border-radius: 16px; }
+          .pd-main-img { aspect-ratio: 4 / 3; max-height: 40vh; }
+          .pd-thumb { width: 46px; height: 46px; }
+          .pd-details { padding: 18px 16px; }
+          .pd-title { font-size: clamp(1.15rem, 5vw, 1.4rem); }
+          .pd-price-row { margin-bottom: 12px; }
+          .pd-regular-price { font-size: 1.1rem; }
+          .pd-sale-price { font-size: 1.2rem; }
+          .pd-description { font-size: 0.85rem; }
+          .pd-selector-row { gap: 10px; margin-bottom: 10px; padding-bottom: 8px; }
+          .pd-selector-label { min-width: 44px; }
+          .pd-type-pill { padding: 5px 10px; font-size: 0.75rem; }
+          .pd-cta { padding: 12px; font-size: 0.9rem; border-radius: 12px; }
+          .pd-feature-toggle { font-size: 0.78rem; padding: 9px 12px; border-radius: 10px; }
         }
       `}</style>
     </div>

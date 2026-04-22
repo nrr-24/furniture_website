@@ -326,6 +326,210 @@ img {
 }
 
 /* -----------------------------------------------------------------------
+   Auth pages (login / signup) — blurred brand image as backdrop with a
+   frosted-glass card on top. Applied via .auth-page on the <main>.
+   ----------------------------------------------------------------------- */
+.auth-page {
+  position: relative;
+  isolation: isolate;
+  /* The <main> no longer scrolls — its own children do. That keeps the
+     absolutely-positioned background + scrim pinned to the page viewport
+     instead of drifting with the form content. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.auth-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg');
+  background-size: cover;
+  background-position: center;
+  /* Slight scale so the blur edges don't reveal the underlying bg color. */
+  transform: scale(1.08);
+  filter: blur(18px) saturate(1.1) brightness(0.7);
+  pointer-events: none;
+}
+.auth-page-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(6, 10, 35, 0.55) 0%,
+    rgba(6, 10, 35, 0.4) 50%,
+    rgba(6, 10, 35, 0.7) 100%);
+  pointer-events: none;
+}
+/* The actual scroll container — sibling of the bg/scrim. When its content
+   exceeds the viewport it scrolls; the bg stays still. */
+.auth-page-scroll {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.auth-card {
+  position: relative;
+  z-index: 2;
+  /* Translucent panel + backdrop blur for the frosted-glass feel. */
+  background: rgba(13, 26, 99, 0.55) !important;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* No box-shadow on the card — when it's wrapped by .auth-step-stack
+     (which has overflow:hidden for slide containment) the shadow gets
+     clipped at the stack edge, producing a hard dark band the user read
+     as a "weird dark mask in the border". The frosted glow from the
+     border + backdrop-filter is enough lift on its own. */
+}
+
+/* Two-step signup slide stack — step 1 sits on top of step 2.
+   Whichever has .is-active is centered; the other slides off-screen. */
+.auth-step-stack {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  /* Wider canvas so the profile-step grid has more room. */
+  max-width: 560px;
+  margin-inline: auto;
+  /* Default height — overridden per step below so step 1 is compact and
+     step 2 has room. Both fit within the viewport so the page never
+     scrolls; if step 2's content is taller than its slot, the inner
+     .auth-step scrolls instead. */
+  height: min(440px, calc(100dvh - 180px));
+  /* Smooth height swap when the user advances to step 2. */
+  transition: height 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  /* Hide the off-screen step so the slide doesn't cause horizontal scroll. */
+  overflow: hidden;
+  /* No padding here — any inset between the stack edge and the card edge
+     would expose the clipped-by-overflow:hidden tail of the card's drop
+     shadow as a visible band, producing the "weird border" the user saw. */
+}
+/* Step 1 — credentials. Short form, no need for a tall card. */
+.auth-step-stack-credentials {
+  height: min(440px, calc(100dvh - 180px));
+}
+/* Step 2 — profile + address. Taller, but still capped by viewport so
+   the body itself never scrolls. The active card's overflow-y handles
+   any extra. */
+.auth-step-stack-profile {
+  height: min(660px, calc(100dvh - 180px));
+}
+.auth-step-stack .auth-step {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 36px 36px;
+  border-radius: 24px;
+  /* Internal scroll for content taller than the card (the profile step). */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Smooth swoosh — slide on transform, fade on opacity. */
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+              opacity 0.4s ease;
+  will-change: transform, opacity;
+}
+/* Subtle scrollbar so it doesn't feel out of place on the frosted card. */
+.auth-step-stack .auth-step::-webkit-scrollbar { width: 8px; }
+.auth-step-stack .auth-step::-webkit-scrollbar-track { background: transparent; }
+.auth-step-stack .auth-step::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+.auth-step-stack .auth-step::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+.auth-step-stack .auth-step.is-active {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+/* Step 1 leaves to the right when step 2 takes over. */
+.auth-step-stack .auth-step.is-out-right {
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Step 2 starts off-screen to the left and slides in to center. */
+.auth-step-stack .auth-step.is-out-left {
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+/* RTL: mirror the slide directions so the swoosh still feels like
+   "old leaves outward, new comes from the leading edge." */
+[dir="rtl"] .auth-step-stack .auth-step.is-out-right {
+  transform: translateX(-110%);
+}
+[dir="rtl"] .auth-step-stack .auth-step.is-out-left {
+  transform: translateX(110%);
+}
+
+/* Step-2 input styling — matches the cream-on-translucent look of step 1. */
+.auth-step-label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.auth-step-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line-soft);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.auth-step-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+.auth-step-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.auth-step-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.auth-step-divider {
+  margin: 14px 0 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-step-stack .auth-step { transition: opacity 0.2s ease; transform: none !important; }
+}
+
+/* -----------------------------------------------------------------------
    Hero column-based image grid (homepage right aside)
    Adapted from W3Schools' responsive image grid:
      https://www.w3schools.com/howto/howto_css_image_grid_responsive.asp

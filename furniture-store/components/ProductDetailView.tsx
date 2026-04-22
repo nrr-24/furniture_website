@@ -253,19 +253,27 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
       <style jsx>{`
         .pd-wrap { width: 100%; }
         .pd-card {
-          background: var(--bg-panel);
+          /* Cream panel matching the homepage hero. Scoped color tokens used by
+             child rules below so we never leak these into global context. */
+          --pd-ink: #0d1a63;
+          --pd-ink-soft: rgba(13, 26, 99, 0.62);
+          --pd-line: rgba(13, 26, 99, 0.12);
+          --pd-surface: var(--sand-soft);
+
+          background: var(--pd-surface);
+          color: var(--pd-ink);
           border-radius: 24px;
           overflow: hidden;
           display: flex;
           flex-direction: ${isRtl ? 'row-reverse' : 'row'};
           min-height: 540px;
-          border: 1px solid var(--line-soft);
+          border: 1px solid var(--pd-line);
         }
         .pd-images {
           flex: 1.15;
           display: flex;
           flex-direction: row;
-          background: var(--bg-main);
+          background: #fff;
           min-height: 480px;
         }
         .pd-thumbs {
@@ -275,7 +283,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           padding: 18px 10px;
           overflow-y: auto;
           max-height: 640px;
-          background: rgba(0,0,0,0.15);
+          background: rgba(13, 26, 99, 0.05);
         }
         .pd-thumb {
           width: 64px;
@@ -296,7 +304,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           display: block;
         }
         .pd-thumb.is-active {
-          border-color: var(--text-main);
+          border-color: var(--pd-ink);
           transform: scale(1.04);
         }
         .pd-main-img {
@@ -369,8 +377,8 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         }
         .pd-title {
           font-size: clamp(1.8rem, 2.6vw, 2.4rem);
-          font-weight: 700;
-          color: var(--text-main);
+          font-weight: 800;
+          color: var(--pd-ink);
           margin: 0 0 6px;
           letter-spacing: -0.01em;
           line-height: 1.15;
@@ -379,8 +387,8 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         .pd-desc-underline {
           width: 64px;
           height: 2px;
-          background: var(--text-main);
-          opacity: 0.6;
+          background: var(--pd-ink);
+          opacity: 0.55;
           margin-bottom: 22px;
         }
         .pd-price-row {
@@ -390,17 +398,17 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           margin-bottom: 24px;
           flex-wrap: wrap;
         }
-        .pd-regular-price { font-size: 1.7rem; font-weight: 700; color: var(--text-main); }
-        .pd-regular-price-strike { font-size: 1.15rem; color: var(--text-soft); text-decoration: line-through; text-decoration-thickness: 2px; }
-        .pd-sale-price { font-size: 1.8rem; font-weight: 800; color: #ff4d4d; }
+        .pd-regular-price { font-size: 1.7rem; font-weight: 700; color: var(--pd-ink); }
+        .pd-regular-price-strike { font-size: 1.15rem; color: var(--pd-ink-soft); text-decoration: line-through; text-decoration-thickness: 2px; }
+        .pd-sale-price { font-size: 1.8rem; font-weight: 800; color: #d93a3a; }
 
         .pd-description {
-          color: var(--text-soft);
+          color: var(--pd-ink-soft);
           line-height: 1.75;
           font-size: 0.98rem;
           margin: 0 0 14px;
         }
-        .pd-description strong { color: var(--text-main); font-weight: 600; }
+        .pd-description strong { color: var(--pd-ink); font-weight: 700; }
 
         .pd-selector-row {
           display: flex;
@@ -408,13 +416,13 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           gap: 18px;
           margin-bottom: 16px;
           padding-bottom: 12px;
-          border-bottom: 1px solid var(--line-soft);
+          border-bottom: 1px solid var(--pd-line);
         }
         .pd-selector-label {
           font-size: 0.78rem;
           font-weight: 700;
           letter-spacing: 0.15em;
-          color: var(--text-soft);
+          color: var(--pd-ink-soft);
           text-transform: uppercase;
           min-width: 58px;
         }
@@ -423,23 +431,24 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         }
         .pd-type-pill {
           padding: 8px 16px; border-radius: 10px;
-          border: 1px solid var(--line-soft);
-          background: var(--bg-main); color: var(--text-main);
-          cursor: pointer; font-size: 0.85rem;
+          border: 1px solid var(--pd-line);
+          background: #fff; color: var(--pd-ink);
+          cursor: pointer; font-size: 0.85rem; font-weight: 600;
           transition: all 0.2s ease;
         }
+        .pd-type-pill:hover { border-color: var(--pd-ink); }
         .pd-type-pill.is-active {
-          background: var(--text-main); color: var(--bg-main);
-          border-color: var(--text-main);
+          background: var(--pd-ink); color: var(--pd-surface);
+          border-color: var(--pd-ink);
         }
         .pd-color-swatch {
           width: 34px; height: 34px; border-radius: 8px;
-          border: 2px solid var(--line-soft);
+          border: 2px solid var(--pd-line);
           padding: 0; cursor: pointer; transition: all 0.2s ease;
         }
         .pd-color-swatch.is-active {
-          border-color: var(--text-main); transform: scale(1.08);
-          box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 4px var(--text-main);
+          border-color: var(--pd-ink); transform: scale(1.08);
+          box-shadow: 0 0 0 2px var(--pd-surface), 0 0 0 4px var(--pd-ink);
         }
 
         .pd-footer {
@@ -452,29 +461,29 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         .pd-qty {
           display: flex; align-items: center; justify-content: flex-end; gap: 14px;
           padding: 6px 10px;
-          background: var(--bg-main);
-          border: 1px solid var(--line-soft);
+          background: #fff;
+          border: 1px solid var(--pd-line);
           border-radius: 10px;
           width: fit-content;
           align-self: flex-end;
         }
         .pd-qty button {
           width: 30px; height: 30px; border: none; background: transparent;
-          color: var(--text-main); cursor: pointer; border-radius: 6px;
+          color: var(--pd-ink); cursor: pointer; border-radius: 6px;
           display: flex; align-items: center; justify-content: center;
         }
-        .pd-qty button:hover { background: rgba(255,255,255,0.08); }
-        .pd-qty span { font-weight: 700; min-width: 28px; text-align: center; color: var(--text-main); }
+        .pd-qty button:hover { background: rgba(13, 26, 99, 0.08); }
+        .pd-qty span { font-weight: 700; min-width: 28px; text-align: center; color: var(--pd-ink); }
 
         .pd-cta {
           width: 100%; padding: 18px;
-          background: var(--text-main); color: var(--bg-main);
+          background: var(--pd-ink); color: var(--pd-surface);
           border: none; border-radius: 14px;
           font-size: 1.05rem; font-weight: 700; letter-spacing: 0.08em;
           cursor: pointer;
           transition: transform 0.15s ease, opacity 0.15s ease;
         }
-        .pd-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+        .pd-cta:hover { opacity: 0.92; transform: translateY(-1px); }
         .pd-cta-edit {
           background: #2e5bff; color: #fff;
           display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -482,25 +491,26 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         .pd-feature-toggle {
           width: 100%; padding: 12px 16px;
           display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-          background: rgba(255,215,0,0.08); color: #ffd700;
-          border: 1px solid rgba(255,215,0,0.35);
+          background: rgba(181, 138, 0, 0.08); color: #8a6700;
+          border: 1px solid rgba(181, 138, 0, 0.35);
           border-radius: 12px;
-          font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em;
+          font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;
           cursor: pointer;
           transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
         }
         .pd-feature-toggle:hover {
-          background: rgba(255,215,0,0.16);
-          border-color: rgba(255,215,0,0.55);
+          background: rgba(181, 138, 0, 0.14);
+          border-color: rgba(181, 138, 0, 0.6);
           transform: translateY(-1px);
         }
         .pd-feature-toggle.is-on {
-          background: rgba(255,215,0,0.18);
-          border-color: #ffd700;
-          color: #ffd700;
+          background: rgba(255, 199, 0, 0.2);
+          border-color: #b58a00;
+          color: #8a6700;
         }
+        .pd-feature-toggle i { color: #b58a00; }
         .pd-login-hint {
-          text-align: center; color: var(--text-soft); font-size: 0.9rem; padding: 14px;
+          text-align: center; color: var(--pd-ink-soft); font-size: 0.9rem; padding: 14px;
         }
 
         @media (max-width: 820px) {

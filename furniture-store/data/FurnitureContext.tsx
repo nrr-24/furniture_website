@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { FurnitureItem, Category, mapDbRowToItem, mapItemToDbRow, mapPartialItemToDbRow, mapDbRowToCategory } from './furnitureData';
 import { supabase } from '../lib/supabase';
+import { authHeaders } from '../lib/authClient';
 
 interface FurnitureContextType {
   items: FurnitureItem[];
@@ -67,7 +68,7 @@ export function FurnitureProvider({
     try {
       const response = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify(dbRow),
       });
 
@@ -102,7 +103,7 @@ export function FurnitureProvider({
     try {
       const res = await fetch('/api/products', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ id, updates: dbUpdates }),
       });
       const json = await res.json();
@@ -125,6 +126,7 @@ export function FurnitureProvider({
 
     const { error } = await fetch(`/api/products?id=${id}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     }).then(res => res.json());
 
     if (error) {
@@ -138,6 +140,7 @@ export function FurnitureProvider({
 
     const { error } = await fetch(`/api/products?ids=${ids.join(',')}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     }).then(res => res.json());
 
     if (error) {
@@ -159,7 +162,7 @@ export function FurnitureProvider({
 
     await fetch('/api/products', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(payload),
     });
   };
@@ -168,7 +171,7 @@ export function FurnitureProvider({
     const sort_order = categories.length;
     const { data, error } = await fetch('/api/categories', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ name, name_ar: nameAr, sort_order }),
     }).then(res => res.json());
 
@@ -186,7 +189,7 @@ export function FurnitureProvider({
 
     await fetch('/api/categories', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ id, ...dbUpdates }),
     });
   };
@@ -198,6 +201,7 @@ export function FurnitureProvider({
 
     await fetch(`/api/categories?id=${id}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     });
   };
 
@@ -212,7 +216,7 @@ export function FurnitureProvider({
 
     await fetch('/api/categories', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(payload),
     });
   };

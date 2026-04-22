@@ -1,24 +1,22 @@
 import { supabaseAdmin } from '../../../lib/supabase';
+import { requireAdmin } from '../../../lib/serverAuth';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request): Promise<NextResponse> {
+  // Admin-only route
+  const guard = await requireAdmin(request);
+  if (!guard.ok) return guard.response;
+
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
 
-    if (!filename) {
-      return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
-    }
+  if (!filename) {
+    return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
+  }
 
-    // Diagnostic check for the admin client
-    if (!supabaseAdmin || supabaseAdmin.auth === undefined) {
-      console.error('Supabase Admin client failed to initialize');
-      return NextResponse.json({ error: 'Storage client initialization failed' }, { status: 500 });
-    }
-
-    try {
-      // Read the request body as an ArrayBuffer
+  try {
     const arrayBuffer = await request.arrayBuffer();
     const buffer = new Uint8Array(arrayBuffer);
 
@@ -26,8 +24,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'File body is empty' }, { status: 400 });
     }
 
-    // Generate a unique filename to avoid collisions (e.g., multiple parallel
-    // uploads of the same filename arriving in the same millisecond).
+    // Unique filename: timestamp + 8-char random + sanitized original name.
     const rand = (globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)).slice(0, 8);
     const safeName = filename.replace(/\s+/g, '_');
     const uniqueName = `${Date.now()}-${rand}-${safeName}`;
@@ -44,10 +41,19 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     if (error) {
       console.error('Supabase Storage upload error:', error);
-      return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+      // Surface the actual error so the client can show a useful message
+      // ("new row violates row-level security policy", "mime type not allowed",
+      //  "The resource already exists", etc.).
+      return NextResponse.json(
+        {
+          error: error.message || 'Failed to upload image',
+          detail: (error as any).statusCode || (error as any).status || null,
+          name: (error as any).name || null,
+        },
+        { status: 500 }
+      );
     }
 
-    // Get the public URL for the uploaded file
     const { data: publicUrlData } = supabaseAdmin.storage
       .from('product-images')
       .getPublicUrl(data.path);
@@ -55,7 +61,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ url: publicUrlData.publicUrl });
   } catch (error) {
     console.error('Error uploading to Supabase Storage:', error);
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Failed to upload image',
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -67,6 +78,9 @@ function getContentType(filename: string): string {
     png: 'image/png',
     gif: 'image/gif',
     webp: 'image/webp',
+    avif: 'image/avif',
+    heic: 'image/heic',
+    heif: 'image/heif',
     svg: 'image/svg+xml',
   };
   return types[ext || ''] || 'application/octet-stream';

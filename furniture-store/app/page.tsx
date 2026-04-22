@@ -21,6 +21,7 @@ const HERO_BANNERS = [
   }
 ];
 
+
 /**
  * Column-based responsive image grid for the homepage hero's right aside.
  * Pattern adapted from https://www.w3schools.com/howto/howto_css_image_grid_responsive.asp —

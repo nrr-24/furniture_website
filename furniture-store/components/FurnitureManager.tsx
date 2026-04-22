@@ -4,6 +4,31 @@ import React, { useState } from 'react';
 import { FurnitureItem } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
 import { useLanguage } from '../data/LanguageContext';
+import { authHeaders } from '../lib/authClient';
+
+// Upload guards — mirror Next App Router's default body size (4 MB) and
+// reject non-image files before hitting the network.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+const ACCEPTED_MIME_RE = /^image\/(jpeg|jpg|png|gif|webp|avif|heic|heif|svg\+xml)$/;
+const ACCEPTED_EXT_RE = /\.(jpe?g|png|gif|webp|avif|heic|heif|svg)$/i;
+
+function validateImageFile(file: File): string | null {
+  // Some environments/browsers leave file.type empty for uncommon formats,
+  // so accept either a known MIME or a known extension.
+  const typeOk = file.type ? ACCEPTED_MIME_RE.test(file.type) : true;
+  const extOk = ACCEPTED_EXT_RE.test(file.name);
+  if (!typeOk && !extOk) {
+    return `unsupported file type (${file.type || 'unknown'})`;
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    const mb = (file.size / 1024 / 1024).toFixed(1);
+    return `too large (${mb} MB, max ${MAX_UPLOAD_BYTES / 1024 / 1024} MB)`;
+  }
+  if (file.size === 0) {
+    return 'file is empty';
+  }
+  return null;
+}
 
 interface FurnitureManagerProps {
   initialItem?: FurnitureItem;
@@ -32,24 +57,84 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
   });
 
   const [uploading, setUploading] = useState(false);
-  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
 
-  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Unified images list — the first entry is the product's main image
+   * (persisted to `products.image_url`), everything after is the gallery
+   * (persisted to `products.gallery`). We derive this from formData so
+   * there's no duplicate state to keep in sync, and we split back on save
+   * via setAllImages().
+   */
+  const allImages = ((): string[] => {
+    const main = formData.image ? [formData.image] : [];
+    const rest = (formData.gallery || []).filter(g => g && g !== formData.image);
+    return [...main, ...rest];
+  })();
+
+  const setAllImages = (list: string[]) => {
+    const cleaned = Array.from(new Set(list.filter(Boolean)));
+    setFormData(prev => ({
+      ...prev,
+      image: cleaned[0] || '',
+      gallery: cleaned.slice(1),
+    }));
+  };
+
+  const setMainImage = (idx: number) => {
+    if (idx === 0) return;
+    const next = [...allImages];
+    const [moved] = next.splice(idx, 1);
+    next.unshift(moved);
+    setAllImages(next);
+  };
+
+  const removeImageAt = (idx: number) => {
+    setAllImages(allImages.filter((_, i) => i !== idx));
+  };
+
+  const addUrlImage = () => {
+    const v = urlInput.trim();
+    if (!v) return;
+    if (allImages.includes(v)) { setUrlInput(''); return; }
+    setAllImages([...allImages, v]);
+    setUrlInput('');
+  };
+
+  const handleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const files = Array.from(e.target.files);
-    setGalleryUploading(true);
+    setUploading(true);
 
-    const uploadOne = async (file: File): Promise<{ url?: string; error?: string; name: string }> => {
+    // Split up-front into files that pass the pre-flight checks and ones
+    // that get rejected locally so we never hit the network for obviously
+    // bad inputs (and the admin gets a specific reason instead of a 413/
+    // mime-rejection).
+    const preflightFailed: { name: string; error: string }[] = [];
+    const okFiles: File[] = [];
+    for (const file of files) {
+      const err = validateImageFile(file);
+      if (err) preflightFailed.push({ name: file.name || '(unnamed)', error: err });
+      else okFiles.push(file);
+    }
+
+    const uploadOne = async (
+      file: File
+    ): Promise<{ url?: string; error?: string; name: string }> => {
       try {
-        const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
-          method: 'POST',
-          body: file,
-        });
+        const response = await fetch(
+          `/api/upload?filename=${encodeURIComponent(file.name)}`,
+          { method: 'POST', body: file, headers: authHeaders() }
+        );
         const text = await response.text();
         let json: any = {};
         try { json = JSON.parse(text); } catch { /* non-JSON response */ }
         if (!response.ok) {
-          return { error: json.error || `${response.status}: ${text.slice(0, 120)}`, name: file.name };
+          const msg =
+            json.error ||
+            json.detail ||
+            `${response.status}: ${text.slice(0, 160) || response.statusText}`;
+          return { error: msg, name: file.name };
         }
         if (!json.url) return { error: 'Response missing url field', name: file.name };
         return { url: json.url, name: file.name };
@@ -59,33 +144,38 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     };
 
     try {
-      // Parallel uploads — much faster than sequential for multi-file selections
-      const results = await Promise.all(files.map(uploadOne));
+      const results = await Promise.all(okFiles.map(uploadOne));
       const succeeded = results.filter(r => r.url).map(r => r.url as string);
-      const failed = results.filter(r => r.error);
+      const failed = [
+        ...preflightFailed,
+        ...results
+          .filter(r => r.error)
+          .map(r => ({ name: r.name, error: r.error as string })),
+      ];
 
+      // Use the functional updater so we append to the CURRENT images
+      // list, not a stale snapshot captured when the upload started.
       if (succeeded.length > 0) {
-        setFormData(prev => ({ ...prev, gallery: [...(prev.gallery || []), ...succeeded] }));
+        setFormData(prev => {
+          const cur = [prev.image, ...((prev.gallery || []).filter(g => g && g !== prev.image))].filter(Boolean) as string[];
+          const next = Array.from(new Set([...cur, ...succeeded]));
+          return { ...prev, image: next[0] || '', gallery: next.slice(1) };
+        });
       }
 
       if (failed.length > 0) {
-        // console.warn instead of .error so Next's dev overlay doesn't
-        // mistake a handled failure for a code crash.
-        console.warn('Gallery upload failures:', failed);
+        // console.warn so Next's dev overlay doesn't flag our handled failures.
+        console.warn('Image upload failures:', failed);
         const msg = failed.map(f => `• ${f.name}: ${f.error}`).join('\n');
         alert(`${succeeded.length}/${files.length} uploaded.\n\nFailed:\n${msg}`);
       }
     } catch (err) {
-      console.error('Gallery upload error:', err);
-      alert('Gallery upload failed unexpectedly — see console.');
+      console.error('Image upload error:', err);
+      alert('Upload failed unexpectedly — see console.');
     } finally {
-      setGalleryUploading(false);
+      setUploading(false);
       e.target.value = '';
     }
-  };
-
-  const removeGalleryImage = (idx: number) => {
-    setFormData(prev => ({ ...prev, gallery: (prev.gallery || []).filter((_, i) => i !== idx) }));
   };
 
   const addColor = (hex: string) => {
@@ -104,46 +194,6 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
   };
   const removeType = (type: string) => {
     setFormData(prev => ({ ...prev, types: (prev.types || []).filter(x => x !== type) }));
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-
-    setUploading(true);
-    const file = e.target.files[0];
-    try {
-      const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
-        method: 'POST',
-        body: file,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Upload API Error:', response.status, errorText);
-        alert(`Upload failed (${response.status}): ${errorText.substring(0, 100)}...`);
-        return;
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Non-JSON response received:', text);
-        alert('Unexpected server response. Please check the logs.');
-        return;
-      }
-
-      const newBlob = await response.json();
-      if (newBlob.url) {
-        setFormData({ ...formData, image: newBlob.url });
-      } else {
-        alert(newBlob.error || 'Failed to upload image.');
-      }
-    } catch (error) {
-      console.error('Upload Exception:', error);
-      alert('Network or processing error during upload.');
-    } finally {
-      setUploading(false);
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -221,21 +271,76 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               />
             </div>
             <div className="col-md-6">
-              <label className="form-label small opacity-75">Image URL</label>
+              <label className="form-label small opacity-75">
+                {isRtl ? 'صور المنتج (الأولى هي الصورة الرئيسية)' : 'Product Images (first = main preview)'}
+              </label>
+              <div className="d-flex flex-wrap gap-2 mb-2" style={{ alignItems: 'flex-start' }}>
+                {allImages.map((url, idx) => (
+                  <div
+                    key={`${url}-${idx}`}
+                    style={{
+                      position: 'relative',
+                      width: '68px',
+                      height: '68px',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      border: idx === 0 ? '2px solid #ffd700' : '1px solid var(--line-soft)',
+                      boxShadow: idx === 0 ? '0 2px 8px rgba(255,215,0,0.25)' : 'none',
+                    }}
+                  >
+                    <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {idx === 0 && (
+                      <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(255,215,0,0.9)', color: '#1a1a1a', fontSize: '0.55rem', fontWeight: 800, textAlign: 'center', padding: '1px 0', letterSpacing: '0.08em' }}>
+                        {isRtl ? 'رئيسية' : 'MAIN'}
+                      </span>
+                    )}
+                    {idx !== 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setMainImage(idx)}
+                        title={isRtl ? 'تعيين كصورة رئيسية' : 'Set as main'}
+                        style={{ position: 'absolute', bottom: '2px', left: '2px', width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(255,215,0,0.92)', color: '#1a1a1a', border: 'none', fontSize: '0.65rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                      >
+                        <i className="bi bi-star-fill" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImageAt(idx)}
+                      title={isRtl ? 'حذف' : 'Remove'}
+                      style={{ position: 'absolute', top: '2px', right: '2px', width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(255,77,77,0.95)', color: 'white', border: 'none', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                    >×</button>
+                  </div>
+                ))}
+                <input
+                  type="file" accept="image/*" multiple className="d-none"
+                  id={`imagesUpload-${initialItem?.id || 'new'}`} onChange={handleImagesUpload}
+                />
+                <label
+                  htmlFor={`imagesUpload-${initialItem?.id || 'new'}`}
+                  style={{ width: '68px', height: '68px', borderRadius: '10px', border: '1px dashed var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-soft)' }}
+                  title={isRtl ? 'رفع صور' : 'Upload images'}
+                >
+                  {uploading ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-plus-lg" />}
+                </label>
+              </div>
               <div className="d-flex gap-2">
                 <input
-                  type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
-                  value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="URL"
+                  type="text"
+                  className="form-control bg-dark text-white border-secondary form-control-sm"
+                  value={urlInput}
+                  onChange={e => setUrlInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addUrlImage(); } }}
+                  placeholder={isRtl ? 'أو الصق رابط صورة' : 'Or paste an image URL'}
                 />
-                <input
-                  type="file" accept="image/*" className="d-none"
-                  id={`imageUpload-${initialItem?.id || 'new'}`} onChange={handleImageUpload}
-                />
-                <label htmlFor={`imageUpload-${initialItem?.id || 'new'}`} className="btn btn-sm hero-secondary-btn py-1 px-3 d-flex align-items-center mb-0" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  {uploading ? <span className="spinner-border spinner-border-sm me-2"></span> : <i className="bi bi-upload me-2"></i>}
-                  {uploading ? (isRtl ? 'جاري...' : 'Up...') : (isRtl ? 'رفع' : 'Upload')}
-                </label>
+                <button
+                  type="button"
+                  onClick={addUrlImage}
+                  className="btn btn-sm hero-secondary-btn py-1 px-3 d-flex align-items-center mb-0"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  <i className="bi bi-plus-lg" />
+                </button>
               </div>
             </div>
             <div className="col-md-3">
@@ -290,32 +395,6 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                   onChange={e => setFormData({ ...formData, salePrice: e.target.value === '' ? null : parseFloat(e.target.value) })}
                   placeholder="Leave blank if not on sale"
                 />
-              </div>
-            </div>
-
-            <div className="col-12">
-              <label className="form-label small opacity-75">Gallery Images (shown as thumbnails in modal)</label>
-              <div className="d-flex flex-wrap gap-2 mb-2">
-                {(formData.gallery || []).map((url, idx) => (
-                  <div key={`${url}-${idx}`} style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--line-soft)' }}>
-                    <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <button
-                      type="button"
-                      onClick={() => removeGalleryImage(idx)}
-                      style={{ position: 'absolute', top: '2px', right: '2px', width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(255,77,77,0.95)', color: 'white', border: 'none', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                    >×</button>
-                  </div>
-                ))}
-                <input
-                  type="file" accept="image/*" multiple className="d-none"
-                  id={`galleryUpload-${initialItem?.id || 'new'}`} onChange={handleGalleryUpload}
-                />
-                <label
-                  htmlFor={`galleryUpload-${initialItem?.id || 'new'}`}
-                  style={{ width: '64px', height: '64px', borderRadius: '8px', border: '1px dashed var(--line-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-soft)' }}
-                >
-                  {galleryUploading ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-plus-lg" />}
-                </label>
               </div>
             </div>
 

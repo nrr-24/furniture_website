@@ -1,12 +1,17 @@
 import { supabaseAdmin } from '../../../lib/supabase';
+import { requireAdmin } from '../../../lib/serverAuth';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 // Handle mutations for furniture products (Add, Update, Delete)
 // Using supabaseAdmin (service role) to bypass RLS for administrative actions.
+// All mutating methods require the caller to be an admin.
 
 export async function POST(request: Request) {
+  const guard = await requireAdmin(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const item = await request.json();
     
@@ -35,6 +40,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const guard = await requireAdmin(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const body = await request.json();
     
@@ -73,6 +81,9 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const guard = await requireAdmin(request);
+  if (!guard.ok) return guard.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

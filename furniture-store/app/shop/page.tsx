@@ -282,7 +282,7 @@ export default function ShopPage() {
 
       <div className="container">
         <header style={{ marginBottom: '28px', textAlign: 'center' }}>
-          <span className="section-kicker" style={{ fontSize: '0.85rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span>
+          {/* <span className="section-kicker" style={{ fontSize: '0.85rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span> */}
           <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 14px', textAlign: 'center', lineHeight: 1.1 }}>
               {isRtl ? 'استكشف' : 'EXPLORE'}
@@ -678,7 +678,11 @@ export default function ShopPage() {
         .shop-showcase {
           position: relative;
           width: 100%;
-          min-height: min(640px, 80vh);
+          /* Compact "banner" feel — shorter than a full hero, taller than a
+             strip. Mobile default is on the lower end of the clamp. */
+          min-height: min(420px, 56vh);
+          /* Breathing room before the EXPLORE COLLECTIONS section below. */
+          margin-bottom: clamp(40px, 6vw, 80px);
           overflow: hidden;
           isolation: isolate;
           background: #0a0f2e;
@@ -732,7 +736,8 @@ export default function ShopPage() {
           position: relative;
           z-index: 3;
           min-height: inherit;
-          padding: clamp(48px, 9vw, 96px) clamp(24px, 6vw, 64px);
+          /* Tighter vertical padding to match the shorter banner. */
+          padding: clamp(36px, 5.5vw, 64px) clamp(24px, 6vw, 64px);
           display: flex;
           flex-direction: column;
           gap: 18px;
@@ -864,7 +869,7 @@ export default function ShopPage() {
 
         /* Desktop: constrain content to the left half, softer horizontal scrim */
         @media (min-width: 992px) {
-          .shop-showcase { min-height: min(620px, 78vh); }
+          .shop-showcase { min-height: min(420px, 52vh); }
           .shop-showcase-content {
             align-items: flex-start;
             text-align: left;

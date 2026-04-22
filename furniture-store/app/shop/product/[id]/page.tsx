@@ -153,7 +153,12 @@ export default function ProductPage() {
       <Footer />
 
       <style jsx global>{`
-        .pp-main { padding: 0; }
+        .pp-main {
+          padding: 0;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+          scroll-behavior: auto;
+        }
         .pp-main .container { padding: 32px 40px 80px; }
         @media (max-width: 991px) { .pp-main .container { padding: 24px 24px 60px; } }
         @media (max-width: 600px) { .pp-main .container { padding: 16px 16px 48px; } }
@@ -220,7 +225,9 @@ export default function ProductPage() {
             margin: 0 -16px;
             padding-left: 16px;
             padding-right: 16px;
-            scroll-snap-type: x mandatory;
+            scroll-snap-type: x proximity;
+            overscroll-behavior-x: contain;
+            -webkit-overflow-scrolling: touch;
           }
           .pp-suggested-rail > * {
             flex: 0 0 62vw;
@@ -230,29 +237,31 @@ export default function ProductPage() {
         }
 
         .pp-suggested-card {
+          /* Cream/navy palette matching the Featured compact cards and the detail card. */
           display: flex;
           flex-direction: column;
-          background: var(--bg-panel);
-          border: 1px solid var(--line-soft);
+          background: var(--sand-soft);
+          border: 1px solid rgba(13, 26, 99, 0.12);
           border-radius: 16px;
           overflow: hidden;
           padding: 0;
           cursor: pointer;
           text-align: left;
           transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
-          color: inherit;
+          color: #0d1a63;
         }
         :global([dir="rtl"]) .pp-suggested-card { text-align: right; }
         .pp-suggested-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 14px 32px rgba(0,0,0,0.35);
-          border-color: var(--text-main);
+          box-shadow: 0 14px 32px rgba(34, 81, 164, 0.45);
+          border-color: rgba(13, 26, 99, 0.3);
         }
         .pp-suggested-img {
           position: relative;
           aspect-ratio: 4 / 3;
           overflow: hidden;
-          background: rgba(255,255,255,0.04);
+          background: #fff;
+          border-bottom: 1px solid rgba(13, 26, 99, 0.08);
         }
         .pp-suggested-img img {
           width: 100%; height: 100%;
@@ -266,25 +275,26 @@ export default function ProductPage() {
           position: absolute;
           top: 10px;
           left: 10px;
-          background: #ff4d4d;
+          background: #d93a3a;
           color: #fff;
           font-size: 0.65rem;
           font-weight: 800;
           letter-spacing: 0.1em;
           padding: 3px 9px;
           border-radius: 999px;
+          box-shadow: 0 2px 6px rgba(13, 26, 99, 0.25);
         }
         :global([dir="rtl"]) .pp-suggested-badge { left: auto; right: 10px; }
         .pp-suggested-meta {
-          padding: 14px 14px 16px;
+          padding: 14px 16px 16px;
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
         .pp-suggested-name {
           font-size: 0.95rem;
-          font-weight: 600;
-          color: var(--text-main);
+          font-weight: 700;
+          color: #0d1a63;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -294,14 +304,15 @@ export default function ProductPage() {
           gap: 8px;
           align-items: baseline;
           font-size: 0.9rem;
-          color: var(--text-soft);
+          color: rgba(13, 26, 99, 0.65);
+          font-weight: 600;
         }
         .pp-suggested-strike {
           text-decoration: line-through;
-          opacity: 0.7;
+          opacity: 0.65;
           font-size: 0.8rem;
         }
-        .pp-suggested-sale { color: #ff4d4d; font-weight: 700; }
+        .pp-suggested-sale { color: #d93a3a; font-weight: 800; }
       `}</style>
     </main>
   );

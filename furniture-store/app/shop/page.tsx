@@ -662,7 +662,14 @@ export default function ShopPage() {
       )}
 
       <style jsx global>{`
-        .shop-main { padding: 0; }
+        .shop-main {
+          padding: 0;
+          /* iOS momentum + keep scroll-chain inside this container so the body
+             doesn't get tugged when we reach the top/bottom of the page. */
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+          scroll-behavior: auto;
+        }
         .shop-main .container { padding: 0 40px; }
         @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
         @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
@@ -675,6 +682,10 @@ export default function ShopPage() {
           overflow: hidden;
           isolation: isolate;
           background: #0a0f2e;
+          /* Scope layout + paint so scrolling never needs to recompute anything
+             inside this hero — the absolute slides and Ken Burns animation
+             stay contained. */
+          contain: layout paint;
         }
 
         .shop-showcase-media {
@@ -802,11 +813,11 @@ export default function ShopPage() {
           letter-spacing: 0.04em;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-          box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+          box-shadow: 0 10px 28px rgba(34, 81, 164, 0.5);
         }
         .shop-showcase-cta:hover {
           transform: translateY(-1px);
-          box-shadow: 0 14px 36px rgba(0,0,0,0.45);
+          box-shadow: 0 14px 36px rgba(34, 81, 164, 0.65);
         }
         .shop-showcase-cta i { font-size: 0.9rem; }
 
@@ -922,7 +933,7 @@ export default function ShopPage() {
           background: var(--blue-deep);
           border-color: var(--blue-accent);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          box-shadow: 0 6px 20px rgba(34, 81, 164, 0.42);
         }
         .shop-category-pill:hover i {
           opacity: 1;
@@ -970,26 +981,26 @@ export default function ShopPage() {
           justify-content: center;
           font-size: 1.15rem;
           cursor: pointer;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 6px 18px rgba(34, 81, 164, 0.5);
           transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                       box-shadow 0.25s ease,
                       background 0.2s ease;
         }
         .cart-fab-add:hover {
           transform: translateY(-3px) scale(1.06);
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(226, 218, 204, 0.18);
+          box-shadow: 0 12px 28px rgba(34, 81, 164, 0.62), 0 0 0 4px rgba(226, 218, 204, 0.18);
           background: #fff;
         }
         .cart-fab-add:active {
           transform: translateY(-1px) scale(0.96);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 12px rgba(34, 81, 164, 0.55);
         }
         .cart-fab-add i {
           line-height: 1;
         }
 
         .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
-        .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
+        .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(34, 81, 164, 0.75) !important; }
         .category-modal::-webkit-scrollbar { width: 6px; }
         .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); border-radius: 10px; }
 
@@ -1009,7 +1020,10 @@ export default function ShopPage() {
           gap: 16px;
           overflow-x: auto;
           padding-bottom: 16px;
-          scroll-snap-type: x mandatory;
+          scroll-snap-type: x proximity;
+          /* Keep horizontal swipes inside this strip so they don't fight the
+             vertical page scroll when gestures cross axes. */
+          overscroll-behavior-x: contain;
           -webkit-overflow-scrolling: touch;
           scrollbar-width: thin;
         }
@@ -1027,29 +1041,31 @@ export default function ShopPage() {
         }
 
         .compact-card {
+          /* Cream/navy palette matching the product detail card and homepage hero. */
           flex: 0 0 auto;
           width: 180px;
           scroll-snap-align: start;
-          background: var(--bg-panel);
+          background: var(--sand-soft);
           border-radius: 14px;
           overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-          border: 1px solid var(--line-soft);
+          box-shadow: 0 4px 14px rgba(34, 81, 164, 0.3);
+          border: 1px solid rgba(13, 26, 99, 0.12);
           cursor: pointer;
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
           display: flex;
           flex-direction: column;
         }
         .compact-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 26px rgba(0,0,0,0.4);
+          box-shadow: 0 12px 28px rgba(34, 81, 164, 0.4);
+          border-color: rgba(13, 26, 99, 0.3);
         }
         .compact-img-wrapper {
           position: relative;
           width: 100%;
           height: 140px;
           overflow: hidden;
-          background: rgba(255,255,255,0.04);
+          background: #fff;
+          border-bottom: 1px solid rgba(13, 26, 99, 0.08);
         }
         .compact-img-wrapper img {
           width: 100%;
@@ -1064,35 +1080,36 @@ export default function ShopPage() {
           position: absolute;
           top: 10px;
           left: 10px;
-          background: var(--text-main);
-          color: var(--bg-main);
+          background: #0d1a63;
+          color: var(--sand-soft);
           font-size: 0.6rem;
-          font-weight: 700;
-          padding: 3px 8px;
+          font-weight: 800;
+          padding: 3px 10px;
           border-radius: 999px;
           letter-spacing: 1px;
           text-transform: uppercase;
+          box-shadow: 0 2px 6px rgba(34, 81, 164, 0.35);
         }
         [dir="rtl"] .compact-tag { left: auto; right: 10px; }
         .compact-info {
-          padding: 12px;
+          padding: 12px 14px 14px;
           display: flex;
           flex-direction: column;
           gap: 4px;
         }
         .compact-title {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-main);
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #0d1a63;
           margin: 0;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
         .compact-price {
-          font-size: 0.75rem;
-          color: var(--text-soft);
-          font-weight: 500;
+          font-size: 0.78rem;
+          color: rgba(13, 26, 99, 0.65);
+          font-weight: 600;
         }
 
         /* Shop Card Redesign */
@@ -1106,12 +1123,12 @@ export default function ShopPage() {
           padding: 1.2em;
           z-index: 1;
           overflow: hidden;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+          box-shadow: 0 8px 24px rgba(34, 81, 164, 0.4);
           transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.4s ease;
         }
         .shop-item-card:hover {
           transform: translateY(-6px) scale(1.02);
-          box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+          box-shadow: 0 16px 40px rgba(34, 81, 164, 0.6), 0 0 0 1px rgba(255,255,255,0.1);
         }
         .card-bg-layer {
           position: absolute;
@@ -1130,7 +1147,7 @@ export default function ShopPage() {
         .card-overlay {
           position: absolute;
           top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 45%, transparent 100%);
+          background: linear-gradient(to top, rgba(6, 10, 35, 0.95) 0%, rgba(6, 10, 35, 0.6) 20%, transparent 45%);
         }
         .card-content {
           color: white;

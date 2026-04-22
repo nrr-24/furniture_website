@@ -328,7 +328,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           height: 42px;
           border: none;
           border-radius: 50%;
-          background: rgba(0,0,0,0.55);
+          background: rgba(34, 81, 164, 0.72);
           color: #fff;
           display: flex;
           align-items: center;
@@ -342,7 +342,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         }
         .pd-main-img:hover .pd-nav,
         .pd-nav:focus-visible { opacity: 1; }
-        .pd-nav:hover { background: rgba(0,0,0,0.75); transform: translateY(-50%) scale(1.05); }
+        .pd-nav:hover { background: rgba(34, 81, 164, 0.92); transform: translateY(-50%) scale(1.05); }
         .pd-nav-prev { left: 14px; }
         .pd-nav-next { right: 14px; }
         :global([dir="rtl"]) .pd-nav-prev { left: auto; right: 14px; }
@@ -352,7 +352,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           position: absolute;
           bottom: 14px;
           right: 14px;
-          background: rgba(0,0,0,0.55);
+          background: rgba(34, 81, 164, 0.72);
           color: #fff;
           font-size: 0.75rem;
           font-weight: 600;

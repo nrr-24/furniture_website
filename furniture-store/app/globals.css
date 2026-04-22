@@ -152,10 +152,15 @@ img {
   padding-left: max(40px, env(safe-area-inset-left));
   padding-right: max(40px, env(safe-area-inset-right));
   z-index: 1000;
-  background: transparent;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* Slight solid tint so the blur isn't the only thing creating contrast —
+     cheaper per frame than a heavy blur over random content. */
+  background: rgba(17, 22, 66, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  /* Scope repaints to the navbar so scrolling doesn't invalidate the
+     page paint region it covers. */
+  contain: paint;
 }
 
 @media (max-width: 991px) {

@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../data/LanguageContext';
 import { FurnitureItem, Category } from '../../data/furnitureData';
 import { useFurniture } from '../../data/FurnitureContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
-import ProductModal from '../../components/ProductModal';
 import Footer from '../../components/layout/Footer';
 
 const FALLBACK_IMAGE = '/images/LOGO/image.png';
@@ -36,6 +36,7 @@ function getCategoryIcon(name: string, nameAr: string): string {
 }
 
 export default function ShopPage() {
+  const router = useRouter();
   const { t, isRtl } = useLanguage();
   const {
     items, categories, initialized,
@@ -46,10 +47,11 @@ export default function ShopPage() {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCart();
 
   // Modals & States
-  const [selectedItem, setSelectedItem] = useState<FurnitureItem | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<FurnitureItem | null>(null);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+
+  const openProduct = (id: string) => router.push(`/shop/product/${id}`);
 
   // Drag and Drop States
   const [draggedItem, setDraggedItem] = useState<{ id: string, index: number, categoryId?: string, type: 'product' | 'category' } | null>(null);
@@ -334,7 +336,7 @@ export default function ShopPage() {
               <div className="featured-carousel-container">
                 <div className="featured-carousel">
                   {featuredItems.map((item) => (
-                    <div key={item.id} className="compact-card" onClick={() => setSelectedItem(item)}>
+                    <div key={item.id} className="compact-card" onClick={() => openProduct(item.id)}>
                       <div className="compact-img-wrapper">
                         <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
                         <div className="compact-tag">{isRtl ? 'مميّز' : 'Featured'}</div>
@@ -397,7 +399,7 @@ export default function ShopPage() {
                       <div
                         className="shop-item-card group"
                         style={{ cursor: 'pointer' }}
-                        onClick={() => setSelectedItem(item)}
+                        onClick={() => openProduct(item.id)}
                       >
                         {isAdmin && (
                           <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
@@ -657,23 +659,6 @@ export default function ShopPage() {
             <FurnitureManager initialItem={itemToEdit || undefined} onClose={() => setIsEditorOpen(false)} />
           </div>
         </div>
-      )}
-
-      {/* Item Details Modal */}
-      {selectedItem && (
-        <ProductModal
-          item={selectedItem}
-          category={categories.find(c => c.id === selectedItem.categoryId) || null}
-          onClose={() => setSelectedItem(null)}
-          onEdit={isAdmin ? () => {
-            setItemToEdit(selectedItem);
-            setSelectedItem(null);
-            setIsEditorOpen(true);
-          } : undefined}
-          onToggleFeatured={isAdmin ? () => {
-            updateItem(selectedItem.id, { isFeatured: !selectedItem.isFeatured });
-          } : undefined}
-        />
       )}
 
       <style jsx global>{`

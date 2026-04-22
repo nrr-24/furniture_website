@@ -21,6 +21,28 @@ const HERO_BANNERS = [
   }
 ];
 
+/**
+ * Column-based responsive image grid for the homepage hero's right aside.
+ * Pattern adapted from https://www.w3schools.com/howto/howto_css_image_grid_responsive.asp —
+ * each outer array is a column; nested items stack top-to-bottom, with per-item
+ * flex weights below producing varied sizing.
+ */
+const HERO_GRID_COLUMNS: { src: string }[][] = [
+  [
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0028_005.jpg' },
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0002_014.jpg' },
+  ],
+  [
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg' },
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0001_001.jpg' },
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0025_008.jpg' },
+  ],
+  [
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg' },
+    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg' },
+  ],
+];
+
 export default function HomePage() {
   const { t, isRtl } = useLanguage();
   const { isAdmin, isCustomer } = useAuth();
@@ -113,27 +135,39 @@ export default function HomePage() {
 
         </div>
 
-        {/* Right Side: Vast Edge Image */}
+        {/* Right Side: Responsive image grid (column-flex, W3Schools-style) */}
         <div className="split-right">
-          <Link href={currentHero.link} className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%', cursor: 'pointer' }}>
-            <img
-              src={currentHero.image}
-              alt={isRtl ? currentHero.titleAr : currentHero.titleEn}
-              className="reveal-inner-img desktop-hero-img"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
-            />
+          <div className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%' }}>
+            {/* Desktop/tablet: multi-image column grid with varied sizing */}
+            <div className="hero-col-grid">
+              {HERO_GRID_COLUMNS.map((col, ci) => (
+                <div key={ci} className="hero-col">
+                  {col.map((item, ii) => (
+                    <Link
+                      key={ii}
+                      href={currentHero.link}
+                      className="hero-col-item"
+                      aria-label={isRtl ? currentHero.titleAr : currentHero.titleEn}
+                    >
+                      <img
+                        src={item.src}
+                        alt=""
+                        loading={ci === 0 && ii === 0 ? 'eager' : 'lazy'}
+                      />
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile: existing full-bleed fallback (the CSS in globals hides the
+                desktop grid below 991px and shows this image as the backdrop). */}
             <img
               src={currentHero.mobileImage}
               alt={isRtl ? currentHero.titleAr : currentHero.titleEn}
               className="mobile-hero-img"
             />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.3) 0%, transparent 100%)' }}></div>
-
-            <div style={{ position: 'absolute', bottom: 'clamp(20px, 4vw, 40px)', left: 'clamp(20px, 4vw, 40px)', right: 'clamp(20px, 4vw, 40px)', color: 'rgba(255,255,255,0.9)' }}>
-              <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>01 /</span>
-              <h3 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 300, margin: 0 }}>{isRtl ? currentHero.titleAr : currentHero.titleEn}</h3>
-            </div>
-          </Link>
+          </div>
         </div>
       </section>
 

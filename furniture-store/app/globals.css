@@ -325,6 +325,78 @@ img {
   min-height: 0; /* Allow the image to shrink to fit the viewport vertically */
 }
 
+/* -----------------------------------------------------------------------
+   Hero column-based image grid (homepage right aside)
+   Adapted from W3Schools' responsive image grid:
+     https://www.w3schools.com/howto/howto_css_image_grid_responsive.asp
+   Columns laid out with flex; within each column, items get varied flex
+   weights so the grid has a masonry-like "varied sizing" feel while
+   still filling the hero's fixed height.
+   ----------------------------------------------------------------------- */
+.hero-col-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+.hero-col {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hero-col-item {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  position: relative;
+  cursor: pointer;
+}
+.hero-col-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-col-item:hover img { transform: scale(1.04); }
+
+/* Varied sizing via per-position flex weights — differences in weight make
+   each cell a different share of its column's height. */
+.hero-col:nth-child(1) .hero-col-item:nth-child(1) { flex: 1.2; }
+.hero-col:nth-child(1) .hero-col-item:nth-child(2) { flex: 0.9; }
+.hero-col:nth-child(2) .hero-col-item:nth-child(1) { flex: 0.8; }
+.hero-col:nth-child(2) .hero-col-item:nth-child(2) { flex: 1.4; }
+.hero-col:nth-child(2) .hero-col-item:nth-child(3) { flex: 0.7; }
+.hero-col:nth-child(3) .hero-col-item:nth-child(1) { flex: 1.1; }
+.hero-col:nth-child(3) .hero-col-item:nth-child(2) { flex: 0.9; }
+
+@media (max-width: 1400px) {
+  .hero-col-grid { gap: 8px; padding: 10px; }
+  .hero-col { gap: 8px; }
+  .hero-col-item { border-radius: 14px; }
+}
+
+/* Tablet: W3Schools-style breakpoint — collapse to 2 cols by hiding the
+   middle (densest) column so the remaining two fill the space cleanly. */
+@media (max-width: 1200px) and (min-width: 992px) {
+  .hero-col:nth-child(2) { display: none; }
+}
+
+/* Below 991px the existing mobile overrides take over (.split-right becomes
+   an absolute full-bleed background for the text overlay), so the grid is
+   hidden and the .mobile-hero-img inside split-right-img-container is shown. */
+@media (max-width: 991px) {
+  .hero-col-grid { display: none; }
+}
+
 .mini-gallery-strip {
   display: flex;
   justify-content: center;

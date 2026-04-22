@@ -105,29 +105,29 @@ export default function ContactPage() {
               : 'We are here to turn your vision into reality. Reach out to us today for a consultation.'}
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(24px, 6vw, 60px)', flexWrap: 'wrap', marginBottom: '60px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', border: '1px solid var(--line-soft)' }}>
+          <div className="contact-info-row">
+            <div className="contact-info-card">
+              <div className="contact-info-icon">
                 <i className="bi bi-building" style={{ fontSize: '1.5rem' }}></i>
               </div>
-              <h5 style={{ margin: '0 0 8px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.9rem' }}>{isRtl ? 'العنوان' : 'Address'}</h5>
-              <p style={{ color: 'var(--text-soft)', margin: 0, fontSize: '0.95rem' }}>[Add Factory/Showroom Location in Kuwait]</p>
+              <h5 className="contact-info-label">{isRtl ? 'العنوان' : 'Address'}</h5>
+              <p className="contact-info-text">[Add Factory/Showroom Location in Kuwait]</p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', border: '1px solid var(--line-soft)' }}>
+            <div className="contact-info-card">
+              <div className="contact-info-icon">
                 <i className="bi bi-telephone" style={{ fontSize: '1.5rem' }}></i>
               </div>
-              <h5 style={{ margin: '0 0 8px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.9rem' }}>{isRtl ? 'الهاتف' : 'Phone'}</h5>
-              <p style={{ color: 'var(--text-soft)', margin: 0, fontSize: '0.95rem' }}>[Add Contact Number]</p>
+              <h5 className="contact-info-label">{isRtl ? 'الهاتف' : 'Phone'}</h5>
+              <p className="contact-info-text">[Add Contact Number]</p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', border: '1px solid var(--line-soft)' }}>
+            <div className="contact-info-card">
+              <div className="contact-info-icon">
                 <i className="bi bi-envelope" style={{ fontSize: '1.5rem' }}></i>
               </div>
-              <h5 style={{ margin: '0 0 8px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', fontSize: '0.9rem' }}>{isRtl ? 'البريد الإلكتروني' : 'Email'}</h5>
-              <p style={{ color: 'var(--text-soft)', margin: 0, fontSize: '0.95rem' }}>[Add Official Email Address]</p>
+              <h5 className="contact-info-label">{isRtl ? 'البريد الإلكتروني' : 'Email'}</h5>
+              <p className="contact-info-text">[Add Official Email Address]</p>
             </div>
           </div>
         </section>
@@ -269,6 +269,60 @@ export default function ContactPage() {
       <Footer />
 
       <style jsx global>{`
+        /* Address / Phone / Email card row — equal-width columns so the row
+           stays visually balanced regardless of how long the placeholder text
+           is, and stays centered within the page. */
+        .contact-info-row {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 220px));
+          justify-content: center;
+          gap: clamp(20px, 5vw, 60px);
+          margin: 0 auto 60px;
+          max-width: 100%;
+        }
+        @media (max-width: 700px) {
+          .contact-info-row {
+            grid-template-columns: 1fr;
+            max-width: 320px;
+          }
+        }
+        .contact-info-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          min-width: 0;
+        }
+        .contact-info-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+          border: 1px solid var(--line-soft);
+        }
+        .contact-info-label {
+          margin: 0 0 8px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-size: 0.9rem;
+          text-align: center;
+        }
+        .contact-info-text {
+          color: var(--text-soft);
+          margin: 0;
+          font-size: 0.95rem;
+          text-align: center;
+          /* Allow long placeholder text to wrap inside the column instead
+             of stretching the column wider than its siblings. */
+          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+
         /* Contact form — cream/navy palette matching the homepage hero & product detail card.
            Scoped tokens so no other page is affected. */
         .contact-form-panel {
@@ -284,17 +338,23 @@ export default function ContactPage() {
         }
 
         .contact-form-title {
-          margin: 0 0 8px;
+          /* margin-inline: auto centers the block itself when Bootstrap's
+             text-wrap: balance shrinks the heading's box to its text width. */
+          margin: 0 auto 8px;
           font-size: 1.4rem;
           font-weight: 700;
           letter-spacing: 0.04em;
           text-transform: uppercase;
           color: var(--cf-ink);
+          text-align: center;
         }
         .contact-form-subtitle {
-          margin: 0;
+          /* Same trick — text-wrap: pretty on <p> elements collapses the
+             box to content width, so we center it explicitly. */
+          margin: 0 auto;
           font-size: 0.92rem;
           color: var(--cf-ink-soft);
+          text-align: center;
         }
 
         .contact-form-panel .contact-label {

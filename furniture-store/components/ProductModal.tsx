@@ -2,12 +2,11 @@
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { FurnitureItem, Category } from '../data/furnitureData';
+import { FurnitureItem, Category, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
 import { useCart } from '../data/CartContext';
 
-const FALLBACK_IMAGE = '/images/LOGO/image.png';
 
 const CUSTOM_KEYWORDS = /wood|door|kitchen|custom|خش|باب|أبواب|مطبخ|مطابخ|تفصيل/;
 

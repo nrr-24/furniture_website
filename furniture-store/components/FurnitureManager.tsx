@@ -244,12 +244,16 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Inject Fallbacks for missing required user data
+    // Inject fallbacks only for required text fields. We deliberately leave
+    // `image` empty when the admin set no images — display components fall
+    // back to the shared FALLBACK_IMAGE constant at render time, so changing
+    // the default URL later updates every product automatically instead of
+    // being baked into individual rows.
     const finalData = {
       ...formData,
       name: formData.name.trim() || 'Unnamed Item',
       nameAr: formData.nameAr.trim() || 'منتج غير مسمى',
-      image: formData.image.trim() || '/images/LOGO/image.png',
+      image: formData.image.trim(),
     };
 
     if (initialItem) {

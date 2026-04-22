@@ -3,14 +3,13 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../data/LanguageContext';
-import { FurnitureItem, Category } from '../../data/furnitureData';
+import { FurnitureItem, Category, FALLBACK_IMAGE } from '../../data/furnitureData';
 import { useFurniture } from '../../data/FurnitureContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
 import FurnitureManager from '../../components/FurnitureManager';
 import Footer from '../../components/layout/Footer';
 
-const FALLBACK_IMAGE = '/images/LOGO/image.png';
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
   'door': 'bi-door-open', 'باب': 'bi-door-open', 'أبواب': 'bi-door-open',

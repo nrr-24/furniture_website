@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { useLanguage } from '../../data/LanguageContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
+import { FALLBACK_IMAGE } from '../../data/furnitureData';
+
+const LEGACY_PLACEHOLDER = '/images/LOGO/image.png';
+const cartImg = (src: string) => (!src || src === LEGACY_PLACEHOLDER ? FALLBACK_IMAGE : src);
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
@@ -206,7 +210,7 @@ export default function Navbar() {
                                     const isCssColor = !!item.selectedColor && /^(#|rgb|hsl|[a-zA-Z]+$)/.test(item.selectedColor);
                                     return (
                                     <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--line-soft)' }}>
-                                        <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
+                                        <img src={cartImg(item.image)} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <h5 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
                                             {hasVariant && (

@@ -1,5 +1,13 @@
 
 
+/**
+ * Public Supabase Storage URL used whenever a product has no image set.
+ * Imported by every display component (cards, modal, detail view, shop hero)
+ * so changing it in one place updates the whole site.
+ */
+export const FALLBACK_IMAGE =
+  'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/default.png';
+
 export interface Category {
   id: string;
   name: string;
@@ -25,15 +33,24 @@ export interface FurnitureItem {
   isFeatured?: boolean;
 }
 
+/**
+ * Legacy fallback URL — older code wrote `/images/LOGO/image.png` directly
+ * into product rows when the admin saved an image-less product. Treat that
+ * exact value as "no image" so the shared FALLBACK_IMAGE renders instead,
+ * without needing a SQL migration to scrub the rows.
+ */
+const LEGACY_PLACEHOLDER = '/images/LOGO/image.png';
+
 /** Maps a Supabase DB row to the app-level FurnitureItem */
 export function mapDbRowToItem(row: any): FurnitureItem {
+  const rawImage = row.image_url || '';
   return {
     id: row.id,
     name: row.name || '',
     nameAr: row.name_ar || '',
     description: row.description || '',
     descriptionAr: row.description_ar || '',
-    image: row.image_url || '',
+    image: rawImage === LEGACY_PLACEHOLDER ? '' : rawImage,
     price: Number(row.price) || 0,
     categoryId: row.category_id || '',
     sortOrder: row.sort_order || 0,

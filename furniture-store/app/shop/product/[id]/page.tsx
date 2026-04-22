@@ -6,11 +6,10 @@ import { useRouter, useParams } from 'next/navigation';
 import { useLanguage } from '../../../../data/LanguageContext';
 import { useAuth } from '../../../../data/AuthContext';
 import { useFurniture } from '../../../../data/FurnitureContext';
+import { FALLBACK_IMAGE } from '../../../../data/furnitureData';
 import ProductDetailView from '../../../../components/ProductDetailView';
 import FurnitureManager from '../../../../components/FurnitureManager';
 import Footer from '../../../../components/layout/Footer';
-
-const FALLBACK_IMAGE = '/images/LOGO/image.png';
 
 export default function ProductPage() {
   const router = useRouter();

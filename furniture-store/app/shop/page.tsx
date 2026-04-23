@@ -334,18 +334,33 @@ export default function ShopPage() {
 
               <div className="featured-carousel-container">
                 <div className="featured-carousel">
-                  {featuredItems.map((item) => (
-                    <div key={item.id} className="compact-card" onClick={() => openProduct(item.id)}>
-                      <div className="compact-img-wrapper">
-                        <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
-                        <div className="compact-tag">{isRtl ? 'مميّز' : 'Featured'}</div>
+                  {featuredItems.map((item) => {
+                    const hasSale = item.salePrice != null && item.salePrice > 0
+                      && item.salePrice !== (item.originalPrice ?? item.price);
+                    return (
+                      <div key={item.id} className="compact-card" onClick={() => openProduct(item.id)}>
+                        <div className="compact-img-wrapper">
+                          <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                          <div className="shop-card-tags">
+                            {item.isFeatured && (
+                              <span className="shop-card-tag tag-featured">
+                                <i className="bi bi-star-fill" /> {isRtl ? 'مميّز' : 'Featured'}
+                              </span>
+                            )}
+                            {hasSale && (
+                              <span className="shop-card-tag tag-sale">
+                                {isRtl ? 'تخفيض' : 'Sale'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="compact-info">
+                          <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
+                          <span className="compact-price">{item.price} {t('currency')}</span>
+                        </div>
                       </div>
-                      <div className="compact-info">
-                        <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
-                        <span className="compact-price">{item.price} {t('currency')}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </section>
@@ -432,6 +447,26 @@ export default function ShopPage() {
                             ><i className="bi bi-trash-fill"></i></button>
                           </div>
                         )}
+
+                        {(() => {
+                          const hasSale = item.salePrice != null && item.salePrice > 0
+                            && item.salePrice !== (item.originalPrice ?? item.price);
+                          if (!item.isFeatured && !hasSale) return null;
+                          return (
+                            <div className={`shop-card-tags ${isAdmin ? 'is-admin' : ''}`}>
+                              {item.isFeatured && (
+                                <span className="shop-card-tag tag-featured">
+                                  <i className="bi bi-star-fill" /> {isRtl ? 'مميّز' : 'Featured'}
+                                </span>
+                              )}
+                              {hasSale && (
+                                <span className="shop-card-tag tag-sale">
+                                  {isRtl ? 'تخفيض' : 'Sale'}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
 
                         <div className="card-bg-layer">
                           <img

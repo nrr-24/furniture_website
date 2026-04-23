@@ -403,7 +403,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                 </button>
               </div>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
               <label className="form-label small opacity-75">Price</label>
               <div className="input-group input-group-sm">
                 <span className="input-group-text bg-dark border-secondary text-white">$</span>
@@ -416,7 +416,19 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                 />
               </div>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
+              <label className="form-label small opacity-75">Sale Price (optional)</label>
+              <div className="input-group input-group-sm">
+                <span className="input-group-text bg-dark border-secondary text-white">$</span>
+                <input
+                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
+                  value={formData.salePrice ?? ''}
+                  onChange={e => setFormData({ ...formData, salePrice: e.target.value === '' ? null : parseFloat(e.target.value) })}
+                  placeholder="Leave blank if not on sale"
+                />
+              </div>
+            </div>
+            <div className="col-md-4">
               <label className="form-label small opacity-75">{isRtl ? 'الفئة' : 'Category'}</label>
               <select
                 className="form-select bg-dark text-white border-secondary form-select-sm"
@@ -431,31 +443,6 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="col-md-6">
-              <label className="form-label small opacity-75">Original Price (optional)</label>
-              <div className="input-group input-group-sm">
-                <span className="input-group-text bg-dark border-secondary text-white">$</span>
-                <input
-                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
-                  value={formData.originalPrice ?? ''}
-                  onChange={e => setFormData({ ...formData, originalPrice: e.target.value === '' ? null : parseFloat(e.target.value) })}
-                  placeholder="Leave blank if same as Price"
-                />
-              </div>
-            </div>
-            <div className="col-md-6">
-              <label className="form-label small opacity-75">Sale Price (optional)</label>
-              <div className="input-group input-group-sm">
-                <span className="input-group-text bg-dark border-secondary text-white">$</span>
-                <input
-                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
-                  value={formData.salePrice ?? ''}
-                  onChange={e => setFormData({ ...formData, salePrice: e.target.value === '' ? null : parseFloat(e.target.value) })}
-                  placeholder="Leave blank if not on sale"
-                />
-              </div>
             </div>
 
             <div className="col-md-6">

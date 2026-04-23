@@ -16,7 +16,7 @@ const HERO_BANNERS = [
     titleEn: 'BEEZ COLLECTION',
     titleAr: 'مجموعة بيز',
     image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg',
-    mobileImage: '/images/home/hero-mobile.png',
+    mobileImage: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg',
     link: '/shop'
   }
 ];

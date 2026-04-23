@@ -114,7 +114,20 @@ export default function ProductPage() {
                   >
                     <div className="pp-suggested-img">
                       <img src={s.image || FALLBACK_IMAGE} alt={isRtl ? s.nameAr : s.name} />
-                      {hasSale && <span className="pp-suggested-badge">{isRtl ? 'تخفيض' : 'SALE'}</span>}
+                      {(s.isFeatured || hasSale) && (
+                        <div className="shop-card-tags">
+                          {s.isFeatured && (
+                            <span className="shop-card-tag tag-featured">
+                              <i className="bi bi-star-fill" /> {isRtl ? 'مميّز' : 'Featured'}
+                            </span>
+                          )}
+                          {hasSale && (
+                            <span className="shop-card-tag tag-sale">
+                              {isRtl ? 'تخفيض' : 'Sale'}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="pp-suggested-meta">
                       <span className="pp-suggested-name">{isRtl ? s.nameAr || s.name : s.name}</span>

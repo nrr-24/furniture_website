@@ -326,6 +326,51 @@ img {
 }
 
 /* -----------------------------------------------------------------------
+   Sale + Featured tags — shared across all product card surfaces:
+   .shop-item-card (collections grid), .compact-card (Featured strip),
+   and .pp-suggested-card ("More from" rail on product detail page).
+   The two badges stack when a product is both featured AND on sale.
+   Lives in globals.css so styles are present on every route, not only
+   /shop where they were originally scoped via styled-jsx.
+   ----------------------------------------------------------------------- */
+.shop-card-tags {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  pointer-events: none;
+}
+[dir="rtl"] .shop-card-tags { left: auto; right: 12px; align-items: flex-end; }
+/* Admin view has a drag handle at top-left, so tags drop below it. */
+.shop-card-tags.is-admin { top: 48px; }
+.shop-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  line-height: 1;
+}
+.shop-card-tag i { font-size: 0.65rem; }
+.shop-card-tag.tag-featured {
+  background: linear-gradient(135deg, #ffd84a 0%, #b58a00 100%);
+  color: #1a1a1a;
+}
+.shop-card-tag.tag-sale {
+  background: #d93a3a;
+  color: #fff;
+}
+
+/* -----------------------------------------------------------------------
    Auth pages (login / signup) — blurred brand image as backdrop with a
    frosted-glass card on top. Applied via .auth-page on the <main>.
    ----------------------------------------------------------------------- */

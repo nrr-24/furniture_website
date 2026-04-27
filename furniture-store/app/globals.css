@@ -157,8 +157,7 @@ img {
 
 
 #navbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -168,14 +167,8 @@ img {
   padding-left: max(40px, env(safe-area-inset-left));
   padding-right: max(40px, env(safe-area-inset-right));
   z-index: 1000;
-  /* Slight solid tint so the blur isn't the only thing creating contrast —
-     cheaper per frame than a heavy blur over random content. */
-  background: rgba(17, 22, 66, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: var(--bg-main);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  /* Scope repaints to the navbar so scrolling doesn't invalidate the
-     page paint region it covers. */
   contain: paint;
 }
 
@@ -296,7 +289,14 @@ img {
   position: absolute;
   inset: 0;
   background: rgba(226, 218, 204, 0.15);
-  /* More discrete, soften from 0.35 */
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-overlay-dark {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 26, 99, 0.4);
   z-index: 1;
   pointer-events: none;
 }
@@ -1095,12 +1095,14 @@ img {
   /* Mobile hero — image as full-bleed background with centered text overlay */
   .home-hero {
     background: var(--bg-main);
+    min-height: 55vh !important;
+    flex: none !important;
   }
 
   .lumiere-split.hero-viewport {
     position: relative;
     display: block;
-    min-height: 100%;
+    min-height: 55vh !important;
   }
 
   .lumiere-split.hero-viewport>.split-right {
@@ -1143,29 +1145,26 @@ img {
   .lumiere-split.hero-viewport>.split-left {
     position: relative;
     z-index: 1;
-    min-height: 100%;
+    min-height: 55vh !important;
     justify-content: center !important;
     align-items: center !important;
     text-align: center !important;
     padding: clamp(60px, 10vw, 100px) clamp(22px, 6vw, 32px);
     padding-top: max(clamp(60px, 10vw, 100px), env(safe-area-inset-top));
     padding-bottom: max(clamp(60px, 10vw, 100px), env(safe-area-inset-bottom));
-    background: linear-gradient(180deg,
-        rgba(13, 26, 99, 0.55) 0%,
-        rgba(13, 26, 99, 0.4) 45%,
-        rgba(13, 26, 99, 0.65) 100%);
-    color: var(--text-main);
+    background: transparent !important;
+    color: #ffffff !important;
   }
 
-  /* Override cream colors on mobile — text should be cream over the image */
+  /* Override cream colors on mobile — text should be pure white over the image */
   .home-hero>.split-left h1,
   .home-hero>.split-left h1 span {
-    color: var(--text-main) !important;
+    color: #ffffff !important;
     text-align: center !important;
   }
 
   .home-hero>.split-left .smartwood-description {
-    color: var(--text-soft) !important;
+    color: #ffffff !important;
     text-align: center !important;
   }
 
@@ -1183,6 +1182,75 @@ img {
     background: transparent !important;
     color: var(--text-main) !important;
     border: 1.5px solid rgba(226, 218, 204, 0.55) !important;
+  }
+
+  /* About Page Mobile Readability */
+  .about-page-theme .split-left h1,
+  .about-page-theme .split-left h1 span,
+  .about-page-theme .split-left p,
+  .about-page-theme .timeline-content h3,
+  .about-page-theme .timeline-content p {
+    color: var(--text-main) !important;
+  }
+
+  .desktop-only-text {
+    display: none !important;
+  }
+
+  /* Responsive Typography for Hero Section */
+  .home-hero-content h1 {
+    font-size: 2.2rem !important;
+    margin-bottom: 16px !important;
+  }
+
+  .home-hero-content .smartwood-description {
+    font-size: 0.95rem !important;
+    margin-bottom: 24px !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 1023px) {
+
+  .home-hero-content h1,
+  .home-hero-content h1 span,
+  .home-hero-content .smartwood-description {
+    color: #ffffff !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .home-hero-content h1 {
+    font-size: 2.8rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  .home-hero-content .smartwood-description {
+    font-size: 1rem !important;
+    max-width: 450px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .home-hero-content h1 {
+    font-size: 3.5rem !important;
+    margin-bottom: 24px !important;
+  }
+
+  .home-hero-content .smartwood-description {
+    font-size: 1.05rem !important;
+    max-width: 500px !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .home-hero-content h1 {
+    font-size: 4.5rem !important;
+  }
+
+  .home-hero-content .smartwood-description {
+    font-size: 1.1rem !important;
+    max-width: 550px !important;
   }
 }
 
@@ -2900,7 +2968,8 @@ img {
    About Page Custom Theme (Refined)
    ============================================================ */
 .about-page-theme {
-  background-color: #f1ede4 !important; /* Exact Product Card Cream */
+  background-color: #f1ede4 !important;
+  /* Exact Product Card Cream */
   color: #0d1a63;
 }
 
@@ -2920,7 +2989,8 @@ img {
 }
 
 .about-page-theme .timeline-content {
-  background: #0d1a63; /* Navy Background */
+  background: #0d1a63;
+  /* Navy Background */
   border: 1px solid rgba(226, 218, 204, 0.1);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
@@ -2929,7 +2999,8 @@ img {
 .about-page-theme .timeline-content h3 i,
 .about-page-theme .timeline-content p,
 .about-page-theme .timeline-content .timeline-step {
-  color: #f1ede4 !important; /* Cream Text */
+  color: #f1ede4 !important;
+  /* Cream Text */
 }
 
 .about-page-theme .timeline-content .timeline-step {

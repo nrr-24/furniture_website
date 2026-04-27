@@ -115,17 +115,17 @@ export default function HomePage() {
         {/* Background Layer with entrance animation */}
         <div className="hero-bg-animate">
           <picture>
-            <source media="(max-width: 768px)" srcSet={currentHero.mobileImage} />
+            <source media="(max-width: 1023px)" srcSet={currentHero.mobileImage} />
             <img src={currentHero.image} alt="" />
           </picture>
         </div>
-        <div className="hero-overlay-light" />
+        <div className="hero-overlay-dark" />
 
         <div className="home-hero-content">
           {/* Left Side: Copy, Gallery, Actions */}
           <div className="split-left">
 
-            <h1 style={{ fontSize: 'clamp(2.5rem, 4.0vw, 4.5rem)', fontWeight: 800, letterSpacing: '-0.07em', margin: '0 0 24px', lineHeight: 1.1, textAlign: 'left', minHeight: '2.2em' }}>
+            <h1 style={{ fontWeight: 800, letterSpacing: '-0.07em', lineHeight: 1.1, textAlign: 'left', minHeight: '2.2em' }}>
               <span style={{ fontWeight: 800 }}>
                 {shown1}
                 {!part1Done && typing && <span className="type-cursor" aria-hidden="true" />}
@@ -141,7 +141,7 @@ export default function HomePage() {
 
             {bgReady && (
               <>
-                <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.0rem', marginBottom: '36px', maxWidth: '500px', animationDelay: '0.2s', textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
+                <p className="smartwood-description animate-fade-up" style={{ animationDelay: '0.2s', textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
                   {isRtl
                     ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
                     : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}

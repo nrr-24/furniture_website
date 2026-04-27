@@ -89,7 +89,7 @@ export default function AboutPage() {
             }
           </p>
 
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '32px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.7s' }}>
+          <p className="smartwood-description animate-fade-up desktop-only-text" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '32px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.7s' }}>
             {isRtl
               ? 'من خلال دمج تكنولوجيا CNC الأكثر تقدماً في العالم مع نظام إدارة Odoo المتطور، نضمن رحلة سلسة من التصميم المبدئي إلى التنفيذ الخالي من العيوب. مهمتنا هي تزويد السوق الكويتي بحلول خشبية مستدامة وراقية تنافس المعايير العالمية.'
               : 'By integrating the world\u2019s most advanced CNC technology with the sophisticated Odoo management system, we ensure a seamless journey from conceptual design to flawless execution. Our mission is to provide the Kuwaiti market with sustainable, high-end wood solutions that rival international standards.'
@@ -113,7 +113,7 @@ export default function AboutPage() {
               className="reveal-inner-img"
               style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
             />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, rgba(0,0,0,0.5) 0%, transparent 100%)' }}></div>
+            <div className="hero-overlay-dark"></div>
 
             {/* Corner Text overlay inside the image */}
             <div style={{

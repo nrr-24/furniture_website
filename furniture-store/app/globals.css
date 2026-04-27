@@ -284,10 +284,12 @@ img {
   pointer-events: none;
 }
 
+.hero-bg-animate picture,
 .hero-bg-animate img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .hero-overlay-light {

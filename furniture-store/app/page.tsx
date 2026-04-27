@@ -114,7 +114,10 @@ export default function HomePage() {
       <section className="hero-viewport home-hero">
         {/* Background Layer with entrance animation */}
         <div className="hero-bg-animate">
-          <img src={currentHero.image} alt="" />
+          <picture>
+            <source media="(max-width: 768px)" srcSet={currentHero.mobileImage} />
+            <img src={currentHero.image} alt="" />
+          </picture>
         </div>
         <div className="hero-overlay-light" />
 

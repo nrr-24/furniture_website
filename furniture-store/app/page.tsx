@@ -15,7 +15,7 @@ const HERO_BANNERS = [
     id: 'beez',
     titleEn: 'BEEZ COLLECTION',
     titleAr: 'مجموعة بيز',
-    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ.jpg',
+    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg',
     mobileImage: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg',
     link: '/shop'
   }
@@ -58,6 +58,7 @@ export default function HomePage() {
   const heroPart2 = isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.';
   const heroTotal = heroPart1.length + heroPart2.length;
   const [typed, setTyped] = useState(0);
+  const [bgReady, setBgReady] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll logic for slider
@@ -78,6 +79,15 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    // Background slide-down duration in CSS is 1.4s
+    const timer = setTimeout(() => {
+      setBgReady(true);
+    }, 1200); // Start typing slightly before completion for a natural feel
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!bgReady) return;
     setTyped(0);
     const id = setInterval(() => {
       setTyped(c => {
@@ -89,7 +99,7 @@ export default function HomePage() {
       });
     }, 70);
     return () => clearInterval(id);
-  }, [heroTotal]);
+  }, [heroTotal, bgReady]);
 
   if (!initialized) return null;
 
@@ -101,73 +111,50 @@ export default function HomePage() {
   return (
     <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* 1. Hero Section (The First Impression) */}
-      <section className="lumiere-split hero-viewport home-hero">
-        {/* Left Side: Copy, Gallery, Actions */}
-        <div className="split-left" style={{ justifyContent: 'center', alignItems: 'flex-start', textAlign: 'left' }}>
-
-          <h1 style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.8rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px', lineHeight: 1, textAlign: 'left', minHeight: '2.2em' }}>
-            <span style={{ fontWeight: 800 }}>
-              {shown1}
-              {!part1Done && typing && <span className="type-cursor" aria-hidden="true" />}
-            </span>
-            {part1Done && <br />}
-            {part1Done && (
-              <span>
-                {shown2}
-                {typing && <span className="type-cursor" aria-hidden="true" />}
-              </span>
-            )}
-          </h1>
-
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.1rem', marginBottom: '36px', maxWidth: '540px', animationDelay: '0.5s', textAlign: 'left', lineHeight: 1.55 }}>
-            {isRtl
-              ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
-              : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
-          </p>
-
-          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.7s', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-            <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
-              {isRtl ? 'استكشف الفن' : 'Explore the Art'}
-            </Link>
-            <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
-              {isRtl ? 'تواصل معنا' : 'Connect with Us'}
-            </Link>
-          </div>
-
+      <section className="hero-viewport home-hero">
+        {/* Background Layer with entrance animation */}
+        <div className="hero-bg-animate">
+          <img src={currentHero.image} alt="" />
         </div>
+        <div className="hero-overlay-light" />
 
-        {/* Right Side: Responsive image grid (column-flex, W3Schools-style) */}
-        <div className="split-right">
-          <div className="split-right-img-container reveal-container" style={{ display: 'block', height: '100%' }}>
-            {/* Desktop/tablet: multi-image column grid with varied sizing */}
-            <div className="hero-col-grid">
-              {HERO_GRID_COLUMNS.map((col, ci) => (
-                <div key={ci} className="hero-col">
-                  {col.map((item, ii) => (
-                    <Link
-                      key={ii}
-                      href={currentHero.link}
-                      className="hero-col-item"
-                      aria-label={isRtl ? currentHero.titleAr : currentHero.titleEn}
-                    >
-                      <img
-                        src={item.src}
-                        alt=""
-                        loading={ci === 0 && ii === 0 ? 'eager' : 'lazy'}
-                      />
-                    </Link>
-                  ))}
+        <div className="home-hero-content">
+          {/* Left Side: Copy, Gallery, Actions */}
+          <div className="split-left">
+
+            <h1 style={{ fontSize: 'clamp(2.5rem, 4.0vw, 4.5rem)', fontWeight: 800, letterSpacing: '-0.07em', margin: '0 0 24px', lineHeight: 1.1, textAlign: 'left', minHeight: '2.2em' }}>
+              <span style={{ fontWeight: 800 }}>
+                {shown1}
+                {!part1Done && typing && <span className="type-cursor" aria-hidden="true" />}
+              </span>
+              {part1Done && <br />}
+              {part1Done && (
+                <span>
+                  {shown2}
+                  {typing && <span className="type-cursor" aria-hidden="true" />}
+                </span>
+              )}
+            </h1>
+
+            {bgReady && (
+              <>
+                <p className="smartwood-description animate-fade-up" style={{ fontSize: '1.0rem', marginBottom: '36px', maxWidth: '500px', animationDelay: '0.2s', textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
+                  {isRtl
+                    ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
+                    : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
+                </p>
+
+                <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.4s', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+                  <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
+                    {isRtl ? 'استكشف الفن' : 'Explore the Art'}
+                  </Link>
+                  <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
+                    {isRtl ? 'تواصل معنا' : 'Connect with Us'}
+                  </Link>
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
-            {/* Mobile: existing full-bleed fallback (the CSS in globals hides the
-                desktop grid below 991px and shows this image as the backdrop). */}
-            <img
-              src={currentHero.mobileImage}
-              alt={isRtl ? currentHero.titleAr : currentHero.titleEn}
-              className="mobile-hero-img"
-            />
           </div>
         </div>
       </section>
@@ -187,7 +174,22 @@ export default function HomePage() {
             { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg", link: "/shop" },
             { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg", link: "/shop" },
             { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg", link: "/shop" }
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0029_004.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0031_002.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0032_001.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0000_016.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0003_013.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0005_011.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0006_010.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0012_004.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0013_003.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0000_010.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0001_009.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0002_008.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0004_006.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0006_004.jpg", link: "/shop" },
+            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0007_003.jpg", link: "/shop" }
           ].map((item, i) => (
             <div key={i} className="slider-item">
               <Link href={item.link} style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', inset: 0, zIndex: 10 }} aria-label="View product" />

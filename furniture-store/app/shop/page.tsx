@@ -1281,6 +1281,22 @@ export default function ShopPage() {
             padding: 12px 20px !important;
             font-size: 0.9rem !important;
           }
+
+          /* Compact mobile card overrides for inline-styled elements */
+          .samsung-card .samsung-card-actions {
+            justify-content: center !important;
+          }
+          .samsung-card .samsung-btn-primary {
+            width: 100% !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+          }
+          .samsung-card .samsung-btn-primary i {
+            font-size: 1rem !important;
+          }
+          .samsung-details-link {
+            display: none !important;
+          }
         }
       `}</style>
       <Footer />

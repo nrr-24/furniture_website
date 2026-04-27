@@ -93,47 +93,47 @@ export default function ContactPage() {
   };
 
   return (
-    <main dir={isRtl ? 'rtl' : 'ltr'} className="app-content" style={{ display: 'flex', flexDirection: 'column' }}>
+    <main dir={isRtl ? 'rtl' : 'ltr'} className="app-content about-page-theme" style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: 'clamp(48px, 8vw, 80px) clamp(16px, 5vw, 60px)' }}>
         <section id="contact" style={{ maxWidth: '1000px', width: '100%', textAlign: 'center' }}>
           <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>
             {isRtl ? 'تواصل معنا' : 'Contact Us'}
           </h2>
-          <p style={{ color: 'var(--text-soft)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
+          <p style={{ color: 'rgba(13, 26, 99, 0.7)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
             {isRtl
               ? 'نحن هنا لتحويل رؤيتك إلى واقع. تواصل معنا اليوم لتحصل على استشارتك.'
               : 'We are here to turn your vision into reality. Reach out to us today for a consultation.'}
           </p>
 
           <div className="contact-info-row">
-            <div className="contact-info-card">
+            <a href="https://share.google/JkdWv1E5o0GEpumZ6" target="_blank" rel="noopener noreferrer" className="contact-info-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="contact-info-icon">
-                <i className="bi bi-building" style={{ fontSize: '1.5rem' }}></i>
+                <i className="bi bi-geo-alt-fill" style={{ fontSize: '1.5rem' }}></i>
               </div>
-              <h5 className="contact-info-label">{isRtl ? 'العنوان' : 'Address'}</h5>
-              <p className="contact-info-text">[Add Factory/Showroom Location in Kuwait]</p>
-            </div>
+              <h5 className="contact-info-label">{isRtl ? 'الموقع' : 'Location'}</h5>
+              <p className="contact-info-text">{isRtl ? 'الكويت' : 'Kuwait'}</p>
+            </a>
 
-            <div className="contact-info-card">
+            <a href="https://wa.me/96595502860" target="_blank" rel="noopener noreferrer" className="contact-info-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="contact-info-icon">
-                <i className="bi bi-telephone" style={{ fontSize: '1.5rem' }}></i>
+                <i className="bi bi-whatsapp" style={{ fontSize: '1.5rem' }}></i>
               </div>
-              <h5 className="contact-info-label">{isRtl ? 'الهاتف' : 'Phone'}</h5>
-              <p className="contact-info-text">[Add Contact Number]</p>
-            </div>
+              <h5 className="contact-info-label">{isRtl ? 'واتساب' : 'WhatsApp'}</h5>
+              <p className="contact-info-text" dir="ltr">+965 9550 2860</p>
+            </a>
 
-            <div className="contact-info-card">
+            <a href="mailto:contact@smartwoodkw.com" className="contact-info-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="contact-info-icon">
-                <i className="bi bi-envelope" style={{ fontSize: '1.5rem' }}></i>
+                <i className="bi bi-envelope-fill" style={{ fontSize: '1.5rem' }}></i>
               </div>
               <h5 className="contact-info-label">{isRtl ? 'البريد الإلكتروني' : 'Email'}</h5>
-              <p className="contact-info-text">[Add Official Email Address]</p>
-            </div>
+              <p className="contact-info-text">contact@smartwoodkw.com</p>
+            </a>
           </div>
         </section>
 
         {/* Contact form — cream/navy palette matching the homepage hero and product detail card */}
-        <section className="contact-form-panel" style={{ maxWidth: '720px', width: '100%', padding: 'clamp(28px, 4vw, 40px)', textAlign: isRtl ? 'right' : 'left' }}>
+        {/* <section className="contact-form-panel" style={{ maxWidth: '720px', width: '100%', padding: 'clamp(28px, 4vw, 40px)', textAlign: isRtl ? 'right' : 'left' }}>
           <div style={{ marginBottom: '24px', textAlign: 'center' }}>
             <h3 className="contact-form-title">
               {isRtl ? 'أرسل رسالة' : 'Send us a message'}
@@ -264,7 +264,7 @@ export default function ContactPage() {
               </div>
             </div>
           </form>
-        </section>
+        </section> */}
       </div>
       <Footer />
 
@@ -297,12 +297,13 @@ export default function ContactPage() {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(13, 26, 99, 0.06);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 20px;
-          border: 1px solid var(--line-soft);
+          border: 1px solid rgba(13, 26, 99, 0.12);
+          color: #0d1a63;
         }
         .contact-info-label {
           margin: 0 0 8px;
@@ -313,7 +314,7 @@ export default function ContactPage() {
           text-align: center;
         }
         .contact-info-text {
-          color: var(--text-soft);
+          color: rgba(13, 26, 99, 0.6);
           margin: 0;
           font-size: 0.95rem;
           text-align: center;

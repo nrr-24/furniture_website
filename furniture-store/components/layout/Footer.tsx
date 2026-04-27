@@ -31,18 +31,22 @@ export default function Footer() {
             />
           </Link>
 
-          <div className="sw-footer-social" aria-label={isRtl ? 'وسائل التواصل' : 'Social media'}>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <i className="bi bi-facebook"></i>
-            </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <div className="sw-footer-social" aria-label={isRtl ? 'وسائل التواصل' : 'Contact'}>
+            <a href="https://www.instagram.com/smartwood_kw/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <i className="bi bi-instagram"></i>
             </a>
-            <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
-              <i className="bi bi-pinterest"></i>
+            <a href="https://share.google/JkdWv1E5o0GEpumZ6" target="_blank" rel="noopener noreferrer" aria-label="Location">
+              <i className="bi bi-geo-alt-fill"></i>
+            </a>
+            <a href="https://wa.me/96595502860" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <i className="bi bi-whatsapp"></i>
+            </a>
+            <a href="mailto:contact@smartwoodkw.com" aria-label="Email">
+              <i className="bi bi-envelope-fill"></i>
             </a>
           </div>
 
+          {/* Newsletter form commented out
           <p className="sw-footer-newsletter-text">
             {isRtl
               ? 'اشترك لتصلك آخر المجموعات والعروض الحصرية من سمارت وود.'
@@ -67,6 +71,7 @@ export default function Footer() {
               {isRtl ? 'شكراً لاشتراكك!' : 'Thanks for subscribing!'}
             </span>
           )}
+          */}
         </div>
 
         <nav className="sw-footer-nav" aria-label={isRtl ? 'روابط الموقع' : 'Sitemap'}>

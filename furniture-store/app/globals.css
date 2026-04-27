@@ -1582,7 +1582,8 @@ img {
 
 @media (max-width: 991px) {
   .shop-sidebar {
-    top: 0;
+    position: relative;
+    top: auto;
     justify-content: flex-start;
     gap: 24px;
     padding: 12px 20px;
@@ -1766,8 +1767,8 @@ img {
 
 @media (max-width: 900px) {
   .shop-sidebar {
-    position: sticky;
-    top: 60px;
+    position: relative;
+    top: auto;
     padding: 12px 0;
     gap: 8px;
     overflow-x: auto;
@@ -1792,28 +1793,39 @@ img {
 
   .samsung-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 
   .samsung-card {
-    border-radius: 16px;
+    border-radius: 14px;
+  }
+
+  .samsung-card-img {
+    aspect-ratio: 1 / 1;
   }
 
   .samsung-card-info {
-    padding: 12px;
+    padding: 10px 10px 12px;
+    gap: 2px;
   }
 
   .samsung-card-title {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
+    margin: 0 0 2px;
+  }
+
+  .samsung-card-sub {
+    font-size: 0.7rem;
+    margin-bottom: 4px;
   }
 
   .samsung-card-price {
-    font-size: 1rem;
-    margin-bottom: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
   }
 
   .samsung-card-actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
   }
 }

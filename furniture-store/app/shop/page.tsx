@@ -94,9 +94,25 @@ export default function ShopPage() {
     }
   }, [heroSlides.length, activeSlide]);
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  const handleCategoryClick = (id: string) => {
+    setSelectedCategoryId(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const clearFilter = () => {
+    setSelectedCategoryId(null);
+  };
+
   const scrollToCategory = (id: string) => {
-    const el = document.getElementById(`category-${id}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // If we're in filtered mode, clearing the filter then scrolling is tricky because of re-render
+    // So let's just clear and show all.
+    setSelectedCategoryId(null);
+    setTimeout(() => {
+      const el = document.getElementById(`category-${id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   if (!initialized) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-soft)' }}>Loading Collections...</div>;
@@ -174,6 +190,11 @@ export default function ShopPage() {
     e.preventDefault(); // Required to allow drop
   };
 
+  const filteredCategories = useMemo(() => {
+    if (!selectedCategoryId) return groupedItems;
+    return groupedItems.filter(cat => cat.id === selectedCategoryId);
+  }, [groupedItems, selectedCategoryId]);
+
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
       {/* 1. Rotating Collection Showcase */}
@@ -239,11 +260,11 @@ export default function ShopPage() {
           <p className="shop-showcase-sub">
             {heroSlides[activeSlide]
               ? (isRtl
-                  ? `${heroSlides[activeSlide].count} قطعة مختارة بعناية`
-                  : `${heroSlides[activeSlide].count} piece${heroSlides[activeSlide].count === 1 ? '' : 's'} curated for your space`)
+                ? `${heroSlides[activeSlide].count} قطعة مختارة بعناية`
+                : `${heroSlides[activeSlide].count} piece${heroSlides[activeSlide].count === 1 ? '' : 's'} curated for your space`)
               : (isRtl
-                  ? 'اكتشف أثاثاً يجمع بين الراحة والأناقة.'
-                  : 'Explore furniture that harmoniously combines comfort and style.')}
+                ? 'اكتشف أثاثاً يجمع بين الراحة والأناقة.'
+                : 'Explore furniture that harmoniously combines comfort and style.')}
           </p>
 
           <button
@@ -279,218 +300,168 @@ export default function ShopPage() {
         </div>
       </section>
 
-      <div className="container">
-        <header style={{ marginBottom: '28px', textAlign: 'center' }}>
-          {/* <span className="section-kicker" style={{ fontSize: '0.85rem', letterSpacing: '2px', opacity: 0.8 }}>{t('premiumCollections')}</span> */}
-          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)', fontWeight: 300, letterSpacing: '-0.02em', margin: '0 0 14px', textAlign: 'center', lineHeight: 1.1 }}>
-              {isRtl ? 'استكشف' : 'EXPLORE'}
-              <br />
-              <span style={{ fontWeight: 600 }}>{isRtl ? 'المجموعات' : 'COLLECTIONS'}</span>
-            </h1>
-          </div>
-          <p className="section-text mx-auto" style={{ color: 'var(--text-soft)', textAlign: 'center', margin: '0 auto', fontSize: '0.88rem' }}>{t('collectionDesc')}</p>
-
-          {isAdmin && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '14px' }}>
-              <button
-                onClick={() => setIsCategoryManagerOpen(true)}
-                className="hero-secondary-btn py-2 px-4 shadow-sm"
-                style={{ fontSize: '0.85rem', borderRadius: '12px' }}
-              >
-                <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
-              </button>
-            </div>
-          )}
-        </header>
-
-        {/* Category Jump Pills with Icons */}
-        <div className="shop-category-pills">
-          {categories.map(cat => (
+      <div className="container" style={{ paddingTop: '0px' }}>
+        <div className="shop-layout">
+          {/* 1. Desktop Sidebar */}
+          <aside className="shop-sidebar">
             <button
-              key={cat.id}
-              onClick={() => scrollToCategory(cat.id)}
-              className="shop-category-pill"
+              onClick={clearFilter}
+              className={`shop-sidebar-category ${selectedCategoryId === null ? 'is-active' : ''}`}
             >
-              <i className={`bi ${getCategoryIcon(cat.name, cat.nameAr)}`}></i>
-              <span>{isRtl ? cat.nameAr : cat.name}</span>
+              <i className="bi bi-grid-fill" style={{ fontSize: '0.9rem' }}></i>
+              <span>{isRtl ? 'الكل' : 'ALL PRODUCTS'}</span>
             </button>
-          ))}
-        </div>
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => handleCategoryClick(cat.id)}
+                className={`shop-sidebar-category ${selectedCategoryId === cat.id ? 'is-active' : ''}`}
+              >
+                <span>{isRtl ? cat.nameAr : cat.name}</span>
+              </button>
+            ))}
+            {selectedCategoryId && (
+              <button
+                onClick={clearFilter}
+                className="shop-sidebar-clear"
+                style={{ marginLeft: '12px', flexShrink: 0 }}
+                title={isRtl ? 'إزالة الفلتر' : 'Clear filter'}
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
+            )}
+          </aside>
 
-        {/* Featured Products Horizontal Row */}
-        {(() => {
-          const featuredItems = items.filter(i => i.isFeatured);
-          if (featuredItems.length === 0) return null;
-          return (
-            <section className="featured-section" style={{ marginBottom: '50px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
-                <div className="shop-section-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem' }}>
-                  <i className="bi bi-star-fill"></i>
-                </div>
-                <h2 className="section-title" style={{ margin: 0, fontSize: '1.4rem' }}>{isRtl ? 'منتجات مميزة' : 'Featured Products'}</h2>
-                <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
+          {/* 2. Main Gallery Area */}
+          <div className="shop-gallery">
+            {/* Header / Filter Status */}
+            {/* Unity Header */}
+            <div className="shop-header-samsung" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ margin: 0, fontWeight: 800, fontSize: '2rem', color: 'var(--bg-main)', letterSpacing: '-0.02em' }}>
+                  {selectedCategoryId
+                    ? (isRtl ? categories.find(c => c.id === selectedCategoryId)?.nameAr : categories.find(c => c.id === selectedCategoryId)?.name)
+                    : (isRtl ? 'جميع التصاميم' : 'All Designs')
+                  }
+                </h2>
+                <p style={{ margin: '4px 0 0', color: 'rgba(13, 26, 99, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
+                  {filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0)} {isRtl ? 'قطعة متوفرة' : 'items found'}
+                </p>
               </div>
 
-              <div className="featured-carousel-container">
-                <div className="featured-carousel">
-                  {featuredItems.map((item) => {
-                    const hasSale = item.salePrice != null && item.salePrice > 0
-                      && item.salePrice !== (item.originalPrice ?? item.price);
-                    return (
-                      <div key={item.id} className="compact-card" onClick={() => openProduct(item.id)}>
-                        <div className="compact-img-wrapper">
-                          <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
-                          <div className="shop-card-tags">
-                            {item.isFeatured && (
-                              <span className="shop-card-tag tag-featured">
-                                <i className="bi bi-star-fill" /> {isRtl ? 'مميّز' : 'Featured'}
-                              </span>
-                            )}
-                            {hasSale && (
-                              <span className="shop-card-tag tag-sale">
-                                {isRtl ? 'تخفيض' : 'Sale'}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="compact-info">
-                          <h4 className="compact-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
-                          <span className="compact-price">{item.price} {t('currency')}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          );
-        })()}
-
-        {groupedItems.map((group, groupIdx) => {
-          const sectionIcon = getCategoryIcon(group.name, group.nameAr);
-
-          return (
-          <section
-            id={`category-${group.id}`}
-            key={group.id}
-            style={{
-              marginBottom: '48px',
-              scrollMarginTop: '120px'
-            }}
-          >
-            <div className="shop-section-header">
-              <div className="shop-section-icon">
-                <i className={`bi ${sectionIcon}`}></i>
-              </div>
-              <h2 className="section-title" style={{ margin: 0 }}>{isRtl ? group.nameAr : group.name}</h2>
-              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--line-soft)' }}></div>
-              <span className="shop-section-count">{group.products.length} {isRtl ? 'منتج' : 'items'}</span>
+              {isAdmin && (
+                <button
+                  onClick={() => setIsCategoryManagerOpen(true)}
+                  className="hero-secondary-btn py-2 px-4 shadow-sm"
+                  style={{ fontSize: '0.85rem', borderRadius: '12px', border: '1.5px solid var(--bg-main)', color: 'var(--bg-main)', fontWeight: 700 }}
+                >
+                  <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
+                </button>
+              )}
             </div>
 
-            {group.products.length > 0 ? (
-              <div className="row g-3">
-                {group.products.map((item, idx) => {
-                  const defaultColor = item.colors?.[0] ?? null;
-                  const defaultType = item.types?.[0] ?? null;
-                  const cartItem = cart.find(i =>
-                    i.productId === item.id &&
-                    (i.selectedColor ?? null) === defaultColor &&
-                    (i.selectedType ?? null) === defaultType
-                  );
-                  const inCart = !!cartItem;
+            {/* Product Rendering */}
+            {filteredCategories.map((group) => (
+              <div key={group.id} id={`category-${group.id}`} style={{ marginBottom: selectedCategoryId ? '0' : '60px' }}>
+                {!selectedCategoryId && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(13, 26, 99, 0.4)' }}>
+                      {isRtl ? group.nameAr : group.name}
+                    </h3>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(13, 26, 99, 0.1)' }}></div>
+                  </div>
+                )}
 
-                  return (
-                    <div
-                      className="col-6 col-sm-6 col-lg-4 col-xl-3"
-                      key={item.id}
-                      draggable={isAdmin}
-                      onDragStart={(e) => handleProductDragStart(e, group.id, idx, item.id)}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => { e.stopPropagation(); handleProductDrop(e, group.id, idx); }}
-                      style={{ opacity: draggedItem?.type === 'product' && draggedItem.id === item.id ? 0.3 : 1 }}
-                    >
+                <div className="samsung-grid">
+                  {group.products.map((item, idx) => {
+                    const defaultColor = item.colors?.[0] ?? null;
+                    const defaultType = item.types?.[0] ?? null;
+                    const cartItem = cart.find(i => i.productId === item.id);
+                    const qty = cartItem?.quantity || 0;
+
+                    return (
                       <div
-                        className="shop-item-card group"
-                        style={{ cursor: 'pointer' }}
+                        key={item.id}
+                        className="samsung-card"
                         onClick={() => openProduct(item.id)}
+                        draggable={isAdmin}
+                        onDragStart={(e) => handleProductDragStart(e, group.id, idx, item.id)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => { e.stopPropagation(); handleProductDrop(e, group.id, idx); }}
+                        style={{ opacity: draggedItem?.id === item.id ? 0.3 : 1 }}
                       >
-                        {isAdmin && (
-                          <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              style={{ background: 'rgba(0,0,0,0.6)', borderRadius: '50px', padding: '4px 10px', backdropFilter: 'blur(4px)', color: 'white', cursor: 'grab', fontSize: '0.85rem' }}
-                            >
-                              <i className="bi bi-list"></i>
+                        <div className="samsung-card-img">
+                          <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                          {isAdmin && (
+                            <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, display: 'flex', gap: '6px' }}>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); updateItem(item.id, { isFeatured: !item.isFeatured }); }}
+                                style={{ background: item.isFeatured ? '#ffd700' : 'white', color: item.isFeatured ? '#1a1a1a' : '#b58a00', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'grab' }}
+                              ><i className={`bi ${item.isFeatured ? 'bi-star-fill' : 'bi-star'}`}></i></button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
+                                style={{ background: 'white', color: 'black', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              ><i className="bi bi-pencil-fill"></i></button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setConfirmDelete({ type: 'product', id: item.id, name: isRtl ? item.nameAr : item.name }); }}
+                                style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                              ><i className="bi bi-trash-fill"></i></button>
                             </div>
-                          </div>
-                        )}
-
-                        {isAdmin && (
-                          <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, display: 'flex', gap: '6px' }}>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); updateItem(item.id, { isFeatured: !item.isFeatured }); }}
-                              className="admin-action-btn shadow-sm"
-                              aria-label={item.isFeatured ? (isRtl ? 'إلغاء التمييز' : 'Unfeature') : (isRtl ? 'تمييز' : 'Feature')}
-                              title={item.isFeatured ? (isRtl ? 'إلغاء التمييز' : 'Unfeature') : (isRtl ? 'عرض كمميّز' : 'Mark as featured')}
-                              style={{ background: item.isFeatured ? '#ffd700' : 'white', color: item.isFeatured ? '#1a1a1a' : '#b58a00', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
-                            ><i className={`bi ${item.isFeatured ? 'bi-star-fill' : 'bi-star'}`}></i></button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setItemToEdit(item); setIsEditorOpen(true); }}
-                              className="admin-action-btn shadow-sm"
-                              style={{ background: 'white', color: 'black', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
-                            ><i className="bi bi-pencil-fill"></i></button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setConfirmDelete({ type: 'product', id: item.id, name: isRtl ? item.nameAr : item.name }); }}
-                              className="admin-action-btn shadow-sm"
-                              style={{ background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}
-                            ><i className="bi bi-trash-fill"></i></button>
-                          </div>
-                        )}
-
-                        {(() => {
-                          const hasSale = item.salePrice != null && item.salePrice > 0
-                            && item.salePrice !== (item.originalPrice ?? item.price);
-                          if (!item.isFeatured && !hasSale) return null;
-                          return (
-                            <div className={`shop-card-tags ${isAdmin ? 'is-admin' : ''}`}>
-                              {item.isFeatured && (
-                                <span className="shop-card-tag tag-featured">
-                                  <i className="bi bi-star-fill" /> {isRtl ? 'مميّز' : 'Featured'}
-                                </span>
-                              )}
-                              {hasSale && (
-                                <span className="shop-card-tag tag-sale">
-                                  {isRtl ? 'تخفيض' : 'Sale'}
-                                </span>
-                              )}
+                          )}
+                          {!isAdmin && item.isFeatured && (
+                            <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10 }}>
+                              <span style={{ background: '#ffd700', color: '#000', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: '20px', textTransform: 'uppercase' }}>
+                                {isRtl ? 'مميّز' : 'Featured'}
+                              </span>
                             </div>
-                          );
-                        })()}
-
-                        <div className="card-bg-layer">
-                          <img
-                            src={item.image || FALLBACK_IMAGE}
-                            alt={isRtl ? item.nameAr : item.name}
-                          />
-                          <div className="card-overlay"></div>
+                          )}
                         </div>
 
-                        <div className="card-content">
-                          <div className="card-header">
-                            <h3 className="card-title">
-                              {isRtl ? item.nameAr || item.name : item.name}
-                            </h3>
+                        <div className="samsung-card-info">
+                          <h4 className="samsung-card-title">{isRtl ? item.nameAr || item.name : item.name}</h4>
+                          <span className="samsung-card-sub">{isRtl ? group.nameAr : group.name}</span>
+                          
+                          {/* Color Swatches */}
+                          {item.colors && item.colors.length > 0 && (
+                            <div style={{ display: 'flex', gap: '6px', margin: '8px 0', justifyContent: 'center' }}>
+                              {item.colors.slice(0, 6).map((c, idx) => (
+                                <div 
+                                  key={idx} 
+                                  style={{ 
+                                    width: '12px', 
+                                    height: '12px', 
+                                    borderRadius: '50%', 
+                                    background: c, 
+                                    border: '1px solid rgba(13, 26, 99, 0.1)',
+                                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)'
+                                  }} 
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px', justifyContent: 'center', width: '100%' }}>
+                            <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--bg-main)', margin: 0 }}>
+                              {item.salePrice ?? item.price} {t('currency')}
+                            </span>
+                            {item.salePrice && item.salePrice < item.price && (
+                              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#2251A4', whiteSpace: 'nowrap' }}>
+                                {isRtl ? `وفر ${item.price - item.salePrice}` : `Save ${item.price - item.salePrice}`}
+                              </span>
+                            )}
                           </div>
 
-                          <div className="card-hover-drawer">
-                            {isCustomer ? (
-                              <div className="hover-inner">
-                                <span className="hover-price">{item.price} {t('currency')}</span>
-                                {!inCart ? (
+                          <div className="samsung-card-actions" style={{ justifyContent: isAdmin ? 'center' : 'space-between' }}>
+                            {/* Quantity Controls / Add to Cart - HIDDEN for Admins */}
+                            {!isAdmin && (() => {
+                              const cartItem = cart.find(i => i.productId === item.id);
+                              const qty = cartItem?.quantity || 0;
+
+                              if (qty === 0) {
+                                return (
                                   <button
-                                    className="cart-fab-add"
-                                    aria-label={isRtl ? 'إضافة إلى العربة' : 'Add to cart'}
+                                    className="samsung-btn samsung-btn-primary"
+                                    style={{ borderRadius: '50%', width: '44px', height: '44px', flex: 'none' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       addToCart({
@@ -503,70 +474,70 @@ export default function ShopPage() {
                                       });
                                     }}
                                   >
-                                    <i className="bi bi-cart-plus"></i>
+                                    <i className="bi bi-cart-plus" style={{ fontSize: '1.2rem' }}></i>
                                   </button>
-                                ) : (
-                                  <div className="d-flex align-items-center" style={{ background: 'white', borderRadius: '8px', padding: '4px', gap: '8px', color: 'black' }}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (cartItem!.quantity > 1) updateQuantity(cartItem!.id, cartItem!.quantity - 1);
-                                        else removeFromCart(cartItem!.id);
-                                      }}
-                                      style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                    >
-                                      {cartItem!.quantity > 1 ? <i className="bi bi-dash"></i> : <i className="bi bi-trash"></i>}
-                                    </button>
-                                    <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{cartItem!.quantity}</span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        updateQuantity(cartItem!.id, cartItem!.quantity + 1);
-                                      }}
-                                      style={{ border: 'none', background: 'var(--bg-main)', color: 'white', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                    >
-                                      <i className="bi bi-plus"></i>
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            ) : isAdmin ? (
-                              <div className="hover-inner">
-                                <span className="hover-price">{item.price} {t('currency')}</span>
-                                {item.isFeatured && (
-                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,215,0,0.15)', color: '#ffd700', fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: '999px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                                    <i className="bi bi-star-fill"></i>
-                                    {isRtl ? 'مميّز' : 'Featured'}
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                               <div className="hover-inner">
-                                  <span className="hover-price">{item.price} {t('currency')}</span>
-                                  <span style={{ color: 'var(--text-soft)', fontSize: '0.8rem' }}>{isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}</span>
-                               </div>
-                            )}
+                                );
+                              }
+
+                              return (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(13, 26, 99, 0.04)', padding: '4px 10px', borderRadius: '999px' }}>
+                                  <button
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      if (!cartItem) return;
+                                      if (qty > 1) {
+                                        updateQuantity(cartItem.id, qty - 1);
+                                      } else {
+                                        removeFromCart(cartItem.id);
+                                      }
+                                    }}
+                                    style={{ border: 'none', background: 'none', color: qty === 1 ? '#ff4d4d' : 'var(--bg-main)', padding: '4px', display: 'flex', alignItems: 'center', transition: 'all 0.2s ease' }}
+                                  >
+                                    <i className={`bi ${qty === 1 ? 'bi-trash3-fill' : 'bi-dash-lg'}`} style={{ fontSize: '0.9rem' }}></i>
+                                  </button>
+                                  <span style={{ fontWeight: 800, color: 'var(--bg-main)', minWidth: '18px', textAlign: 'center', fontSize: '0.85rem' }}>{qty}</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (!cartItem) return;
+                                      updateQuantity(cartItem.id, qty + 1);
+                                    }}
+                                    style={{ border: 'none', background: 'none', color: 'var(--bg-main)', padding: '4px', display: 'flex', alignItems: 'center' }}
+                                  >
+                                    <i className="bi bi-plus-lg" style={{ fontSize: '0.9rem' }}></i>
+                                  </button>
+                                </div>
+                              );
+                            })()}
+
+                            <button
+                              className="samsung-details-link"
+                              onClick={(e) => { e.stopPropagation(); openProduct(item.id); }}
+                              style={{ flex: isAdmin ? '1' : 'none', justifyContent: isAdmin ? 'center' : 'flex-start' }}
+                            >
+                              {isRtl ? 'التفاصيل' : 'Learn More'}
+                              <i className={`bi ${isRtl ? 'bi-arrow-left-short' : 'bi-arrow-right-short'} ms-1`}></i>
+                            </button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            ) : (
-              <div
-                style={{ padding: '30px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed var(--line-soft)' }}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleProductDrop(e, group.id, 0)}
-              >
-                <p style={{ color: 'var(--text-soft)', fontStyle: 'italic', margin: 0, fontSize: '0.88rem' }}>
-                  {isRtl ? 'لا توجد منتجات في هذا القسم حالياً' : 'No products found in this category yet.'}
-                </p>
+            ))}
+
+            {filteredCategories.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '100px 0' }}>
+                <i className="bi bi-search" style={{ fontSize: '3rem', opacity: 0.1, marginBottom: '20px', display: 'block' }}></i>
+                <h3 style={{ fontWeight: 800 }}>{isRtl ? 'لا توجد منتجات' : 'No products found'}</h3>
+                <button onClick={clearFilter} className="samsung-btn samsung-btn-secondary mt-3" style={{ maxWidth: '200px', margin: '0 auto' }}>
+                  {isRtl ? 'إظهار الكل' : 'View All Products'}
+                </button>
               </div>
             )}
-          </section>
-          );
-        })}
+          </div>
+        </div>
 
         {/* Global Admin Floating Add Button */}
         {isAdmin && !isEditorOpen && (
@@ -628,7 +599,7 @@ export default function ShopPage() {
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'var(--bg-main)', borderRadius: '16px', border: '1px solid var(--line-soft)' }}>
-              <h4 style={{ fontSize: '0.8rem', marginBottom: '12px', color: 'var(--text-soft)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>{isRtl ? 'فئة جديدة' : 'Add New Category'}</h4>
+              <h4 style={{ fontSize: '0.8rem', marginBottom: 'px', color: 'var(--text-soft)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>{isRtl ? 'فئة جديدة' : 'Add New Category'}</h4>
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
@@ -715,8 +686,8 @@ export default function ShopPage() {
           /* Compact "banner" feel — shorter than a full hero, taller than a
              strip. Mobile default is on the lower end of the clamp. */
           min-height: min(420px, 56vh);
-          /* Breathing room before the EXPLORE COLLECTIONS section below. */
-          margin-bottom: clamp(40px, 6vw, 80px);
+          /* Minimal breathing room before the category bar. */
+          margin-bottom: 10px;
           overflow: hidden;
           isolation: isolate;
           background: #0a0f2e;
@@ -1053,6 +1024,35 @@ export default function ShopPage() {
         }
         @media (max-width: 600px) {
           .featured-carousel-container { margin: 0 -16px; padding: 0 16px; }
+        }
+        .samsung-details-link {
+          background: none;
+          border: none;
+          color: var(--bg-main);
+          font-size: 0.78rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          padding: 8px 12px;
+          display: flex;
+          align-items: center;
+          transition: all 0.3s ease;
+          opacity: 0.6;
+        }
+        .samsung-details-link:hover {
+          opacity: 1;
+          transform: translateX(4px);
+        }
+        [dir="rtl"] .samsung-details-link:hover {
+          transform: translateX(-4px);
+        }
+        .samsung-card-actions {
+          display: flex;
+          width: 100%;
+          gap: 12px;
+          justify-content: center;
+          align-items: center;
         }
         .featured-carousel {
           display: flex;

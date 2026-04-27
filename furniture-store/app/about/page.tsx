@@ -66,7 +66,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
+    <main className="app-content about-page-theme" dir={isRtl ? 'rtl' : 'ltr'}>
 
       {/* 1. Heritage Split Section — matches Home hero sizing with nav clearance */}
       <section className="lumiere-split hero-viewport">

@@ -61,16 +61,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
           .eq('user_id', user.id);
 
         if (data && !error) {
-          const dbItems: CartItem[] = (data as any[]).map((row: any) => ({
-            id: makeCartLineId(row.products.id, row.selected_color, row.selected_type),
-            productId: row.products.id,
-            name: row.products.name,
-            price: row.products.price,
-            image: row.products.image_url,
-            quantity: row.quantity,
-            selectedColor: row.selected_color ?? null,
-            selectedType: row.selected_type ?? null,
-          }));
+          const dbItems: CartItem[] = (data as any[])
+            .filter((row: any) => row.products !== null) // Skip orphaned items
+            .map((row: any) => ({
+              id: makeCartLineId(row.products.id, row.selected_color, row.selected_type),
+              productId: row.products.id,
+              name: row.products.name,
+              price: row.products.price,
+              image: row.products.image_url,
+              quantity: row.quantity,
+              selectedColor: row.selected_color ?? null,
+              selectedType: row.selected_type ?? null,
+            }));
 
           // Merge with any guest cart in localStorage
           const saved = localStorage.getItem('smartwood_cart');

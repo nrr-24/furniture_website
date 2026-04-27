@@ -99,8 +99,8 @@ export default function Navbar() {
             </div>
         </nav>
 
-            {/* Rendered outside <nav>: navbar's backdrop-filter creates a containing block for position:fixed in Safari/Firefox. */}
-            {isCustomer && !isAdminView && (
+            {/* Floating Cart FAB - HIDDEN for Admins */}
+            {!isAdmin && !isAdminView && (
                 <button
                     className="floating-cart-fab pulse"
                     onClick={() => setIsCartOpen(true)}

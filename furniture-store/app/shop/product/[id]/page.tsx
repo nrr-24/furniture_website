@@ -170,6 +170,8 @@ export default function ProductPage() {
           -webkit-overflow-scrolling: touch;
           overscroll-behavior: contain;
           scroll-behavior: auto;
+          background: var(--sand-soft);
+          color: #0d1a63;
         }
         .pp-main .container { padding: 32px 40px 80px; }
         @media (max-width: 991px) { .pp-main .container { padding: 24px 24px 60px; } }
@@ -180,18 +182,18 @@ export default function ProductPage() {
           align-items: center;
           gap: 10px;
           font-size: 0.82rem;
-          color: var(--text-soft);
+          color: rgba(13, 26, 99, 0.55);
           margin-bottom: 22px;
           flex-wrap: wrap;
         }
         .pp-crumbs a {
-          color: var(--text-soft);
+          color: rgba(13, 26, 99, 0.55);
           text-decoration: none;
           transition: color 0.2s ease;
         }
-        .pp-crumbs a:hover { color: var(--text-main); }
+        .pp-crumbs a:hover { color: #0d1a63; }
         .pp-crumbs-sep { opacity: 0.5; }
-        .pp-crumbs-current { color: var(--text-main); font-weight: 600; }
+        .pp-crumbs-current { color: #0d1a63; font-weight: 600; }
 
         .pp-suggested {
           margin-top: 56px;
@@ -209,9 +211,10 @@ export default function ProductPage() {
           font-size: clamp(1.3rem, 2vw, 1.6rem);
           font-weight: 700;
           letter-spacing: -0.01em;
+          color: #0d1a63;
         }
         .pp-suggested-all {
-          color: var(--text-soft);
+          color: rgba(13, 26, 99, 0.55);
           text-decoration: none;
           font-size: 0.85rem;
           font-weight: 600;
@@ -221,7 +224,7 @@ export default function ProductPage() {
           gap: 6px;
           transition: color 0.2s ease;
         }
-        .pp-suggested-all:hover { color: var(--text-main); }
+        .pp-suggested-all:hover { color: #0d1a63; }
 
         .pp-suggested-rail {
           display: grid;
@@ -249,10 +252,10 @@ export default function ProductPage() {
         }
 
         .pp-suggested-card {
-          /* Cream/navy palette matching the Featured compact cards and the detail card. */
+          /* Cream/navy palette matching the product detail card. */
           display: flex;
           flex-direction: column;
-          background: var(--sand-soft);
+          background: #faf8f4;
           border: 1px solid rgba(13, 26, 99, 0.12);
           border-radius: 16px;
           overflow: hidden;
@@ -272,7 +275,7 @@ export default function ProductPage() {
           position: relative;
           aspect-ratio: 4 / 3;
           overflow: hidden;
-          background: #fff;
+          background: #ebe6db;
           border-bottom: 1px solid rgba(13, 26, 99, 0.08);
         }
         .pp-suggested-img img {

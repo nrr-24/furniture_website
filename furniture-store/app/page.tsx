@@ -149,12 +149,11 @@ export default function HomePage() {
         {/* Background Layer with entrance animation */}
         <div className="hero-bg-animate">
           <picture>
-            <source media="(max-width: 1023px)" srcSet={currentHero.mobileImage} />
+            <source media="(max-width: 768px)" srcSet={currentHero.mobileImage} />
             <img src={currentHero.image} alt="" />
           </picture>
         </div>
-        <div className="hero-overlay-dark" />
-        
+
         {/* Hotspots for Desktop */}
         {bgReady && (
           <div className="hero-hotspots-container">
@@ -186,7 +185,6 @@ export default function HomePage() {
             ))}
           </div>
         )}
-
 
         <div className="home-hero-content">
           {/* Left Side: Copy, Gallery, Actions */}
@@ -221,6 +219,19 @@ export default function HomePage() {
                   <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
                     {isRtl ? 'تواصل معنا' : 'Connect with Us'}
                   </Link>
+                </div>
+
+                {/* Persistent Feature Box (BEEZ BLUE) - Mobile Flow / Desktop Absolute */}
+                <div className="hero-feature-box animate-fade-up" style={{ animationDelay: '0.6s' }}>
+                  <div className="feature-box-content">
+                    <div className="feature-box-img">
+                      <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.jpg" alt="Beez Blue" />
+                    </div>
+                    <div className="feature-box-text">
+                      <h4>{isRtl ? 'مجموعة بيز بلو' : 'Beez Blue Collection'}</h4>
+                      <p>{isRtl ? 'تصميم حصري يجمع بين الفخامة والجرأة.' : 'Exclusive design blending luxury with boldness.'}</p>
+                    </div>
+                  </div>
                 </div>
               </>
             )}

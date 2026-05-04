@@ -273,7 +273,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           --pd-ink: #0d1a63;
           --pd-ink-soft: rgba(13, 26, 99, 0.62);
           --pd-line: rgba(13, 26, 99, 0.12);
-          --pd-surface: var(--sand-soft);
+          --pd-surface: #faf8f4;
 
           background: var(--pd-surface);
           color: var(--pd-ink);

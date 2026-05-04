@@ -21,6 +21,40 @@ const HERO_BANNERS = [
   }
 ];
 
+const HERO_HOTSPOTS = [
+  {
+    id: 'cnc',
+    top: '40%',
+    left: '60%',
+    titleEn: 'Advanced CNC Precision',
+    titleAr: 'دقة CNC المتقدمة',
+    textEn: 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
+    textAr: 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.',
+    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0003_030.jpg'
+  },
+  {
+    id: 'materials',
+    top: '72%',
+    left: '42%',
+    titleEn: 'Premium Sourcing',
+    titleAr: 'مصادر مواد فاخرة',
+    textEn: 'Sustainable woods tested to withstand the Gulf\'s unique climate.',
+    textAr: 'خشب مستدام تم اختباره لتحمل مناخ الخليج الفريد.',
+    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0024_009.jpg'
+  },
+  {
+    id: 'kuwait',
+    top: '28%',
+    left: '78%',
+    titleEn: 'Made in Kuwait',
+    titleAr: 'صُنع في الكويت',
+    textEn: 'A national brand committed to local excellence and superior support.',
+    textAr: 'علامة وطنية تلتزم بالتميز المحلي ودعم أفضل لعملائنا.',
+  }
+];
+
+
+
 
 /**
  * Column-based responsive image grid for the homepage hero's right aside.
@@ -120,6 +154,39 @@ export default function HomePage() {
           </picture>
         </div>
         <div className="hero-overlay-dark" />
+        
+        {/* Hotspots for Desktop */}
+        {bgReady && (
+          <div className="hero-hotspots-container">
+            {HERO_HOTSPOTS.map((spot) => (
+              <div 
+                key={spot.id} 
+                className="hero-hotspot" 
+                style={{ top: spot.top, left: spot.left }}
+              >
+                <div className="hotspot-trigger">
+                  <div className="hotspot-dot" />
+                  <div className="hotspot-pulse" />
+                </div>
+                <div className="hotspot-tooltip">
+                  <div className="tooltip-content">
+                    {spot.image && (
+                      <div className="tooltip-img">
+                        <img src={spot.image} alt="" />
+                      </div>
+                    )}
+                    <div className="tooltip-text">
+                      <h4>{isRtl ? spot.titleAr : spot.titleEn}</h4>
+                      <p>{isRtl ? spot.textAr : spot.textEn}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        )}
+
 
         <div className="home-hero-content">
           {/* Left Side: Copy, Gallery, Actions */}

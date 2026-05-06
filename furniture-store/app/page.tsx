@@ -88,11 +88,6 @@ export default function HomePage() {
 
   const currentHero = HERO_BANNERS[0]; // Easily swap index or find by ID
 
-  const heroPart1 = isRtl ? 'سمارت وود:' : 'Smartwood:';
-  const heroPart2 = isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.';
-  const heroTotal = heroPart1.length + heroPart2.length;
-  const [typed, setTyped] = useState(0);
-  const [bgReady, setBgReady] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll logic for slider
@@ -108,46 +103,18 @@ export default function HomePage() {
           sliderRef.current.scrollBy({ left: 350, behavior: 'smooth' });
         }
       }
-    }, 1000); // Trigger every 2s
+    }, 2000); // Trigger every 2s
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    // Background slide-down duration in CSS is 1.4s
-    const timer = setTimeout(() => {
-      setBgReady(true);
-    }, 1200); // Start typing slightly before completion for a natural feel
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!bgReady) return;
-    setTyped(0);
-    const id = setInterval(() => {
-      setTyped(c => {
-        if (c + 1 >= heroTotal) {
-          clearInterval(id);
-          return heroTotal;
-        }
-        return c + 1;
-      });
-    }, 70);
-    return () => clearInterval(id);
-  }, [heroTotal, bgReady]);
-
   if (!initialized) return null;
-
-  const shown1 = heroPart1.slice(0, Math.min(typed, heroPart1.length));
-  const shown2 = heroPart2.slice(0, Math.max(0, typed - heroPart1.length));
-  const part1Done = typed >= heroPart1.length;
-  const typing = typed < heroTotal;
 
   return (
     <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* 1. Hero Section (The First Impression) */}
       <section className="hero-viewport home-hero">
         {/* Background Layer with entrance animation */}
-        <div className="hero-bg-animate">
+        <div className="hero-bg-static">
           <picture>
             <source media="(max-width: 768px)" srcSet={currentHero.mobileImage} />
             <img src={currentHero.image} alt="" />
@@ -155,8 +122,7 @@ export default function HomePage() {
         </div>
 
         {/* Hotspots for Desktop */}
-        {bgReady && (
-          <div className="hero-hotspots-container">
+        <div className="hero-hotspots-container">
             {HERO_HOTSPOTS.map((spot) => (
               <div 
                 key={spot.id} 
@@ -184,35 +150,29 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        )}
 
         <div className="home-hero-content">
           {/* Left Side: Copy, Gallery, Actions */}
           <div className="split-left">
 
-            <h1 style={{ fontWeight: 800, letterSpacing: '-0.07em', lineHeight: 1.1, textAlign: 'left', minHeight: '2.2em' }}>
+            <h1 style={{ fontWeight: 800, letterSpacing: '-0.07em', lineHeight: 1.1, textAlign: 'left' }}>
               <span style={{ fontWeight: 800 }}>
-                {shown1}
-                {!part1Done && typing && <span className="type-cursor" aria-hidden="true" />}
+                {isRtl ? 'سمارت وود:' : 'Smartwood:'}
               </span>
-              {part1Done && <br />}
-              {part1Done && (
-                <span>
-                  {shown2}
-                  {typing && <span className="type-cursor" aria-hidden="true" />}
-                </span>
-              )}
+              <br />
+              <span>
+                {isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.'}
+              </span>
             </h1>
 
-            {bgReady && (
-              <>
-                <p className="smartwood-description animate-fade-up" style={{ animationDelay: '0.2s', textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
+            <div className="hero-main-content-fade-in">
+                <p className="smartwood-description" style={{ textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
                   {isRtl
                     ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
                     : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
                 </p>
 
-                <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '0.4s', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+                <div className="hero-main-actions d-flex gap-3" style={{ justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                   <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
                     {isRtl ? 'استكشف الفن' : 'Explore the Art'}
                   </Link>
@@ -222,7 +182,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Persistent Feature Box (BEEZ BLUE) - Mobile Flow / Desktop Absolute */}
-                <div className="hero-feature-box animate-fade-up" style={{ animationDelay: '0.6s' }}>
+                <div className="hero-feature-box">
                   <div className="feature-box-content">
                     <div className="feature-box-img">
                       <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.jpg" alt="Beez Blue" />
@@ -233,8 +193,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </>
-            )}
+            </div>
 
           </div>
         </div>

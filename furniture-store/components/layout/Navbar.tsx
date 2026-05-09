@@ -12,6 +12,8 @@ const cartImg = (src: string) => (!src || src === LEGACY_PLACEHOLDER ? FALLBACK_
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const { language, setLanguage, isRtl, t } = useLanguage();
     const { user, logout, isAdmin } = useAuth();
     const { cart, removeFromCart, updateQuantity, totalItems, totalPrice, isCartOpen, setIsCartOpen } = useCart();
@@ -36,7 +38,7 @@ export default function Navbar() {
                 />
             </Link>
 
-            <div className="nav-center-pills">
+            <div className="nav-center-pills d-none d-lg-flex">
                 <Link href="/" className={`nav-pill-link ${pathname === '/' ? 'active' : ''}`}>{t('home')}</Link>
                 <Link href="/shop" className={`nav-pill-link ${pathname === '/shop' ? 'active' : ''}`}>{t('collections')}</Link>
                 <Link href="/about" className={`nav-pill-link ${pathname === '/about' ? 'active' : ''}`}>{t('craftsmanship')}</Link>
@@ -44,7 +46,15 @@ export default function Navbar() {
 
             <div className="nav-right-actions">
                 <button
-                    className="nav-icon-btn"
+                    className="d-lg-none"
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    aria-label="Open Menu"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.6rem', padding: '0 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                >
+                    <i className="bi bi-list"></i>
+                </button>
+                <button
+                    className="nav-icon-btn d-none d-lg-flex"
                     style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}
                     onClick={toggleLanguage}
                     title={t('switchLang')}
@@ -263,7 +273,23 @@ export default function Navbar() {
                 </div>
             </div>
 
-            <style jsx>{`
+            {/* Full-Screen Mobile Menu Overlay */}
+            <div className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
+                <button 
+                    className="close-menu-btn" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    aria-label="Close Menu"
+                >
+                    <i className="bi bi-x-lg"></i>
+                </button>
+                <div className="mobile-menu-links">
+                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`}>{t('home')}</Link>
+                    <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/shop' ? 'active' : ''}`}>{t('collections')}</Link>
+                    <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/about' ? 'active' : ''}`}>{t('craftsmanship')}</Link>
+                </div>
+            </div>
+
+            <style jsx global>{`
                 .floating-cart-fab:hover {
                     transform: scale(1.1) translateY(-5px);
                 }
@@ -291,6 +317,7 @@ export default function Navbar() {
                         font-size: 1.2rem !important;
                     }
                 }
+
             `}</style>
         </>
     );

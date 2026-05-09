@@ -274,7 +274,7 @@ img {
   min-height: 100%;
   flex: 1;
   overflow: hidden;
-  background: var(--sand-soft);
+  background: var(--bg-main); /* Keep navy background just in case */
 }
 
 .hero-bg-animate,
@@ -296,6 +296,7 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 30%; /* Focus higher up to avoid awkward zoom on the middle */
   display: block;
 }
 
@@ -570,7 +571,7 @@ img {
 
 .home-hero .split-left {
   background: transparent;
-  color: var(--bg-main);
+  color: var(--sand-soft);
   padding: 0;
   width: 100%;
   max-width: 900px;
@@ -582,11 +583,11 @@ img {
 
 .home-hero .split-left h1,
 .home-hero .split-left h1 span {
-  color: var(--bg-main);
+  color: var(--sand-soft);
 }
 
 .home-hero .smartwood-description {
-  color: rgba(13, 26, 99, 0.75);
+  color: var(--text-soft);
 }
 
 @media (max-width: 991px) {
@@ -1116,25 +1117,25 @@ img {
 }
 
 .hero-primary-btn {
-  background: var(--bg-main);
-  color: var(--sand-soft);
-  box-shadow: 0 10px 30px rgba(13, 26, 99, 0.2);
+  background: var(--sand-soft);
+  color: var(--bg-main);
+  box-shadow: 0 10px 30px rgba(226, 218, 204, 0.2);
 }
 
 .hero-primary-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(226, 218, 204, 0.35);
+  box-shadow: 0 15px 40px rgba(226, 218, 204, 0.4);
 }
 
 .hero-secondary-btn {
   background: transparent;
-  color: var(--bg-main);
-  border: 1px solid var(--bg-main);
+  color: var(--sand-soft);
+  border: 1px solid var(--sand-soft);
 }
 
 .hero-secondary-btn:hover {
-  background: rgba(13, 26, 99, 0.08);
-  /* Navy hint */
+  background: rgba(226, 218, 204, 0.1);
+  /* Cream hint */
   transform: translateY(-2px);
 }
 
@@ -1409,15 +1410,15 @@ img {
     color: var(--bg-main) !important;
   }
 
-  /* Override cream colors on mobile — text should be pure white over the image */
+  /* Cream colors on mobile */
   .home-hero>.split-left h1,
   .home-hero>.split-left h1 span {
-    color: var(--bg-main) !important;
+    color: var(--sand-soft) !important;
     text-align: center !important;
   }
 
   .home-hero>.split-left .smartwood-description {
-    color: var(--bg-main) !important;
+    color: var(--text-soft) !important;
     text-align: center !important;
   }
 
@@ -1428,10 +1429,10 @@ img {
     gap: 12px !important;
   }
 
-  /* Primary button on mobile: navy pill on light bg */
+  /* Primary button on mobile */
   .home-hero .split-left .hero-primary-btn {
-    background: var(--bg-main) !important;
-    color: var(--sand-soft) !important;
+    background: var(--sand-soft) !important;
+    color: var(--bg-main) !important;
     padding: 0 16px !important;
     min-height: 44px !important;
     font-size: 0.9rem !important;
@@ -1439,8 +1440,8 @@ img {
 
   .home-hero .split-left .hero-secondary-btn {
     background: transparent !important;
-    color: var(--bg-main) !important;
-    border: 1.5px solid var(--bg-main) !important;
+    color: var(--sand-soft) !important;
+    border: 1.5px solid var(--sand-soft) !important;
     padding: 0 16px !important;
     min-height: 44px !important;
     font-size: 0.9rem !important;
@@ -1489,7 +1490,7 @@ img {
   .home-hero-content h1,
   .home-hero-content h1 span,
   .home-hero-content .smartwood-description {
-    color: var(--bg-main) !important;
+    color: var(--sand-soft) !important;
   }
 }
 
@@ -3293,3 +3294,73 @@ img {
 .about-page-theme .timeline-item.visible .timeline-node {
   box-shadow: 0 0 0 3px #0d1a63, 0 0 20px rgba(13, 26, 99, 0.15);
 }
+
+/* =========================================
+   Mobile Menu Overlay
+========================================= */
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 15, 30, 0.45);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 15vw;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.close-menu-btn {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10001;
+  opacity: 0.8;
+}
+.close-menu-btn:hover {
+  opacity: 1;
+}
+
+[dir="rtl"] .close-menu-btn {
+  right: auto;
+  left: 32px;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.mobile-nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-family: 'MontserratArabic', sans-serif;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: 0.3s;
+}
+
+.mobile-nav-link:hover, .mobile-nav-link.active {
+  color: white;
+  transform: translateX(10px);
+}

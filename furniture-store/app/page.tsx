@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
 import { useCart } from '../data/CartContext';
-import { FurnitureItem } from '../data/furnitureData';
+import { FurnitureItem, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
 import FurnitureManager from '../components/FurnitureManager';
 import Footer from '../components/layout/Footer';
@@ -24,8 +24,8 @@ const HERO_BANNERS = [
 const HERO_HOTSPOTS = [
   {
     id: 'cnc',
-    top: '40%',
-    left: '60%',
+    top: '45%',
+    left: '75%',
     titleEn: 'Advanced CNC Precision',
     titleAr: 'دقة CNC المتقدمة',
     textEn: 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
@@ -34,8 +34,8 @@ const HERO_HOTSPOTS = [
   },
   {
     id: 'materials',
-    top: '72%',
-    left: '42%',
+    top: '20%',
+    left: '50%',
     titleEn: 'Premium Sourcing',
     titleAr: 'مصادر مواد فاخرة',
     textEn: 'Sustainable woods tested to withstand the Gulf\'s unique climate.',
@@ -44,8 +44,8 @@ const HERO_HOTSPOTS = [
   },
   {
     id: 'kuwait',
-    top: '28%',
-    left: '78%',
+    top: '25%',
+    left: '88%',
     titleEn: 'Made in Kuwait',
     titleAr: 'صُنع في الكويت',
     textEn: 'A national brand committed to local excellence and superior support.',
@@ -116,46 +116,45 @@ export default function HomePage() {
         {/* Background Layer with entrance animation */}
         <div className="hero-bg-static">
           <picture>
-            <source media="(max-width: 768px)" srcSet={currentHero.mobileImage} />
             <img src={currentHero.image} alt="" />
           </picture>
         </div>
 
         {/* Hotspots for Desktop */}
         <div className="hero-hotspots-container">
-            {HERO_HOTSPOTS.map((spot) => (
-              <div 
-                key={spot.id} 
-                className="hero-hotspot" 
-                style={{ top: spot.top, left: spot.left }}
-              >
-                <div className="hotspot-trigger">
-                  <div className="hotspot-dot" />
-                  <div className="hotspot-pulse" />
-                </div>
-                <div className="hotspot-tooltip">
-                  <div className="tooltip-content">
-                    {spot.image && (
-                      <div className="tooltip-img">
-                        <img src={spot.image} alt="" />
-                      </div>
-                    )}
-                    <div className="tooltip-text">
-                      <h4>{isRtl ? spot.titleAr : spot.titleEn}</h4>
-                      <p>{isRtl ? spot.textAr : spot.textEn}</p>
+          {HERO_HOTSPOTS.map((spot) => (
+            <div
+              key={spot.id}
+              className="hero-hotspot"
+              style={{ top: spot.top, left: spot.left }}
+            >
+              <div className="hotspot-trigger">
+                <div className="hotspot-dot" />
+                <div className="hotspot-pulse" />
+              </div>
+              <div className="hotspot-tooltip">
+                <div className="tooltip-content">
+                  {spot.image && (
+                    <div className="tooltip-img">
+                      <img src={spot.image} alt="" />
                     </div>
+                  )}
+                  <div className="tooltip-text">
+                    <h4>{isRtl ? spot.titleAr : spot.titleEn}</h4>
+                    <p>{isRtl ? spot.textAr : spot.textEn}</p>
                   </div>
                 </div>
-
               </div>
-            ))}
-          </div>
+
+            </div>
+          ))}
+        </div>
 
         <div className="home-hero-content">
           {/* Left Side: Copy, Gallery, Actions */}
           <div className="split-left">
 
-            <h1 style={{ fontWeight: 800, letterSpacing: '-0.07em', lineHeight: 1.1, textAlign: 'left' }}>
+            <h1 style={{ fontWeight: 800, fontSize: 'clamp(2.5rem, 8vw, 4rem)', letterSpacing: 'normal', lineHeight: 1.1, textAlign: 'left' }}>
               <span style={{ fontWeight: 800 }}>
                 {isRtl ? 'سمارت وود:' : 'Smartwood:'}
               </span>
@@ -166,33 +165,35 @@ export default function HomePage() {
             </h1>
 
             <div className="hero-main-content-fade-in">
-                <p className="smartwood-description" style={{ textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
-                  {isRtl
-                    ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. نمزج بين الحرفية المتبكرة والتكنولوجيا المتقدمة لنبتكر تصاميم داخلية تعبر عن قصتك.'
-                    : 'Redefining luxury woodworking in Kuwait. We blend master craftsmanship with advanced technology to create bespoke interiors that tell your story.'}
-                </p>
+              <p className="smartwood-description" style={{ textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
+                {isRtl
+                  ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. تصاميم داخلية تعبر عن قصتك.'
+                  : 'Redefining luxury woodworking in Kuwait. Bespoke interiors that tell your story.'}
+              </p>
 
-                <div className="hero-main-actions d-flex gap-3" style={{ justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-                  <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
-                    {isRtl ? 'استكشف الفن' : 'Explore the Art'}
-                  </Link>
-                  <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
-                    {isRtl ? 'تواصل معنا' : 'Connect with Us'}
-                  </Link>
-                </div>
+              <div className="hero-main-actions" style={{ marginBottom: '40px' }}>
+                <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
+                  {isRtl ? 'استكشف الفن' : 'Explore the Art'}
+                </Link>
+                <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
+                  {isRtl ? 'تواصل معنا' : 'Connect with Us'}
+                </Link>
+              </div>
 
-                {/* Persistent Feature Box (BEEZ BLUE) - Mobile Flow / Desktop Absolute */}
-                <div className="hero-feature-box">
+              {/* Persistent Feature Box - Dynamic First Product */}
+              {items && items.length > 0 && (
+                <Link href={`/shop/product/${items[0].id}`} className="hero-feature-box" style={{ textDecoration: 'none' }}>
                   <div className="feature-box-content">
                     <div className="feature-box-img">
-                      <img src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/BEEZ%20BLUE.jpg" alt="Beez Blue" />
+                      <img src={items[0].image || FALLBACK_IMAGE} alt={isRtl ? items[0].nameAr : items[0].name} />
                     </div>
                     <div className="feature-box-text">
-                      <h4>{isRtl ? 'مجموعة بيز بلو' : 'Beez Blue Collection'}</h4>
-                      <p>{isRtl ? 'تصميم حصري يجمع بين الفخامة والجرأة.' : 'Exclusive design blending luxury with boldness.'}</p>
+                      <h4>{isRtl ? items[0].nameAr : items[0].name}</h4>
+                      <p style={{ wordSpacing: '0.15em' }}>{isRtl ? items[0].descriptionAr : items[0].description}</p>
                     </div>
                   </div>
-                </div>
+                </Link>
+              )}
             </div>
 
           </div>

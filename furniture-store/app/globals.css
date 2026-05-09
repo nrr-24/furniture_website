@@ -21,6 +21,14 @@
 
 @font-face {
   font-family: 'MontserratArabic';
+  src: url('/fonts/ALLEXP03SAHLAB.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MontserratArabic';
   src: url('/fonts/Montserrat-Arabic Medium 500.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
@@ -505,12 +513,15 @@ img {
     bottom: auto;
     right: auto;
     width: 100%;
-    margin-top: 32px;
+    margin-top: 48px;
     z-index: 5;
   }
   
   .feature-box-content {
-    background: rgba(255, 255, 255, 0.05); /* Lighter on mobile for contrast */
+    background: rgba(13, 26, 99, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 14px;
     border-radius: 20px;
   }
@@ -1078,6 +1089,7 @@ img {
 .smartwood-description {
   font-size: 1.02rem;
   line-height: 1.9;
+  font-weight: 500;
   color: var(--text-soft);
   max-width: 520px;
   margin-bottom: 34px;
@@ -1409,20 +1421,41 @@ img {
     text-align: center !important;
   }
 
-  .home-hero>.split-left .hero-main-actions {
-    justify-content: center !important;
+  .home-hero .split-left .hero-main-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    width: 100%;
+    gap: 12px !important;
   }
 
-  /* Primary button on mobile: cream pill on image */
-  .home-hero>.split-left .hero-primary-btn {
-    background: var(--sand-soft) !important;
-    color: var(--bg-main) !important;
+  /* Primary button on mobile: navy pill on light bg */
+  .home-hero .split-left .hero-primary-btn {
+    background: var(--bg-main) !important;
+    color: var(--sand-soft) !important;
+    padding: 0 16px !important;
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
   }
 
-  .home-hero>.split-left .hero-secondary-btn {
+  .home-hero .split-left .hero-secondary-btn {
     background: transparent !important;
-    color: var(--text-main) !important;
-    border: 1.5px solid rgba(226, 218, 204, 0.55) !important;
+    color: var(--bg-main) !important;
+    border: 1.5px solid var(--bg-main) !important;
+    padding: 0 16px !important;
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+  }
+
+  @media (max-width: 400px) {
+    .home-hero .split-left .hero-main-actions {
+      gap: 8px !important;
+    }
+    .home-hero .split-left .hero-primary-btn,
+    .home-hero .split-left .hero-secondary-btn {
+      padding: 0 8px !important;
+      font-size: 0.75rem !important;
+      min-height: 40px !important;
+    }
   }
 
   /* About Page Mobile Readability */

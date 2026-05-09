@@ -37,29 +37,96 @@ export function FurnitureProvider({
   const [initialized, setInitialized] = useState(initialItems.length > 0 || initialCategories.length > 0);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
       try {
         const [prodRes, catRes] = await Promise.all([
           supabase.from('products').select('*').order('sort_order', { ascending: true }),
           supabase.from('categories').select('*').order('sort_order', { ascending: true })
         ]);
-
+        if (cancelled) return;
         if (prodRes.error) console.error('Error fetching products:', prodRes.error);
         if (catRes.error) console.error('Error fetching categories:', catRes.error);
-
         if (prodRes.data) setItems(prodRes.data.map(mapDbRowToItem));
         if (catRes.data) setCategories(catRes.data.map(mapDbRowToCategory));
       } catch (err) {
         console.error('Fetch error:', err);
       } finally {
-        setInitialized(true);
+        if (!cancelled) setInitialized(true);
       }
     };
 
-    // Only fetch if not already hydrated
+    // Initial fetch only if SSR didn't hydrate us — otherwise we already
+    // have fresh data from the server render.
     if (initialItems.length === 0 && initialCategories.length === 0) {
       fetchData();
+    } else {
+      setInitialized(true);
     }
+
+    // === Freshness layer 1: Supabase Realtime ===========================
+    // Pushes INSERT/UPDATE/DELETE events from the DB straight into local
+    // state, so admin changes appear in every connected browser within
+    // ~1 second. Requires Realtime to be enabled on the `products` and
+    // `categories` tables in the Supabase dashboard
+    // (Database → Replication → enable for those tables). If it's not
+    // enabled the channel just sits idle — the polling layer below covers
+    // that case.
+    const channel = supabase
+      .channel('public:products,categories')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        (payload: any) => {
+          if (cancelled) return;
+          if (payload.eventType === 'INSERT' && payload.new) {
+            const item = mapDbRowToItem(payload.new);
+            setItems(prev => prev.some(i => i.id === item.id) ? prev : [...prev, item]);
+          } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const item = mapDbRowToItem(payload.new);
+            setItems(prev => prev.map(i => i.id === item.id ? item : i));
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setItems(prev => prev.filter(i => i.id !== payload.old.id));
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'categories' },
+        (payload: any) => {
+          if (cancelled) return;
+          if (payload.eventType === 'INSERT' && payload.new) {
+            const cat = mapDbRowToCategory(payload.new);
+            setCategories(prev => prev.some(c => c.id === cat.id) ? prev : [...prev, cat]);
+          } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const cat = mapDbRowToCategory(payload.new);
+            setCategories(prev => prev.map(c => c.id === cat.id ? cat : c));
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setCategories(prev => prev.filter(c => c.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    // === Freshness layer 2: refetch on tab focus ========================
+    // When a user comes back to the tab after a while, immediately pull
+    // the latest. Cheap, always works.
+    const onVisible = () => { if (document.visibilityState === 'visible') fetchData(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', fetchData);
+
+    // === Freshness layer 3: background polling ==========================
+    // Catches the worst case (Realtime disabled + tab stayed in foreground
+    // for a long time). 60s is gentle enough not to hammer Supabase.
+    const interval = setInterval(fetchData, 60_000);
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', fetchData);
+      clearInterval(interval);
+    };
   }, []);
 
   const addItem = async (item: Omit<FurnitureItem, 'id'>) => {

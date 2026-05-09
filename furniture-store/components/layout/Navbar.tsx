@@ -64,18 +64,18 @@ export default function Navbar() {
 
                 {/* Authentication & Profile Controls */}
                 {user ? (
-                    <div className="d-flex align-items-center gap-3">
+                    <div className="d-none d-lg-flex align-items-center gap-3">
                         {isAdmin && (
                             <Link href="/admin/users" style={{ color: 'var(--blue-main)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}>
                                 {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
                             </Link>
                         )}
-                        
+
                         {/* Profile Link - Hidden in Admin View */}
                         {!isAdmin && (
-                            <Link 
+                            <Link
                                 href="/profile"
-                                className="nav-icon-btn" 
+                                className="nav-icon-btn"
                                 title={isRtl ? 'الملف الشخصي' : 'My Profile'}
                                 style={{ fontSize: '1.4rem', color: 'var(--text-main)', opacity: 0.8, textDecoration: 'none' }}
                             >
@@ -91,7 +91,7 @@ export default function Navbar() {
                         </button>
                     </div>
                 ) : (
-                    <div className="d-flex align-items-center gap-3">
+                    <div className="d-none d-lg-flex align-items-center gap-3">
                         <Link href="/login" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, letterSpacing: '0.5px' }}>
                             {isRtl ? 'تسجيل الدخول' : 'LOG IN'}
                         </Link>
@@ -102,7 +102,7 @@ export default function Navbar() {
                 )}
 
                 {!isAdminView && (
-                    <Link href="/contact" className="contact-cta-btn" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
+                    <Link href="/contact" className="contact-cta-btn d-none d-lg-inline-flex" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
                         {isRtl ? 'تواصل معنا' : 'CONTACT US'}
                     </Link>
                 )}
@@ -274,18 +274,133 @@ export default function Navbar() {
             </div>
 
             {/* Full-Screen Mobile Menu Overlay */}
-            <div className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
-                <button 
-                    className="close-menu-btn" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    aria-label="Close Menu"
-                >
-                    <i className="bi bi-x-lg"></i>
-                </button>
-                <div className="mobile-menu-links">
-                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`}>{t('home')}</Link>
-                    <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/shop' ? 'active' : ''}`}>{t('collections')}</Link>
-                    <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className={`mobile-nav-link ${pathname === '/about' ? 'active' : ''}`}>{t('craftsmanship')}</Link>
+            <div
+                className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}
+                dir={isRtl ? 'rtl' : 'ltr'}
+                aria-hidden={!isMobileMenuOpen}
+            >
+                <div className="mobile-menu-bg" aria-hidden="true">
+                    <span className="mobile-menu-orb mobile-menu-orb-a" />
+                    <span className="mobile-menu-orb mobile-menu-orb-b" />
+                </div>
+
+                <div className="mobile-menu-header stagger-item">
+                    <Link
+                        href="/"
+                        className="brand-link"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <img
+                            src={`/images/LOGO/smartwood-${language}-white.svg`}
+                            alt="SmartWood Logo"
+                            className="brand-logo-img"
+                            style={{ height: '28px', width: 'auto' }}
+                        />
+                    </Link>
+                    <button
+                        className="close-menu-btn"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        aria-label="Close Menu"
+                    >
+                        <i className="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div className="mobile-menu-body">
+                    <span className="mobile-menu-eyebrow stagger-item">
+                        {isRtl ? 'القائمة' : 'Menu'}
+                    </span>
+
+                    <nav className="mobile-menu-links">
+                        {[
+                            { href: '/', label: t('home') },
+                            { href: '/shop', label: t('collections') },
+                            { href: '/about', label: t('craftsmanship') },
+                            { href: '/contact', label: isRtl ? 'تواصل معنا' : 'Contact' },
+                        ].map((item, idx) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`mobile-nav-link stagger-item ${pathname === item.href ? 'active' : ''}`}
+                            >
+                                <span className="mobile-nav-index">
+                                    {String(idx + 1).padStart(2, '0')}
+                                </span>
+                                <span className="mobile-nav-label">{item.label}</span>
+                                <span className="mobile-nav-arrow" aria-hidden="true">
+                                    <i className={`bi ${isRtl ? 'bi-arrow-left' : 'bi-arrow-right'}`}></i>
+                                </span>
+                            </Link>
+                        ))}
+                    </nav>
+
+                    <div className="mobile-menu-auth stagger-item">
+                        {user ? (
+                            <>
+                                {!isAdmin && (
+                                    <Link
+                                        href="/profile"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="mobile-menu-pill mobile-menu-pill-primary"
+                                    >
+                                        <i className="bi bi-person-circle"></i>
+                                        <span>{isRtl ? 'الملف الشخصي' : 'My Profile'}</span>
+                                    </Link>
+                                )}
+                                {isAdmin && (
+                                    <Link
+                                        href="/admin/users"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="mobile-menu-pill mobile-menu-pill-primary"
+                                    >
+                                        <i className="bi bi-shield-lock"></i>
+                                        <span>{isRtl ? 'لوحة المشرف' : 'Admin Panel'}</span>
+                                    </Link>
+                                )}
+                                <button
+                                    onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                                    className="mobile-menu-pill mobile-menu-pill-ghost"
+                                >
+                                    <i className="bi bi-box-arrow-right"></i>
+                                    <span>{isRtl ? 'تسجيل الخروج' : 'Log Out'}</span>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="mobile-menu-pill mobile-menu-pill-ghost"
+                                >
+                                    <i className="bi bi-box-arrow-in-right"></i>
+                                    <span>{isRtl ? 'تسجيل الدخول' : 'Log In'}</span>
+                                </Link>
+                                <Link
+                                    href="/signup"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="mobile-menu-pill mobile-menu-pill-primary"
+                                >
+                                    <i className="bi bi-stars"></i>
+                                    <span>{isRtl ? 'حساب جديد' : 'Sign Up'}</span>
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                <div className="mobile-menu-footer stagger-item">
+                    <button
+                        className="mobile-menu-lang"
+                        onClick={toggleLanguage}
+                        aria-label={t('switchLang')}
+                    >
+                        <i className="bi bi-translate"></i>
+                        <span>{language === 'en' ? 'العربية' : 'English'}</span>
+                    </button>
+                    <span className="mobile-menu-tagline">
+                        {isRtl ? 'صُمم لحياة راقية' : 'Crafted for refined living'}
+                    </span>
                 </div>
             </div>
 

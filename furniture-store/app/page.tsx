@@ -233,7 +233,6 @@ export default function HomePage() {
             { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0007_003.jpg", link: "/shop" }
           ].map((item, i) => (
             <div key={i} className="slider-item">
-              <Link href={item.link} style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', inset: 0, zIndex: 10 }} aria-label="View product" />
               <img src={item.src} alt="" loading="lazy" />
               <div className="slider-overlay" />
             </div>

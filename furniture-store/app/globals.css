@@ -93,6 +93,11 @@
   --shadow-main: 0 32px 80px rgba(0, 0, 0, 0.45);
   --glass-bg: rgba(26, 44, 163, 0.6);
   --transition-smooth: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  --font-app: 'MontserratArabic', sans-serif;
+}
+
+html[lang="ar"] {
+  --font-app: 'UbuntuArabic', 'MontserratArabic', sans-serif;
 }
 
 * {
@@ -107,7 +112,7 @@ body {
   height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
-  font-family: 'MontserratArabic', sans-serif;
+  font-family: var(--font-app);
   background: var(--bg-main);
   /* Deepest blue globally */
   color: var(--text-main);
@@ -189,11 +194,11 @@ img {
   color: var(--bg-main);
 }
 
-#navbar [dir="rtl"],
-[dir="rtl"] #navbar,
-[dir="rtl"] .mobile-menu-overlay,
-[dir="rtl"] .sw-footer {
-  font-family: 'UbuntuArabic', 'MontserratArabic', sans-serif;
+input,
+textarea,
+button,
+select {
+  font-family: inherit;
 }
 
 @media (max-width: 991px) {
@@ -1148,7 +1153,7 @@ img {
   border-radius: 14px;
   font-weight: 700;
   transition: 0.25s ease;
-  font-family: 'MontserratArabic', sans-serif;
+  font-family: var(--font-app);
   cursor: pointer;
 }
 
@@ -1695,7 +1700,7 @@ img {
   background: var(--blue-deep);
   border: 1px solid var(--blue-accent);
   color: var(--text-main);
-  font-family: 'MontserratArabic', sans-serif;
+  font-family: var(--font-app);
   font-weight: 600;
   cursor: pointer;
   transition: 0.3s ease;
@@ -3331,6 +3336,27 @@ img {
   box-shadow: 0 0 0 3px #0d1a63, 0 0 20px rgba(13, 26, 99, 0.15);
 }
 
+/* Desktop-only refinements for the About page hero */
+@media (min-width: 992px) {
+  /* Remove the dark scrim sitting on top of the right-side hero image */
+  .about-page-theme .hero-overlay-dark {
+    display: none;
+  }
+
+  /* DISCOVER DESIGNS CTA — give it contrast against the cream background */
+  .about-page-theme .hero-secondary-btn {
+    background: #0d1a63;
+    color: #f1ede4;
+    border: 1px solid #0d1a63;
+  }
+
+  .about-page-theme .hero-secondary-btn:hover {
+    background: #1A2CA3;
+    border-color: #1A2CA3;
+    color: #ffffff;
+  }
+}
+
 /* =========================================
    Mobile Menu Overlay
 ========================================= */
@@ -3479,7 +3505,7 @@ img {
   gap: 16px;
   padding: 22px 4px;
   border-bottom: 1px solid rgba(13, 26, 99, 0.12);
-  font-family: 'MontserratArabic', sans-serif;
+  font-family: var(--font-app);
   font-size: 1.85rem;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -3495,11 +3521,6 @@ img {
   border-top: 1px solid rgba(13, 26, 99, 0.12);
 }
 
-[dir="rtl"] .mobile-nav-link,
-[dir="rtl"] .mobile-nav-index {
-  font-family: 'UbuntuArabic', 'MontserratArabic', sans-serif;
-}
-
 .mobile-nav-index {
   font-size: 0.7rem;
   font-weight: 600;
@@ -3507,7 +3528,7 @@ img {
   color: rgba(13, 26, 99, 0.55);
   opacity: 1;
   min-width: 26px;
-  font-family: 'MontserratArabic', sans-serif;
+  font-family: var(--font-app);
   transition: 0.4s ease;
 }
 

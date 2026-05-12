@@ -126,7 +126,7 @@ export default function HomePage() {
             <div
               key={spot.id}
               className="hero-hotspot"
-              style={{ top: spot.top, left: spot.left }}
+              style={isRtl ? { top: spot.top, right: spot.left } : { top: spot.top, left: spot.left }}
             >
               <div className="hotspot-trigger">
                 <div className="hotspot-dot" />
@@ -154,7 +154,7 @@ export default function HomePage() {
           {/* Left Side: Copy, Gallery, Actions */}
           <div className="split-left">
 
-            <h1 style={{ fontWeight: 800, fontSize: 'clamp(2.5rem, 8vw, 4rem)', letterSpacing: 'normal', lineHeight: 1.1, textAlign: 'left' }}>
+            <h1 style={{ fontWeight: 800, fontSize: 'clamp(2.5rem, 8vw, 4rem)', letterSpacing: 'normal', lineHeight: 1.1, textAlign: isRtl ? 'right' : 'left' }}>
               <span style={{ fontWeight: 800 }}>
                 {isRtl ? 'سمارت وود:' : 'Smartwood:'}
               </span>
@@ -165,7 +165,7 @@ export default function HomePage() {
             </h1>
 
             <div className="hero-main-content-fade-in">
-              <p className="smartwood-description" style={{ textAlign: 'left', lineHeight: 1.6, marginInline: '0' }}>
+              <p className="smartwood-description" style={{ textAlign: isRtl ? 'right' : 'left', lineHeight: 1.6, marginInline: '0' }}>
                 {isRtl
                   ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. تصاميم داخلية تعبر عن قصتك.'
                   : 'Redefining luxury woodworking in Kuwait. Bespoke interiors that tell your story.'}

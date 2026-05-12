@@ -26,7 +26,7 @@ export default function Footer() {
         <div className="sw-footer-left">
           <Link href="/" className="sw-footer-logo" aria-label="Smartwood">
             <img
-              src={`/images/LOGO/smartwood-${language}-white.svg`}
+              src={`/images/LOGO/smartwood-${language}-blue.svg`}
               alt="Smartwood"
             />
           </Link>

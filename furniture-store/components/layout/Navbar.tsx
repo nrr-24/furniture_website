@@ -31,7 +31,7 @@ export default function Navbar() {
         <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
             <Link href="/" className="brand-link">
                 <img
-                    src={`/images/LOGO/smartwood-${language}-white.svg`}
+                    src={`/images/LOGO/smartwood-${language}-blue.svg`}
                     alt="SmartWood Logo"
                     className="brand-logo-img"
                     style={{ height: '32px', width: 'auto' }}
@@ -49,7 +49,7 @@ export default function Navbar() {
                     className="d-lg-none"
                     onClick={() => setIsMobileMenuOpen(true)}
                     aria-label="Open Menu"
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontSize: '1.6rem', padding: '0 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--bg-main)', fontSize: '1.6rem', padding: '0 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                 >
                     <i className="bi bi-list"></i>
                 </button>
@@ -66,7 +66,7 @@ export default function Navbar() {
                 {user ? (
                     <div className="d-none d-lg-flex align-items-center gap-3">
                         {isAdmin && (
-                            <Link href="/admin/users" style={{ color: 'var(--blue-main)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}>
+                            <Link href="/admin/users" style={{ color: 'var(--bg-main)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}>
                                 {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
                             </Link>
                         )}
@@ -77,7 +77,7 @@ export default function Navbar() {
                                 href="/profile"
                                 className="nav-icon-btn"
                                 title={isRtl ? 'الملف الشخصي' : 'My Profile'}
-                                style={{ fontSize: '1.4rem', color: 'var(--text-main)', opacity: 0.8, textDecoration: 'none' }}
+                                style={{ fontSize: '1.4rem', color: 'var(--bg-main)', opacity: 0.85, textDecoration: 'none' }}
                             >
                                 <i className="bi bi-person-circle"></i>
                             </Link>
@@ -92,17 +92,17 @@ export default function Navbar() {
                     </div>
                 ) : (
                     <div className="d-none d-lg-flex align-items-center gap-3">
-                        <Link href="/login" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, letterSpacing: '0.5px' }}>
+                        <Link href="/login" style={{ color: 'var(--bg-main)', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, letterSpacing: '0.5px' }}>
                             {isRtl ? 'تسجيل الدخول' : 'LOG IN'}
                         </Link>
-                        <Link href="/signup" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600, padding: '6px 16px', background: 'var(--blue-deep)', borderRadius: '20px', letterSpacing: '0.5px' }}>
+                        <Link href="/signup" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600, padding: '6px 16px', background: 'var(--bg-main)', borderRadius: '20px', letterSpacing: '0.5px' }}>
                             {isRtl ? 'حساب جديد' : 'SIGN UP'}
                         </Link>
                     </div>
                 )}
 
                 {!isAdminView && (
-                    <Link href="/contact" className="contact-cta-btn d-none d-lg-inline-flex" style={{ background: 'transparent', border: '1px solid var(--text-main)', textDecoration: 'none' }}>
+                    <Link href="/contact" className="contact-cta-btn d-none d-lg-inline-flex" style={{ background: 'transparent', border: '1px solid var(--bg-main)', color: 'var(--bg-main)', textDecoration: 'none' }}>
                         {isRtl ? 'تواصل معنا' : 'CONTACT US'}
                     </Link>
                 )}
@@ -291,7 +291,7 @@ export default function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <img
-                            src={`/images/LOGO/smartwood-${language}-white.svg`}
+                            src={`/images/LOGO/smartwood-${language}-blue.svg`}
                             alt="SmartWood Logo"
                             className="brand-logo-img"
                             style={{ height: '28px', width: 'auto' }}

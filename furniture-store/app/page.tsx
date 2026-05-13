@@ -250,7 +250,7 @@ export default function HomePage() {
 
         <div className="home-perspectives-grid">
           {/* Column 1 (LEFT, offset DOWN): card top, image bottom — warm wood tones */}
-          <Link href="/shop" className="perspective-col perspective-col-down perspective-wood">
+          <Link href="/shop#all-designs" className="perspective-col perspective-col-down perspective-wood">
             <div className="perspective-card">
               <h3>{isRtl ? 'الخشب الدافئ' : 'Warm Wood Craft'}</h3>
               <p>
@@ -269,7 +269,7 @@ export default function HomePage() {
           </Link>
 
           {/* Column 2 (MIDDLE, stays UP): image top, card bottom — cream focal */}
-          <Link href="/shop" className="perspective-col perspective-col-up perspective-cream">
+          <Link href="/shop#all-designs" className="perspective-col perspective-col-up perspective-cream">
             <div className="perspective-img">
               <img src="/images/home/perspective-2-beige.png" alt={isRtl ? 'تصميم أنيق' : 'Timeless elegance'} />
             </div>
@@ -288,7 +288,7 @@ export default function HomePage() {
           </Link>
 
           {/* Column 3 (RIGHT, offset DOWN): card top, image bottom — cool slate */}
-          <Link href="/about" className="perspective-col perspective-col-down perspective-slate">
+          <Link href="/about#timeline" className="perspective-col perspective-col-down perspective-slate">
             <div className="perspective-card">
               <h3>{isRtl ? 'دقة بلا حدود' : 'Precision, Refined'}</h3>
               <p>

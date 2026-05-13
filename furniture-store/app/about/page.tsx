@@ -135,7 +135,7 @@ export default function AboutPage() {
       </section>
 
       {/* 2. Why Smartwood? — Timeline */}
-      <section className="timeline-section">
+      <section className="timeline-section" id="timeline">
         <div className="timeline-section-header">
           <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'The Competitive Edge'}</span>
           <h2 className="section-title" style={{ marginBottom: '0' }}>{isRtl ? 'لماذا سمارت وود؟' : 'Why Smartwood?'}</h2>

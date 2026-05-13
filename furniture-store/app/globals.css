@@ -21,7 +21,9 @@
 
 @font-face {
   font-family: 'MontserratArabic';
-  src: url('/fonts/ALLEXP03SAHLAB.otf') format('opentype');
+  /* No genuine Montserrat-Arabic Regular shipped with the project; Light is the closest substitute
+     for default-weight (400) body text. Previously mapped to ALLEXP03SAHLAB which collapsed Latin word spacing. */
+  src: url('/fonts/Montserrat-Arabic Light 300.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -70,9 +72,12 @@
 @font-face {
   font-family: 'UbuntuArabic';
   src: url('/fonts/UbuntuArabic-Bold.ttf') format('truetype');
-  font-weight: 700;
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+  /* Only used for Arabic / Arabic Supplement / Arabic Extended-A /
+     Arabic Presentation Forms-A & B — Latin glyphs fall through to MontserratArabic. */
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
 }
 
 :root {
@@ -93,10 +98,6 @@
   --shadow-main: 0 32px 80px rgba(0, 0, 0, 0.45);
   --glass-bg: rgba(26, 44, 163, 0.6);
   --transition-smooth: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  --font-app: 'MontserratArabic', sans-serif;
-}
-
-html[lang="ar"] {
   --font-app: 'UbuntuArabic', 'MontserratArabic', sans-serif;
 }
 
@@ -119,23 +120,29 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Base monolithic container wrapping all pages for the "App" look */
+/* Full-bleed app container — no rounded panel, no margin, no border */
 .monolithic-island {
-  border-radius: 40px;
-  background-color: var(--bg-panel);
-  height: calc(100vh - 40px);
-  height: calc(100dvh - 40px);
-  margin: 20px;
-  box-shadow: var(--shadow-main);
-  border: 1px solid var(--line-soft);
+  border-radius: 0;
+  background-color: transparent;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  box-shadow: none;
+  border: none;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-main.app-content {
+main.app-content,
+.monolithic-island > main {
   flex: 1;
+  /* min-height: 0 lets flex:1 actually constrain the main when its intrinsic content
+     is taller than the remaining flex space — without this, the main pushes the
+     navbar off-screen the moment anything (focus, scrollIntoView, etc.) triggers
+     a scroll on the island. */
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -145,25 +152,6 @@ main.app-content {
   min-height: 100%;
   flex-shrink: 0;
   display: flex;
-}
-
-@media (max-width: 900px) {
-  .monolithic-island {
-    height: calc(100vh - 20px);
-    height: calc(100dvh - 20px);
-    margin: 10px;
-    border-radius: 20px;
-  }
-}
-
-@media (max-width: 600px) {
-  .monolithic-island {
-    height: 100vh;
-    height: 100dvh;
-    margin: 0;
-    border-radius: 0;
-    border: none;
-  }
 }
 
 a {
@@ -3305,22 +3293,24 @@ select {
 }
 
 .about-page-theme .timeline-content {
-  background: #0d1a63;
-  /* Navy Background */
-  border: 1px solid rgba(226, 218, 204, 0.1);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  border: 1px solid rgba(13, 26, 99, 0.12);
+  box-shadow: 0 12px 32px rgba(13, 26, 99, 0.08);
 }
 
 .about-page-theme .timeline-content h3,
 .about-page-theme .timeline-content h3 i,
 .about-page-theme .timeline-content p,
 .about-page-theme .timeline-content .timeline-step {
-  color: #f1ede4 !important;
-  /* Cream Text */
+  color: #0d1a63 !important;
+}
+
+.about-page-theme .timeline-content p {
+  color: rgba(13, 26, 99, 0.78) !important;
 }
 
 .about-page-theme .timeline-content .timeline-step {
-  border-bottom-color: rgba(226, 218, 204, 0.2) !important;
+  border-bottom-color: rgba(13, 26, 99, 0.15) !important;
 }
 
 .about-page-theme .timeline-node {

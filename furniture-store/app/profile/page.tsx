@@ -421,7 +421,7 @@ export default function ProfilePage() {
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               autoFocus
               placeholder="DELETE"
-              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,77,77,0.4)', background: 'rgba(0,0,0,0.25)', color: 'white', marginBottom: '16px', fontFamily: 'monospace', letterSpacing: '0.15em', textAlign: 'center', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,77,77,0.4)', background: 'rgba(0,0,0,0.25)', color: 'white', marginBottom: '16px', fontFamily: 'var(--font-app), monospace', letterSpacing: '0.15em', textAlign: 'center', fontSize: '1rem' }}
             />
             {deleteError && (
               <div style={{ background: 'rgba(255,77,77,0.1)', color: '#ff6b6b', padding: '10px', borderRadius: '8px', marginBottom: '14px', fontSize: '0.85rem' }}>

@@ -333,7 +333,7 @@ export default function ShopPage() {
           </aside>
 
           {/* 2. Main Gallery Area */}
-          <div className="shop-gallery">
+          <div className="shop-gallery" id="all-designs">
             {/* Header / Filter Status */}
             {/* Unity Header */}
             <div className="shop-header-samsung" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -872,14 +872,18 @@ export default function ShopPage() {
           vertical-align: middle;
         }
 
-        /* Desktop: constrain content to the left half, softer horizontal scrim */
+        /* Desktop: constrain content to the leading half, softer horizontal scrim.
+           Uses logical properties so the layout mirrors automatically in RTL — no separate
+           [dir="rtl"] override needed (previous override misused flex-end which in column-flex
+           on RTL resolves to the LEFT cross-axis edge, so the Arabic title was stuck on the
+           left of the content box). */
         @media (min-width: 992px) {
           .shop-showcase { min-height: min(420px, 52vh); }
           .shop-showcase-content {
             align-items: flex-start;
-            text-align: left;
+            text-align: start;
             max-width: min(640px, 55%);
-            padding-right: clamp(40px, 5vw, 64px);
+            padding-inline-end: clamp(40px, 5vw, 64px);
           }
           .shop-showcase-dots { justify-content: flex-start; }
           .shop-showcase-scrim {
@@ -889,14 +893,6 @@ export default function ShopPage() {
               rgba(6,10,35,0.2) 65%,
               rgba(6,10,35,0.05) 100%);
           }
-          [dir="rtl"] .shop-showcase-content {
-            align-items: flex-end;
-            text-align: right;
-            margin-left: auto;
-            padding-right: clamp(24px, 6vw, 64px);
-            padding-left: clamp(40px, 5vw, 64px);
-          }
-          [dir="rtl"] .shop-showcase-dots { justify-content: flex-end; }
           [dir="rtl"] .shop-showcase-scrim {
             background: linear-gradient(270deg,
               rgba(6,10,35,0.82) 0%,

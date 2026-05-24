@@ -80,6 +80,15 @@
   unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
 }
 
+@font-face {
+  font-family: 'SydneySignature';
+  src: url('/fonts/Sydney Signature.otf') format('opentype'),
+       url('/fonts/Sydney Signature.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* === Smartwood 2026 redesign — warm cream + espresso palette ===
      The site flipped from a dark-navy theme to a cream/espresso theme.
@@ -4766,7 +4775,7 @@ select {
   .home-2026 .sw-quote { padding: 32px 24px; }
 }
 /* ============================================================
-   ABOUT US 2026 REDESIGN
+   ABOUT US / CRAFTSMANSHIP 2026 REDESIGN
    Composed in app/about/page.tsx. Scoped under .about-2026.
    ============================================================ */
 .about-2026 {
@@ -4774,261 +4783,793 @@ select {
   color: var(--text-main);
   font-family: var(--font-app);
 }
+
 .about-2026 .sw-center { text-align: center; }
 
-.about-2026 .av-section-title {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-  margin: 0 0 24px;
+/* 1. Hero Mockup Split layout */
+.about-2026 .av-hero-mockup {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-main);
+  min-height: 82vh;
+  position: relative; /* Anchor for the glass card */
+  border-bottom: 1px solid var(--line-soft);
 }
-.about-2026 .av-body {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--text-soft);
-  margin: 0 0 18px;
-  max-width: 46ch;
+
+.about-2026 .av-hero-left {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--accent-deep);
 }
-.about-2026 .av-link-arrow {
-  display: inline-flex;
+
+.about-2026 .av-hero-left .hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 88% center; /* Crop left gray wall, show cabinet frame */
+  display: block;
+}
+
+/* Floating overlay badges (Two-line editorial text format) */
+.about-2026 .hero-overlay-badge {
+  position: absolute;
+  background: rgba(42, 32, 24, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 18px;
+  border-radius: 16px;
+  color: #fff;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--text-main);
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  border-bottom: 1px solid var(--text-main);
-  padding-bottom: 4px;
-  margin-top: 8px;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   transition: var(--transition-smooth);
 }
-.about-2026 .av-link-arrow:hover { gap: 14px; }
 
-/* --- 1. Hero --- */
-.about-2026 .av-hero {
-  text-align: center;
-  padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 80px) 0;
+.about-2026 .hero-overlay-badge:hover {
+  background: rgba(42, 32, 24, 0.6);
+  transform: translateY(-2px);
+}
+
+.about-2026 .badge-wood {
+  top: 30px;
+  left: 30px;
+}
+
+.about-2026 .badge-accessories {
+  bottom: 110px;
+  left: 30px;
+}
+
+.about-2026 .badge-icon-box {
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.95;
+}
+
+.about-2026 .badge-text-box {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 2px;
+  text-align: left;
 }
-.about-2026 .av-hero-title {
-  font-family: var(--font-serif);
+
+[dir="rtl"] .about-2026 .badge-text-box {
+  text-align: right;
+}
+
+.about-2026 .badge-small-text {
+  font-size: 0.65rem;
   font-weight: 500;
-  font-size: clamp(2.6rem, 7vw, 5rem);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  margin: 8px 0 20px;
-  color: var(--text-main);
-}
-.about-2026 .av-hero-sub {
-  font-size: clamp(1rem, 2vw, 1.15rem);
-  line-height: 1.6;
-  color: var(--text-soft);
-  max-width: 60ch;
-  margin: 0 auto clamp(40px, 6vw, 64px);
-}
-.about-2026 .av-hero-img {
-  width: 100%;
-  max-width: 1200px;
-  aspect-ratio: 16 / 7;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  background: var(--surface-soft);
-}
-.about-2026 .av-hero-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 35%;
-  display: block;
+  letter-spacing: 0.03em;
+  opacity: 0.8;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
-/* --- 2. Story --- */
-.about-2026 .av-story {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 5vw, 80px);
+.about-2026 .badge-bold-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+/* Glassmorphic Customizable Corner Design card (overlaps vertical seam) */
+.about-2026 .hero-glass-card {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(42, 32, 24, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 12px 18px;
+  display: flex;
   align-items: center;
-  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+  gap: 16px;
+  width: max-content;
+  z-index: 10;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+  transition: var(--transition-smooth);
 }
-.about-2026 .av-story-img {
-  border-radius: var(--r-card);
-  overflow: hidden;
-  aspect-ratio: 4 / 5;
-  background: var(--surface-soft);
+
+.about-2026 .hero-glass-card:hover {
+  transform: translateX(-50%) translateY(-2px);
+  background: rgba(42, 32, 24, 0.75);
 }
-.about-2026 .av-story-img img {
+
+.about-2026 .hero-glass-img-container {
+  width: 76px;
+  height: 76px;
+  background: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+.about-2026 .hero-glass-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-/* --- 3. Stats band --- */
-.about-2026 .av-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line-soft);
-  border-top: 1px solid var(--line-soft);
-  border-bottom: 1px solid var(--line-soft);
-  margin: 0 clamp(24px, 6vw, 80px);
-}
-.about-2026 .av-stat {
-  background: var(--bg-main);
-  padding: clamp(28px, 4vw, 44px) 20px;
-  text-align: center;
+.about-2026 .hero-glass-info {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: center;
-}
-.about-2026 .av-stat-num {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1;
-  color: var(--text-main);
-}
-.about-2026 .av-stat-label {
-  font-size: 0.82rem;
-  color: var(--text-soft);
-  letter-spacing: 0.02em;
-  max-width: 20ch;
+  text-align: left;
 }
 
-/* --- 4. Why SmartWood values --- */
-.about-2026 .av-why {
-  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+[dir="rtl"] .about-2026 .hero-glass-info {
+  text-align: right;
 }
-.about-2026 .av-why-header {
-  text-align: center;
-  margin-bottom: clamp(40px, 6vw, 64px);
-}
-.about-2026 .av-value-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(20px, 2.5vw, 32px);
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.about-2026 .av-value {
-  position: relative;
-  background: var(--bg-panel);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--r-card);
-  padding: 32px 26px;
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.about-2026 .av-value.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.about-2026 .av-value-num {
-  position: absolute;
-  top: 22px;
-  right: 24px;
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  color: var(--text-soft);
-  opacity: 0.6;
-}
-[dir="rtl"] .about-2026 .av-value-num { right: auto; left: 24px; }
-.about-2026 .av-value-icon {
-  font-size: 1.8rem;
-  color: var(--accent-warm);
-  display: block;
-  margin-bottom: 18px;
-}
-.about-2026 .av-value-title {
-  font-family: var(--font-app);
-  font-size: 1.02rem;
+
+.about-2026 .hero-glass-title {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-main);
-  margin: 0 0 10px;
-}
-.about-2026 .av-value-text {
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: var(--text-soft);
-  margin: 0;
+  color: #ffffff;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
 }
 
-/* --- 5. Quote / CTA --- */
-.about-2026 .av-cta-wrap {
-  padding: 0 clamp(24px, 6vw, 80px) clamp(48px, 7vw, 88px);
-}
-.about-2026 .av-cta {
-  background: var(--accent-deep);
-  color: var(--bg-main);
-  border-radius: var(--r-card);
-  padding: clamp(40px, 6vw, 72px) clamp(28px, 5vw, 80px);
-  text-align: center;
+.about-2026 .hero-glass-price-wrap {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 18px;
-  max-width: 1000px;
-  margin: 0 auto;
+  gap: 8px;
 }
-.about-2026 .av-cta-mark {
+
+.about-2026 .hero-glass-price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.about-2026 .hero-glass-badge {
+  background: #ffffff;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 1px solid rgba(242, 235, 224, 0.4);
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  font-weight: 600;
+  text-transform: lowercase;
 }
-.about-2026 .av-cta-quote {
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
+
+/* Right side walnut copy panel */
+.about-2026 .av-hero-right {
+  flex: 0 0 45%;
+  background: var(--accent-deep); /* Dark walnut */
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(36px, 6vw, 88px);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-2026 .av-hero-right-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Elegant signature text using Sydney Signature font */
+.about-2026 .hero-signature-text {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  font-family: 'SydneySignature', 'Playfair Display', 'Georgia', serif;
+  font-style: normal;
+  font-size: 2.2rem;
   font-weight: 400;
-  line-height: 1.3;
-  margin: 0;
-  max-width: 22ch;
-  color: var(--bg-main);
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 0.08em;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
 }
-.about-2026 .av-cta-btn {
-  display: inline-flex;
+
+[dir="rtl"] .about-2026 .hero-signature-text {
+  right: auto;
+  left: 40px;
+}
+
+.about-2026 .av-hero-right .av-hero-title {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  line-height: 1.08;
+  margin: 0 0 24px;
+}
+
+.about-2026 .av-hero-right .av-hero-sub {
+  color: rgba(242, 235, 224, 0.8);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 36ch;
+}
+
+/* 2. Excellence in Every Detail */
+.about-2026 .av-excellence {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-  padding: 14px 28px;
-  border-radius: var(--r-pill);
+  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
   background: var(--bg-main);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.about-2026 .av-excellence-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   color: var(--text-main);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-decoration: none;
+  margin: 0 0 40px;
+  text-align: center;
+  max-width: 800px;
+}
+
+.about-2026 .av-excellence-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: start;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.about-2026 .av-excellence-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-2026 .av-excel-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
   transition: var(--transition-smooth);
 }
-.about-2026 .av-cta-btn:hover { transform: translateY(-2px); }
 
-/* --- Responsive --- */
+.about-2026 .av-excel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.about-2026 .av-excel-img {
+  width: 140px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  flex-shrink: 0;
+}
+
+.about-2026 .av-excel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.about-2026 .av-excel-title {
+  font-family: var(--font-app);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.about-2026 .av-excel-text {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.about-2026 .av-excellence-copy {
+  max-width: 100%;
+}
+
+.about-2026 .av-excellence-features {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  justify-content: flex-start;
+}
+
+.about-2026 .av-excel-feat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.about-2026 .av-excel-feat i {
+  font-size: 1.3rem;
+  color: var(--text-main);
+  opacity: 0.85;
+}
+
+/* 3. Designed for Living Category Grid */
+.about-2026 .av-living {
+  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+  border-bottom: none;
+}
+
+.about-2026 .av-living-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.about-2026 .av-living-tile {
+  position: relative;
+  display: block;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-2026 .av-living-tile:hover {
+  transform: translateY(-4px);
+}
+
+.about-2026 .av-living-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-2026 .av-living-tile:hover img {
+  transform: scale(1.04);
+}
+
+.about-2026 .av-living-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(31, 24, 18, 0.6) 100%);
+  pointer-events: none;
+}
+
+.about-2026 .av-living-label {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  z-index: 1;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+[dir="rtl"] .about-2026 .av-living-label {
+  left: auto;
+  right: 24px;
+}
+
+/* 4. Proudly Kuwaiti Banner */
+.about-2026 .av-heritage {
+  position: relative;
+  margin: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  color: var(--bg-main);
+  isolation: isolate;
+  min-height: 440px;
+  box-shadow: var(--shadow-main);
+}
+
+.about-2026 .av-heritage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.about-2026 .av-heritage-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(110deg,
+    rgba(31, 24, 18, 0.95) 0%,
+    rgba(31, 24, 18, 0.8) 45%,
+    rgba(31, 24, 18, 0.35) 100%);
+}
+
+.about-2026 .av-heritage-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: clamp(40px, 6vw, 72px);
+}
+
+.about-2026 .av-heritage-copy {
+  max-width: 480px;
+}
+
+.about-2026 .av-heritage-kicker {
+  color: #fff;
+  opacity: 0.85;
+}
+
+.about-2026 .av-heritage-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.08;
+  margin: 0 0 18px;
+  color: #fff;
+}
+
+.about-2026 .av-heritage-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(242, 235, 224, 0.78);
+  margin: 0 0 22px;
+}
+
+.about-2026 .av-heritage-badge {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(242, 235, 224, 0.55);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.about-2026 .av-heritage-badge-top,
+.about-2026 .av-heritage-badge-bot {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+}
+
+.about-2026 .av-heritage-badge-num {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 1;
+  margin: 4px 0;
+}
+
+.about-2026 .av-link-arrow-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid #fff;
+  padding-bottom: 4px;
+  transition: var(--transition-smooth);
+}
+
+.about-2026 .av-link-arrow-light:hover {
+  gap: 14px;
+}
+
+/* 5. Compare Our Models Section */
+.about-2026 .av-compare {
+  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.about-2026 .av-compare-table-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.about-2026 .av-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.about-2026 .av-compare-table thead th {
+  padding: 18px 24px;
+  font-family: var(--font-app);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.about-2026 .av-compare-table thead th.av-compare-col-active {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+.about-2026 .av-compare-table tbody th {
+  padding: 16px 24px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-soft);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-panel);
+}
+
+[dir="rtl"] .about-2026 .av-compare-table tbody th {
+  text-align: right;
+}
+
+.about-2026 .av-compare-table tbody td {
+  padding: 16px 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-panel);
+}
+
+.about-2026 .av-compare-table tbody td.av-compare-col-active {
+  background: var(--surface-soft);
+  font-weight: 600;
+}
+
+.about-2026 .av-compare-table tbody tr:last-child th,
+.about-2026 .av-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 6. SmartWood Collection Section */
+.about-2026 .av-collection {
+  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+}
+
+.about-2026 .av-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.about-2026 .av-product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-main);
+  border: 1px solid var(--line-soft);
+  transition: var(--transition-smooth);
+}
+
+.about-2026 .av-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+
+.about-2026 .av-product-img {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.about-2026 .av-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-2026 .av-product-card:hover .av-product-img img {
+  transform: scale(1.03);
+}
+
+.about-2026 .av-product-meta {
+  padding: 18px 20px 22px;
+}
+
+.about-2026 .av-product-name {
+  font-family: var(--font-app);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+  color: var(--text-main);
+}
+
+.about-2026 .av-product-price {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Centered Section Title */
+.about-2026 .av-section-title-centered {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--text-main);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.about-2026 .av-product-price span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-left: 2px;
+  opacity: 0.75;
+}
+
+[dir="rtl"] .about-2026 .av-product-price span {
+  margin-left: 0;
+  margin-right: 2px;
+}
+
+/* Animations helper */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.about-2026 .animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.about-2026 .animate-fade-in-up {
+  animation: fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ============================================================
+   RESPONSIVE (tablet + mobile breakpoints)
+   ============================================================ */
 @media (max-width: 991px) {
-  .about-2026 .av-value-grid { grid-template-columns: repeat(2, 1fr); }
-  .about-2026 .av-stats { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 767px) {
-  .about-2026 .av-story {
+  .about-2026 .av-living-grid,
+  .about-2026 .av-collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .about-2026 .av-excellence {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 40px;
   }
-  .about-2026 .av-story-img {
-    aspect-ratio: 4 / 3;
-    order: -1;
+  .about-2026 .av-compare { display: none; }
+  .about-2026 .av-heritage-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
-  .about-2026 .av-hero-img { aspect-ratio: 4 / 3; }
-  .about-2026 .av-value-grid { grid-template-columns: 1fr; }
+  .about-2026 .av-heritage-badge {
+    width: 132px;
+    height: 132px;
+    align-self: flex-start;
+  }
+  .about-2026 .av-heritage-badge-num { font-size: 2rem; }
 }
+
+@media (max-width: 767px) {
+  .about-2026 .av-hero-mockup {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .about-2026 .av-hero-left {
+    height: 45vh;
+  }
+  .about-2026 .av-hero-right {
+    flex: none;
+    width: 100%;
+    padding: 40px 24px;
+  }
+  .about-2026 .av-hero-right .av-hero-title {
+    font-size: 2.2rem;
+  }
+  .about-2026 .av-living-grid,
+  .about-2026 .av-collection-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .about-2026 .av-living-grid::-webkit-scrollbar,
+  .about-2026 .av-collection-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .about-2026 .av-living-tile {
+    flex: 0 0 75vw;
+    scroll-snap-align: start;
+  }
+  .about-2026 .av-product-card {
+    flex: 0 0 65vw;
+    scroll-snap-align: start;
+  }
+  .about-2026 .badge-wood,
+  .about-2026 .badge-accessories {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+  .about-2026 .badge-accessories {
+    bottom: 100px;
+  }
+  .about-2026 .hero-glass-card {
+    padding: 8px 12px;
+  }
+}
+

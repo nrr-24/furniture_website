@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { useLanguage } from '../../data/LanguageContext';
-import { useEffect } from 'react';
+import { useFurniture } from '../../data/FurnitureContext';
+import { FALLBACK_IMAGE } from '../../data/furnitureData';
+import { useEffect, useMemo } from 'react';
 import Footer from '../../components/layout/Footer';
 
 /* ============================================================
@@ -18,10 +20,10 @@ import Footer from '../../components/layout/Footer';
  *   6. CTA — start a project (not the homepage quote)
  * ============================================================ */
 
-const HERO_IMG = '/images/home/about-hero.png';
-
 export default function CraftsmanshipPage() {
   const { isRtl } = useLanguage();
+  const { items } = useFurniture();
+  const featuredProduct = useMemo(() => items[0] || null, [items]);
   const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
 
   useEffect(() => {
@@ -118,20 +120,70 @@ export default function CraftsmanshipPage() {
   ];
 
   return (
-    <main className="app-content craft" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* === 1. Hero (centered, wide image below) === */}
-      <section className="cr-hero">
-        <span className="section-kicker">{isRtl ? 'الحرفية' : 'CRAFTSMANSHIP'}</span>
-        <h1 className="cr-hero-title">
-          {isRtl ? (<>فنّ<br />الصناعة.</>) : (<>The Art<br />of the Build.</>)}
-        </h1>
-        <p className="cr-hero-sub">
-          {isRtl
-            ? 'من المخطط الرقمي إلى التركيب النهائي — كل قطعة سمارت وود رحلة من الدقة والحرفية.'
-            : 'From digital blueprint to final install — every SmartWood piece is a journey of precision and craft.'}
-        </p>
-        <div className="cr-hero-img">
-          <img src={HERO_IMG} alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood craftsmanship'} />
+    <main className="app-content craft about-2026" dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* === 1. Hero (image-3 mockup: niche + floating badges + glass card + signature) === */}
+      <section className="av-hero-mockup">
+        {/* Left: niche photo + floating editorial badges */}
+        <div className="av-hero-left">
+          <img
+            src="/images/home/hero-niche.png"
+            alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood Craftsmanship'}
+            className="hero-bg-img"
+          />
+          <div className="hero-overlay-badge badge-wood">
+            <div className="badge-icon-box"><i className="bi bi-tree"></i></div>
+            <div className="badge-text-box">
+              <span className="badge-small-text">{isRtl ? 'ممتاز' : 'Premium'}</span>
+              <span className="badge-bold-text">{isRtl ? 'خشب ألماني' : 'German Wood'}</span>
+            </div>
+          </div>
+          <div className="hero-overlay-badge badge-accessories">
+            <div className="badge-icon-box"><i className="bi bi-gear"></i></div>
+            <div className="badge-text-box">
+              <span className="badge-small-text">{isRtl ? 'ألماني ونمساوي' : 'German & Austrian'}</span>
+              <span className="badge-bold-text">{isRtl ? 'إكسسوارات' : 'Accessories'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating glassmorphic product card (overlaps the seam) */}
+        {featuredProduct && (
+          <Link href={`/shop/product/${featuredProduct.id}`} className="hero-glass-card-link">
+            <div className="hero-glass-card">
+              <div className="hero-glass-img-container">
+                <img
+                  src={featuredProduct.image || FALLBACK_IMAGE}
+                  alt={isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name}
+                  className="hero-glass-img"
+                />
+              </div>
+              <div className="hero-glass-info">
+                <span className="hero-glass-title">
+                  {isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name}
+                </span>
+                <div className="hero-glass-price-wrap">
+                  <span className="hero-glass-price">
+                    {isRtl ? `${featuredProduct.price} د.ك` : `${featuredProduct.price} KWD`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {/* Right: dark walnut copy panel + signature */}
+        <div className="av-hero-right">
+          <div className="av-hero-right-content">
+            <h1 className="av-hero-title">
+              {isRtl ? (<>صُنع ليدوم.<br />خُلق ليلهم.</>) : (<>Built to last.<br />Made to inspire.</>)}
+            </h1>
+            <p className="av-hero-sub">
+              {isRtl
+                ? 'مصنع سمارت وود هو رائد في الكويت في صناعة الأثاث الفاخر منذ أكثر من ٢٦ سنة.'
+                : 'SmartWood factory has been a leader in the Kuwaiti high-end furniture for more than 26 years.'}
+            </p>
+          </div>
+          <span className="hero-signature-text">SmartWood</span>
         </div>
       </section>
 

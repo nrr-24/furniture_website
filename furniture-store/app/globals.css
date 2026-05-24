@@ -4795,55 +4795,53 @@ select {
   color: var(--text-main);
 }
 
-/* --- 1. Hero (full-bleed image + scrim, white copy) --- */
+/* --- 1. Hero (centered headline + wide image below) --- */
 .craft .cr-hero {
-  position: relative;
-  isolation: isolate;
-  min-height: 64vh;
+  text-align: center;
+  padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 80px) 0;
   display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  color: #fff;
+  flex-direction: column;
+  align-items: center;
 }
-.craft .cr-hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-.craft .cr-hero-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(0deg,
-    rgba(20, 14, 8, 0.88) 0%,
-    rgba(20, 14, 8, 0.45) 45%,
-    rgba(20, 14, 8, 0.2) 100%);
-}
-.craft .cr-hero-inner {
-  position: relative;
-  z-index: 2;
-  padding: clamp(36px, 6vw, 80px);
-  max-width: 760px;
-}
-.craft .cr-hero-kicker { color: rgba(255, 255, 255, 0.8); }
 .craft .cr-hero-title {
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(2.8rem, 7vw, 5rem);
-  line-height: 1.02;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 1.04;
   letter-spacing: -0.02em;
-  margin: 8px 0 18px;
-  color: #fff;
+  margin: 8px 0 20px;
+  color: var(--text-main);
 }
 .craft .cr-hero-sub {
   font-size: clamp(1rem, 2vw, 1.15rem);
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0;
-  max-width: 52ch;
+  color: var(--text-soft);
+  margin: 0 auto clamp(40px, 6vw, 64px);
+  max-width: 56ch;
+}
+.craft .cr-hero-img {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+.craft .cr-hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+  display: block;
+}
+
+/* Kicker contrast fix — the soft token was too faint against cream, so the
+   craft kickers ("CRAFTSMANSHIP", "HOW WE BUILD", "MATERIALS & HARDWARE")
+   use the saturated tan accent at full opacity instead. */
+.craft .section-kicker {
+  color: var(--accent-warm);
+  opacity: 1;
+  font-weight: 700;
 }
 
 /* --- 2. Intro --- */

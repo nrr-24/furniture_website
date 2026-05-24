@@ -18,7 +18,7 @@ import Footer from '../../components/layout/Footer';
  *   6. CTA — start a project (not the homepage quote)
  * ============================================================ */
 
-const HERO_IMG = '/images/home/craft-hero.png';
+const HERO_IMG = '/images/home/about-hero.png';
 
 export default function CraftsmanshipPage() {
   const { isRtl } = useLanguage();
@@ -119,20 +119,19 @@ export default function CraftsmanshipPage() {
 
   return (
     <main className="app-content craft" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* === 1. Hero === */}
+      {/* === 1. Hero (centered, wide image below) === */}
       <section className="cr-hero">
-        <img className="cr-hero-bg" src={HERO_IMG} alt="" aria-hidden="true" />
-        <div className="cr-hero-scrim" aria-hidden="true" />
-        <div className="cr-hero-inner">
-          <span className="section-kicker cr-hero-kicker">{isRtl ? 'الحرفية' : 'CRAFTSMANSHIP'}</span>
-          <h1 className="cr-hero-title">
-            {isRtl ? (<>فنّ<br />الصناعة.</>) : (<>The Art<br />of the Build.</>)}
-          </h1>
-          <p className="cr-hero-sub">
-            {isRtl
-              ? 'من المخطط الرقمي إلى التركيب النهائي — كل قطعة سمارت وود رحلة من الدقة والحرفية.'
-              : 'From digital blueprint to final install — every SmartWood piece is a journey of precision and craft.'}
-          </p>
+        <span className="section-kicker">{isRtl ? 'الحرفية' : 'CRAFTSMANSHIP'}</span>
+        <h1 className="cr-hero-title">
+          {isRtl ? (<>فنّ<br />الصناعة.</>) : (<>The Art<br />of the Build.</>)}
+        </h1>
+        <p className="cr-hero-sub">
+          {isRtl
+            ? 'من المخطط الرقمي إلى التركيب النهائي — كل قطعة سمارت وود رحلة من الدقة والحرفية.'
+            : 'From digital blueprint to final install — every SmartWood piece is a journey of precision and craft.'}
+        </p>
+        <div className="cr-hero-img">
+          <img src={HERO_IMG} alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood craftsmanship'} />
         </div>
       </section>
 

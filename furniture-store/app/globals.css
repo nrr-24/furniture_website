@@ -81,24 +81,56 @@
 }
 
 :root {
-  --blue-main: #E2DACC;
-  /* Light element color */
-  --blue-deep: #2251A4;
-  /* Lightest blue: Buttons, Accents */
-  --blue-accent: #1A2CA3;
-  /* Mid-tone blue */
-  --sand-soft: #E2DACC;
-  --bg-main: #0D1A63;
-  /* Darkest: Core website background */
-  --bg-panel: #1A2CA3;
-  /* Background for panels */
-  --text-main: #E2DACC;
-  --text-soft: rgba(226, 218, 204, 0.75);
-  --line-soft: rgba(226, 218, 204, 0.2);
-  --shadow-main: 0 32px 80px rgba(0, 0, 0, 0.45);
-  --glass-bg: rgba(26, 44, 163, 0.6);
+  /* === Smartwood 2026 redesign — warm cream + espresso palette ===
+     The site flipped from a dark-navy theme to a cream/espresso theme.
+     Token names are preserved (no renames) so existing rules and inline
+     styles in components keep working. Semantics are repointed:
+       - `--bg-main` was the dark navy page bg; now it's the cream page bg.
+       - `--text-main` was cream text; now it's espresso text.
+       - `--blue-*` and `--sand-*` legacy aliases below map to the new
+         warm palette so old `var(--blue-deep)` button refs render as the
+         new tan accent, etc.
+     A few globals.css rules that previously used the old --bg-main
+     name to mean "the dark brand color" have been swept to --text-main,
+     which now plays that role on the cream page. */
+
+  /* Page surfaces */
+  --bg-main: #F2EBE0;            /* Page background — warm cream */
+  --bg-panel: #FAF6EE;           /* Cards & raised panels — lighter cream */
+  --surface-soft: #E8DFD2;       /* Chips, subtle fills — slightly deeper cream */
+
+  /* Text */
+  --text-main: #2A2018;          /* Body text — espresso */
+  --text-soft: rgba(42, 32, 24, 0.65);
+  --line-soft: rgba(42, 32, 24, 0.12);
+
+  /* Brand accents */
+  --accent-deep: #1F1812;        /* Footer, quote card — darkest espresso */
+  --accent-warm: #8B6F4E;        /* Primary action buttons, links — tan */
+  --accent-hover: #6E5638;       /* Hover state for tan */
+
+  /* Effects */
+  --shadow-main: 0 32px 80px rgba(42, 32, 24, 0.10);
+  --shadow-card: 0 12px 32px rgba(42, 32, 24, 0.08);
+  --glass-bg: rgba(248, 244, 235, 0.7);
   --transition-smooth: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Typography */
   --font-app: 'UbuntuArabic', 'MontserratArabic', sans-serif;
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+
+  /* Geometry */
+  --r-card: 24px;
+  --r-pill: 999px;
+  --r-img: 20px;
+
+  /* === Legacy aliases — pointed at the new palette so existing
+     `var(--blue-*)` / `var(--sand-soft)` references keep producing
+     visually correct results without a global rename pass. === */
+  --blue-main: var(--text-main);     /* was cream; usages were as a text color → keep dark */
+  --blue-deep: var(--accent-warm);   /* was action blue; now tan */
+  --blue-accent: var(--accent-deep); /* was deep navy panel; now near-black brown */
+  --sand-soft: var(--surface-soft);  /* was cream; now slightly deeper cream chip */
 }
 
 * {
@@ -115,9 +147,39 @@ body {
   overscroll-behavior: none;
   font-family: var(--font-app);
   background: var(--bg-main);
-  /* Deepest blue globally */
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
+}
+
+/* === Serif headlines (2026 redesign) ===
+   All h1/h2/h3 inherit Cormorant Garamond unless a more specific rule
+   overrides. Weight 400 with slightly tighter tracking matches the
+   editorial feel of the new mockups. Arabic falls back to UbuntuArabic
+   automatically via the existing unicode-range rule. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+h1 { font-weight: 500; }
+h2 { font-weight: 500; }
+h3 { font-weight: 600; }
+
+/* Small uppercase kicker — used above section titles in the new design.
+   Example: "OUR PROMISE", "EST. 1998". */
+.section-kicker {
+  display: inline-block;
+  font-family: var(--font-app);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 16px;
 }
 
 /* Full-bleed app container — no rounded panel, no margin, no border */
@@ -176,10 +238,10 @@ img {
   padding-left: max(40px, env(safe-area-inset-left));
   padding-right: max(40px, env(safe-area-inset-right));
   z-index: 1000;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(13, 26, 99, 0.12);
+  background: var(--bg-main);
+  border-bottom: 1px solid rgba(42, 32, 24, 0.12);
   contain: paint;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 input,
@@ -200,94 +262,232 @@ select {
 
 
 
+/* ============================================================
+   Navbar (2026 redesign — cream pill nav with icon-square actions)
+   Composed in components/layout/Navbar.tsx
+   ============================================================ */
+
 .brand-link {
   display: inline-flex;
   align-items: center;
-  color: var(--bg-main);
+  color: var(--text-main);
+  flex-shrink: 0;
 }
 
+/* Uppercase letter-spaced wordmark (matches the mockup logo). */
+.brand-wordmark {
+  font-family: var(--font-app);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--text-main);
+  text-decoration: none;
+  line-height: 1;
+}
+@media (max-width: 767px) {
+  .brand-wordmark { font-size: 1.1rem; letter-spacing: 0.1em; }
+}
+
+.brand-logo-img {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+@media (min-width: 992px) {
+  .brand-logo-img { height: 30px; }
+}
+
+/* --- Center pill bar (desktop) ---
+   A rounded chip-rail holding the four primary nav links. Each link is
+   itself a pill that fills with espresso when active. */
+.nav-pill-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-pill);
+  padding: 4px;
+}
+
+.nav-pill-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-app);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-main);
+  opacity: 0.72;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-pill-link:hover {
+  background: var(--bg-main);
+  opacity: 1;
+}
+
+.nav-pill-link.active {
+  background: var(--text-main);
+  color: var(--bg-main);
+  opacity: 1;
+}
+
+/* --- Right-side actions --- */
+.nav-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Rounded-square icon button — heart, cart, profile, hamburger, etc.
+   Default style: dark espresso fill, cream icon, matching image 3 mockup.
+   The hover lift is intentionally small (1px) to feel premium, not bouncy. */
+.nav-icon-square {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--text-main);
+  color: var(--bg-main);
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.nav-icon-square:hover {
+  background: var(--accent-deep);
+  color: var(--bg-main);
+  transform: translateY(-1px);
+}
+
+/* Cart badge — small red pip on the cart icon. */
+.nav-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #c2402a;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-main);
+  pointer-events: none;
+}
+
+[dir="rtl"] .nav-cart-badge {
+  right: auto;
+  left: -4px;
+}
+
+/* Compact text links (LOG IN, LOG OUT, ADMIN) — kept text-only to keep
+   the right side visually light next to the icon-square actions. */
+.nav-text-link {
+  font-family: var(--font-app);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: opacity 0.2s ease;
+  opacity: 0.75;
+}
+.nav-text-link:hover { opacity: 1; }
+.nav-text-link-danger { color: #a8553a; }
+
+.nav-auth-group {
+  align-items: center;
+  gap: 10px;
+}
+
+/* Subtle language toggle — text-only inside a hairline pill. */
+.nav-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.nav-lang-btn:hover {
+  background: var(--surface-soft);
+}
+
+/* --- LEGACY ALIASES (kept so anything outside the navbar that still
+   references the old class names keeps working until those callers
+   migrate). Re-pointed at the new chip styling. --- */
 .nav-center-pills {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 2vw, 32px);
-  /* Responsive gap */
-  flex-wrap: wrap;
-}
-
-/* Subtle Text Links instead of Buttons */
-.nav-pill-link {
-  color: var(--bg-main);
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  transition: 0.25s ease;
-  opacity: 0.7;
-}
-
-.nav-pill-link:hover,
-.nav-pill-link.active {
-  opacity: 1;
-}
-
-.nav-right-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  gap: 4px;
 }
 
 .contact-cta-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 12px 24px;
-  background: #ffffff;
-  color: var(--bg-main);
+  border: 1px solid var(--text-main);
+  border-radius: var(--r-pill);
+  padding: 10px 22px;
+  background: transparent;
+  color: var(--text-main);
   font-size: 0.75rem;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: 0.25s ease;
+  transition: var(--transition-smooth);
   cursor: pointer;
+  text-decoration: none;
+}
+.contact-cta-btn:hover {
+  background: var(--text-main);
+  color: var(--bg-main);
 }
 
 .nav-icon-btn {
-  background: #ffffff;
-  border: 1px solid rgba(13, 26, 99, 0.18);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  color: var(--bg-main);
+  background: var(--surface-soft);
+  border: 1px solid var(--line-soft);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: 0.25s ease;
+  transition: var(--transition-smooth);
 }
-
-.contact-cta-btn:hover,
 .nav-icon-btn:hover {
-  background: var(--bg-main);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-/* Header auth/CTA inline-styled links — force blue on white */
-#navbar .nav-right-actions a[href="/login"] {
-  color: var(--bg-main) !important;
-}
-
-#navbar .nav-right-actions a[href="/signup"] {
-  background: var(--bg-main) !important;
-  color: #ffffff !important;
-}
-
-#navbar .contact-cta-btn {
-  border: 1px solid var(--bg-main) !important;
-  color: var(--bg-main) !important;
-}
-
-#navbar .contact-cta-btn:hover {
-  background: var(--bg-main) !important;
-  color: #ffffff !important;
+  background: var(--text-main);
+  color: var(--bg-main);
 }
 
 /* --- Riad Lumiere Split View (Home Page) --- */
@@ -332,7 +532,7 @@ select {
 .hero-overlay-light {
   position: absolute;
   inset: 0;
-  background: rgba(226, 218, 204, 0.15);
+  background: rgba(242, 235, 224, 0.15);
   z-index: 1;
   pointer-events: none;
 }
@@ -340,7 +540,7 @@ select {
 .hero-overlay-dark {
   position: absolute;
   inset: 0;
-  background: rgba(13, 26, 99, 0.4);
+  background: rgba(42, 32, 24, 0.4);
   z-index: 1;
   pointer-events: none;
 }
@@ -382,7 +582,7 @@ select {
   height: 12px;
   background: var(--blue-deep);
   border-radius: 50%;
-  box-shadow: 0 0 15px rgba(34, 81, 164, 0.8);
+  box-shadow: 0 0 15px rgba(139, 111, 78, 0.8);
   z-index: 2;
   transition: transform 0.3s ease;
 }
@@ -431,7 +631,7 @@ select {
 }
 
 .tooltip-content {
-  background: rgba(13, 26, 99, 0.6);
+  background: rgba(42, 32, 24, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -489,7 +689,7 @@ select {
 }
 
 .feature-box-content {
-  background: rgba(13, 26, 99, 0.5);
+  background: rgba(42, 32, 24, 0.5);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -548,7 +748,7 @@ select {
   }
   
   .feature-box-content {
-    background: rgba(13, 26, 99, 0.5);
+    background: rgba(42, 32, 24, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -748,9 +948,9 @@ select {
   inset: 0;
   z-index: 1;
   background: linear-gradient(180deg,
-      rgba(6, 10, 35, 0.55) 0%,
-      rgba(6, 10, 35, 0.4) 50%,
-      rgba(6, 10, 35, 0.7) 100%);
+      rgba(31, 24, 18, 0.55) 0%,
+      rgba(31, 24, 18, 0.4) 50%,
+      rgba(31, 24, 18, 0.7) 100%);
   pointer-events: none;
 }
 
@@ -776,7 +976,7 @@ select {
   position: relative;
   z-index: 2;
   /* Translucent panel + backdrop blur for the frosted-glass feel. */
-  background: rgba(13, 26, 99, 0.55) !important;
+  background: rgba(42, 32, 24, 0.55) !important;
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -785,6 +985,23 @@ select {
      clipped at the stack edge, producing a hard dark band the user read
      as a "weird dark mask in the border". The frosted glow from the
      border + backdrop-filter is enough lift on its own. */
+  /* The card sits on a dark espresso scrim, so its text must be light.
+     After the 2026 palette flip, --text-main is espresso (dark) — without
+     these overrides the heading/labels render dark-on-dark. */
+  color: var(--bg-main);
+}
+.auth-card .smartwood-title {
+  color: var(--bg-main);
+}
+/* Inline styles on the labels/paragraphs use color: var(--text-soft)
+   (now a dark espresso alpha). Force them to a light cream alpha so they
+   read on the dark frosted card. */
+.auth-card label,
+.auth-card p {
+  color: rgba(242, 235, 224, 0.78) !important;
+}
+.auth-card a {
+  color: var(--bg-main) !important;
 }
 
 /* Two-step signup slide stack — step 1 sits on top of step 2.
@@ -1147,13 +1364,13 @@ select {
 
 .hero-primary-btn {
   background: var(--sand-soft);
-  color: var(--bg-main);
-  box-shadow: 0 10px 30px rgba(226, 218, 204, 0.2);
+  color: var(--text-main);
+  box-shadow: 0 10px 30px rgba(242, 235, 224, 0.2);
 }
 
 .hero-primary-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(226, 218, 204, 0.4);
+  box-shadow: 0 15px 40px rgba(242, 235, 224, 0.4);
 }
 
 .hero-secondary-btn {
@@ -1163,7 +1380,7 @@ select {
 }
 
 .hero-secondary-btn:hover {
-  background: rgba(226, 218, 204, 0.1);
+  background: rgba(242, 235, 224, 0.1);
   /* Cream hint */
   transform: translateY(-2px);
 }
@@ -1182,7 +1399,7 @@ select {
 .hero-image-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(13, 26, 99, 0.02), rgba(13, 26, 99, 0.08));
+  background: linear-gradient(180deg, rgba(42, 32, 24, 0.02), rgba(42, 32, 24, 0.08));
 }
 
 .hero-image-caption {
@@ -1436,7 +1653,7 @@ select {
     padding-top: max(clamp(60px, 10vw, 100px), env(safe-area-inset-top));
     padding-bottom: max(clamp(60px, 10vw, 100px), env(safe-area-inset-bottom));
     background: transparent !important;
-    color: var(--bg-main) !important;
+    color: var(--text-main) !important;
   }
 
   /* Cream colors on mobile */
@@ -1461,7 +1678,7 @@ select {
   /* Primary button on mobile */
   .home-hero .split-left .hero-primary-btn {
     background: var(--sand-soft) !important;
-    color: var(--bg-main) !important;
+    color: var(--text-main) !important;
     padding: 0 16px !important;
     min-height: 44px !important;
     font-size: 0.9rem !important;
@@ -1565,60 +1782,54 @@ select {
 
 @media (max-width: 767px) {
   #navbar {
-    padding: 10px 16px;
-    padding-top: max(10px, env(safe-area-inset-top));
+    padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
     gap: 8px;
   }
 
   .brand-logo-img {
-    height: 28px !important;
-  }
-
-  .nav-center-pills {
-    justify-content: center;
-    gap: 18px;
-    order: 3;
-    flex-basis: 100%;
-    padding-top: 4px;
-  }
-
-  .nav-pill-link {
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
+    height: 22px;
   }
 
   .nav-right-actions {
     flex-wrap: nowrap;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 8px;
   }
 
-  /* Compact the inline-styled auth links */
-  #navbar .nav-right-actions a[href="/login"] {
-    font-size: 0.72rem !important;
-    letter-spacing: 0.3px !important;
+  /* Compact the icon-square buttons on mobile so the header fits the
+     phone layout shown in image 1 (logo + wishlist + cart + hamburger). */
+  .nav-icon-square {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 0.95rem;
   }
 
-  #navbar .nav-right-actions a[href="/signup"] {
-    padding: 6px 12px !important;
-    font-size: 0.72rem !important;
-    letter-spacing: 0.3px !important;
+  /* The hamburger uses a hairline-outlined variant on mobile to keep the
+     three icons from feeling like a wall of dark chips. */
+  .nav-icon-hamburger {
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--line-soft);
+  }
+  .nav-icon-hamburger:hover {
+    background: var(--surface-soft);
+    color: var(--text-main);
   }
 
-  /* Contact button: compact on tablet, hidden on phone */
+  /* Legacy aliases retained in case any non-navbar callers still use them */
   .contact-cta-btn {
-    padding: 7px 12px;
-    font-size: 0.65rem;
+    padding: 7px 14px;
+    font-size: 0.7rem;
   }
 
   .nav-icon-btn {
-    min-width: 36px;
-    min-height: 36px;
     width: 36px;
     height: 36px;
-    font-size: 0.72rem;
+    font-size: 0.85rem;
   }
 
   .mini-gallery-strip {
@@ -1709,12 +1920,12 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(226, 218, 204, 0.3);
+  background: rgba(242, 235, 224, 0.3);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(226, 218, 204, 0.6);
+  background: rgba(242, 235, 224, 0.6);
 }
 
 /* --- Animations --- */
@@ -1921,7 +2132,7 @@ select {
 .shop-main {
   background: var(--sand-soft) !important;
   min-height: 100vh;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .shop-layout {
@@ -1944,11 +2155,11 @@ select {
   overflow-x: auto;
   gap: 32px;
   padding: 14px 20px;
-  background: rgba(226, 218, 204, 0.9);
+  background: rgba(242, 235, 224, 0.9);
   backdrop-filter: blur(16px);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  border-bottom: 1px solid rgba(13, 26, 99, 0.04);
+  border-bottom: 1px solid rgba(42, 32, 24, 0.04);
   justify-content: center;
 }
 
@@ -1973,7 +2184,7 @@ select {
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  color: var(--bg-main);
+  color: var(--text-main);
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
@@ -1999,8 +2210,8 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-main);
-  color: white;
+  background: var(--text-main);
+  color: var(--bg-main);
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -2029,7 +2240,7 @@ select {
 }
 
 .samsung-card {
-  background: #faf8f4;
+  background: var(--bg-panel);
   border-radius: 24px;
   /* Restored rounded look */
   overflow: hidden;
@@ -2038,13 +2249,13 @@ select {
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   height: 100%;
   position: relative;
-  border: 1px solid rgba(13, 26, 99, 0.05);
+  border: 1px solid rgba(42, 32, 24, 0.05);
 }
 
 .samsung-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(13, 26, 99, 0.08);
-  border-color: rgba(13, 26, 99, 0.1);
+  box-shadow: 0 12px 32px rgba(42, 32, 24, 0.08);
+  border-color: rgba(42, 32, 24, 0.1);
 }
 
 .samsung-card-img {
@@ -2052,7 +2263,7 @@ select {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: #ebe6db;
+  background: var(--surface-soft);
 }
 
 .samsung-card-img img {
@@ -2079,19 +2290,19 @@ select {
   font-size: 1.1rem;
   font-weight: 800;
   margin: 0 0 8px;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .samsung-card-sub {
   font-size: 0.82rem;
-  color: rgba(13, 26, 99, 0.6);
+  color: rgba(42, 32, 24, 0.6);
   margin-bottom: 16px;
 }
 
 .samsung-card-price {
   font-size: 1.25rem;
   font-weight: 900;
-  color: var(--bg-main);
+  color: var(--text-main);
   margin-top: auto;
   margin-bottom: 20px;
 }
@@ -2118,23 +2329,23 @@ select {
 }
 
 .samsung-btn-primary {
-  background: var(--bg-main);
-  color: white;
+  background: var(--text-main);
+  color: var(--bg-main);
   border: none;
 }
 
 .samsung-btn-secondary {
   background: transparent;
-  color: var(--bg-main);
+  color: var(--text-main);
   border: 1.5px solid var(--bg-main);
 }
 
 .samsung-btn-primary:hover {
-  background: #050f4a;
+  background: var(--accent-deep);
 }
 
 .samsung-btn-secondary:hover {
-  background: rgba(13, 26, 99, 0.05);
+  background: rgba(42, 32, 24, 0.05);
 }
 
 @media (max-width: 900px) {
@@ -2234,7 +2445,7 @@ select {
 }
 
 .timeline-item.visible .timeline-node {
-  box-shadow: 0 0 0 3px var(--bg-main), 0 0 16px rgba(226, 218, 204, 0.45);
+  box-shadow: 0 0 0 3px var(--bg-main), 0 0 16px rgba(242, 235, 224, 0.45);
 }
 
 /* Content card */
@@ -2350,11 +2561,11 @@ select {
     left: 72px;
     z-index: 3;
     padding: 6px 14px;
-    background: rgba(13, 26, 99, 0.72);
+    background: rgba(42, 32, 24, 0.72);
     color: var(--sand-soft);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(226, 218, 204, 0.25);
+    border: 1px solid rgba(242, 235, 224, 0.25);
     border-radius: 100px;
     font-size: 0.78rem;
     font-weight: 700;
@@ -2401,10 +2612,10 @@ select {
     border: none;
     border-radius: 0 0 22px 22px;
     background: linear-gradient(to top,
-        rgba(13, 26, 99, 0.95) 0%,
-        rgba(13, 26, 99, 0.82) 35%,
-        rgba(13, 26, 99, 0.4) 70%,
-        rgba(13, 26, 99, 0) 100%);
+        rgba(42, 32, 24, 0.95) 0%,
+        rgba(42, 32, 24, 0.82) 35%,
+        rgba(42, 32, 24, 0.4) 70%,
+        rgba(42, 32, 24, 0) 100%);
     flex: unset;
     min-width: unset;
     max-width: none;
@@ -2543,7 +2754,7 @@ select {
   }
 
   .timeline-item.visible .timeline-node {
-    box-shadow: 0 0 0 4px var(--bg-panel), 0 0 0 6px var(--sand-soft), 0 0 14px rgba(226, 218, 204, 0.3);
+    box-shadow: 0 0 0 4px var(--bg-panel), 0 0 0 6px var(--sand-soft), 0 0 14px rgba(242, 235, 224, 0.3);
   }
 
   /* RTL */
@@ -2589,11 +2800,11 @@ select {
 }
 
 .slider-header .section-title {
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .slider-header .section-kicker {
-  color: rgba(13, 26, 99, 0.6);
+  color: rgba(42, 32, 24, 0.6);
 }
 
 .slider-track {
@@ -2655,7 +2866,7 @@ select {
 .slider-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(13, 26, 99, 0.3) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(42, 32, 24, 0.3) 0%, transparent 60%);
   opacity: 0.6;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -2695,7 +2906,7 @@ select {
   font-size: clamp(1.7rem, 3.8vw, 2.8rem);
   margin: 0;
   text-align: left;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 [dir="rtl"] .home-perspectives-title {
@@ -2911,17 +3122,17 @@ select {
   z-index: 1;
   background:
     linear-gradient(90deg,
-      rgba(226, 218, 204, 0.9) 0%,
-      rgba(226, 218, 204, 0.7) 45%,
-      rgba(226, 218, 204, 0.2) 100%);
+      rgba(242, 235, 224, 0.9) 0%,
+      rgba(242, 235, 224, 0.7) 45%,
+      rgba(242, 235, 224, 0.2) 100%);
   pointer-events: none;
 }
 
 [dir="rtl"] .home-feature-overlay {
   background: linear-gradient(-90deg,
-      rgba(226, 218, 204, 0.9) 0%,
-      rgba(226, 218, 204, 0.7) 45%,
-      rgba(226, 218, 204, 0.2) 100%);
+      rgba(242, 235, 224, 0.9) 0%,
+      rgba(242, 235, 224, 0.7) 45%,
+      rgba(242, 235, 224, 0.2) 100%);
 }
 
 .home-feature-content {
@@ -2929,11 +3140,11 @@ select {
   z-index: 2;
   padding: clamp(36px, 5vw, 80px) clamp(24px, 5vw, 80px);
   max-width: 640px;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .home-feature-kicker {
-  color: var(--bg-main);
+  color: var(--text-main);
   opacity: 0.85;
   margin-bottom: 18px;
   display: inline-block;
@@ -2945,18 +3156,18 @@ select {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0 0 16px;
-  color: var(--bg-main);
+  color: var(--text-main);
 }
 
 .home-feature-dot {
-  color: var(--bg-main);
+  color: var(--text-main);
   opacity: 1;
 }
 
 .home-feature-text {
   font-size: clamp(0.88rem, 1.1vw, 1rem);
   line-height: 1.65;
-  color: rgba(13, 26, 99, 0.7);
+  color: rgba(42, 32, 24, 0.7);
   margin: 0 0 24px;
   max-width: 500px;
 }
@@ -2966,7 +3177,7 @@ select {
   align-items: center;
   gap: 10px;
   padding: 12px 26px;
-  background: var(--bg-main);
+  background: var(--text-main);
   color: var(--sand-soft);
   border-radius: 999px;
   font-weight: 700;
@@ -3006,16 +3217,16 @@ select {
 @media (max-width: 768px) {
   .home-feature-overlay {
     background: linear-gradient(180deg,
-        rgba(226, 218, 204, 0.5) 0%,
-        rgba(226, 218, 204, 0.8) 55%,
-        rgba(226, 218, 204, 0.95) 100%);
+        rgba(242, 235, 224, 0.5) 0%,
+        rgba(242, 235, 224, 0.8) 55%,
+        rgba(242, 235, 224, 0.95) 100%);
   }
 
   [dir="rtl"] .home-feature-overlay {
     background: linear-gradient(180deg,
-        rgba(226, 218, 204, 0.5) 0%,
-        rgba(226, 218, 204, 0.8) 55%,
-        rgba(226, 218, 204, 0.95) 100%);
+        rgba(242, 235, 224, 0.5) 0%,
+        rgba(242, 235, 224, 0.8) 55%,
+        rgba(242, 235, 224, 0.95) 100%);
   }
 
   .home-feature {
@@ -3028,263 +3239,305 @@ select {
 }
 
 /* ============================================================
-   Footer (appears at the bottom of every page)
+   Footer (2026 redesign — dark espresso card with newsletter)
+   Composed in components/layout/Footer.tsx
    ============================================================ */
 .sw-footer {
-  background: #ffffff;
-  color: var(--bg-main);
-  border-top: 1px solid rgba(13, 26, 99, 0.12);
+  background: var(--bg-main);
+  color: var(--text-main);
   margin-top: auto;
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
-.sw-footer-main {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: clamp(32px, 5vw, 80px);
-  padding: clamp(48px, 7vw, 88px) clamp(24px, 6vw, 80px) clamp(40px, 5vw, 64px);
-  max-width: 1400px;
-  margin: 0 auto;
-  align-items: start;
-}
-
-.sw-footer-left {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.sw-footer-logo {
-  display: inline-block;
-  line-height: 0;
-}
-
-.sw-footer-logo img {
-  height: clamp(72px, 10vw, 128px);
-  width: auto;
-  display: block;
-}
-
-.sw-footer-social {
+/* --- Desktop meta bar above the card (per image 3) --- */
+.sw-footer-meta {
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px clamp(24px, 6vw, 80px);
+  border-top: 1px solid var(--line-soft);
+  font-size: 0.78rem;
+  color: var(--text-soft);
 }
 
-.sw-footer-social a {
+.sw-footer-meta-copy {
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.sw-footer-meta-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+  justify-content: center;
+}
+
+.sw-footer-meta-link-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sw-footer-meta-link {
+  font-size: 0.82rem;
+  color: var(--text-main);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: var(--transition-smooth);
+}
+.sw-footer-meta-link:hover {
+  background: var(--surface-soft);
+}
+
+.sw-footer-meta-sep {
+  color: var(--line-soft);
+  user-select: none;
+}
+
+.sw-footer-meta-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+.sw-footer-meta-social a {
+  color: var(--text-main);
+  font-size: 1.05rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+.sw-footer-meta-social a:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+/* --- Dark espresso card shell --- */
+.sw-footer-shell {
+  padding: clamp(20px, 3vw, 32px) clamp(16px, 4vw, 40px) clamp(24px, 4vw, 40px);
+}
+
+.sw-footer-card {
+  background: var(--accent-deep);
+  color: var(--bg-main);
+  border-radius: var(--r-card);
+  padding: clamp(28px, 4vw, 48px) clamp(24px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 36px);
+}
+
+/* --- Newsletter section --- */
+.sw-footer-newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sw-footer-newsletter-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sw-footer-newsletter-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
+  border: 1px solid rgba(242, 235, 224, 0.3);
   color: var(--bg-main);
-  font-size: 1.1rem;
-  opacity: 0.85;
-  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
-  text-decoration: none;
-  background: transparent;
+  font-size: 1.15rem;
+  flex-shrink: 0;
 }
 
-.sw-footer-social a:hover {
-  opacity: 1;
-  transform: translateY(-2px);
-  background: rgba(13, 26, 99, 0.08);
+.sw-footer-newsletter-headtext {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.sw-footer-newsletter-text {
-  font-size: 0.92rem;
-  color: var(--text-soft);
-  line-height: 1.6;
-  max-width: 420px;
-  margin: 4px 0 0;
+.sw-footer-newsletter-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+  margin: 0;
+  color: var(--bg-main);
+  line-height: 1.1;
 }
 
-.sw-footer-newsletter {
+.sw-footer-newsletter-sub {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(242, 235, 224, 0.72);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.sw-footer-newsletter-form {
   display: flex;
   align-items: stretch;
-  max-width: 440px;
-  background: rgba(13, 26, 99, 0.45);
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
+  width: 100%;
+  max-width: 720px;
+  background: rgba(242, 235, 224, 0.06);
+  border: 1px solid rgba(242, 235, 224, 0.18);
+  border-radius: 12px;
   overflow: hidden;
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.sw-footer-newsletter-form:focus-within {
+  border-color: rgba(242, 235, 224, 0.45);
+  background: rgba(242, 235, 224, 0.1);
 }
 
-.sw-footer-newsletter:focus-within {
-  border-color: rgba(226, 218, 204, 0.55);
-}
-
-.sw-footer-newsletter input {
+.sw-footer-newsletter-form input {
   flex: 1;
   min-width: 0;
   padding: 14px 18px;
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text-main);
+  color: var(--bg-main);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+}
+.sw-footer-newsletter-form input::placeholder {
+  color: rgba(242, 235, 224, 0.5);
 }
 
-.sw-footer-newsletter input::placeholder {
-  color: rgba(226, 218, 204, 0.5);
-}
-
-.sw-footer-newsletter button {
+.sw-footer-newsletter-form button {
   border: none;
-  background: var(--sand-soft);
+  background: transparent;
   color: var(--bg-main);
   padding: 0 22px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  transition: background 0.25s ease, transform 0.25s ease;
+  font-size: 1.05rem;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
-
-.sw-footer-newsletter button:hover {
-  background: #fff;
-  transform: translateX(2px);
-}
-
-[dir="rtl"] .sw-footer-newsletter button:hover {
-  transform: translateX(-2px);
+.sw-footer-newsletter-form button:hover {
+  background: rgba(242, 235, 224, 0.1);
 }
 
 .sw-footer-thanks {
-  font-size: 0.88rem;
-  color: var(--sand-soft);
-  opacity: 0.9;
-  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  font-size: 0.85rem;
+  color: rgba(242, 235, 224, 0.85);
+  margin-top: -4px;
 }
 
-.sw-footer-nav {
+/* --- Hairline divider between newsletter and brand row --- */
+.sw-footer-divider {
+  height: 1px;
+  background: rgba(242, 235, 224, 0.14);
+}
+
+/* --- Brand row: logo + copyright (left), social (right) --- */
+.sw-footer-brandbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sw-footer-brand {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
-.sw-footer-nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 4px;
-  color: var(--bg-main);
-  text-decoration: none;
-  font-size: clamp(1rem, 1.3vw, 1.15rem);
-  font-weight: 600;
+.sw-footer-brand-logo {
+  display: inline-block;
+  line-height: 0;
+}
+.sw-footer-brand-logo img {
+  height: 26px;
+  width: auto;
+  display: block;
+}
+
+.sw-footer-brand-copy {
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: rgba(242, 235, 224, 0.65);
   letter-spacing: 0.01em;
-  border-bottom: 1px solid rgba(13, 26, 99, 0.12);
-  transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
 }
 
-.sw-footer-nav-link:first-child {
-  border-top: 1px solid rgba(13, 26, 99, 0.12);
-}
-
-.sw-footer-nav-link i {
-  opacity: 0.55;
-  font-size: 0.95rem;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
-}
-
-.sw-footer-nav-link:hover {
-  padding-left: 12px;
-  padding-right: 4px;
-  color: var(--blue-deep);
-}
-
-[dir="rtl"] .sw-footer-nav-link:hover {
-  padding-left: 4px;
-  padding-right: 12px;
-}
-
-.sw-footer-nav-link:hover i {
-  opacity: 1;
-  transform: translateX(4px);
-}
-
-[dir="rtl"] .sw-footer-nav-link:hover i {
-  transform: translateX(-4px);
-}
-
-/* Bottom bar: copyright + legal */
-.sw-footer-bar {
-  background: #ffffff;
-  padding: 22px clamp(24px, 6vw, 80px);
-  border-top: 1px solid rgba(13, 26, 99, 0.12);
-  display: flex;
-  justify-content: space-between;
+.sw-footer-social {
+  display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 0.82rem;
+  gap: 18px;
 }
-
-.sw-footer-copy {
-  color: rgba(13, 26, 99, 0.7);
-  letter-spacing: 0.02em;
-}
-
-.sw-footer-legal {
-  display: flex;
-  gap: clamp(16px, 2.2vw, 32px);
-  flex-wrap: wrap;
-}
-
-.sw-footer-legal a {
-  color: rgba(13, 26, 99, 0.7);
-  text-decoration: none;
-  transition: color 0.25s ease;
-}
-
-.sw-footer-legal a:hover {
+.sw-footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   color: var(--bg-main);
+  font-size: 1.05rem;
+  opacity: 0.85;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  text-decoration: none;
+  background: transparent;
+}
+.sw-footer-social a:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  background: rgba(242, 235, 224, 0.08);
 }
 
-/* Responsive: stack on mobile */
-@media (max-width: 860px) {
-  .sw-footer-main {
-    grid-template-columns: 1fr;
-    gap: 40px;
+/* --- Responsive --- */
+@media (max-width: 767px) {
+  .sw-footer-shell {
+    padding: 12px 12px 16px;
   }
-
-  .sw-footer-logo img {
-    height: 68px;
+  .sw-footer-card {
+    padding: 28px 24px;
+    gap: 24px;
   }
-}
-
-@media (max-width: 560px) {
-  .sw-footer-bar {
-    flex-direction: column;
-    align-items: flex-start;
+  .sw-footer-newsletter-head {
     gap: 12px;
-    padding: 20px 20px max(20px, env(safe-area-inset-bottom));
   }
-
-  .sw-footer-legal {
-    gap: 14px 20px;
-    font-size: 0.78rem;
+  .sw-footer-newsletter-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
   }
+  .sw-footer-newsletter-title { font-size: 1.4rem; }
+  .sw-footer-newsletter-sub  { font-size: 0.82rem; }
+  .sw-footer-newsletter-form input { padding: 12px 14px; font-size: 0.88rem; }
+  .sw-footer-brandbar { gap: 16px; }
+  .sw-footer-brand-logo img { height: 22px; }
+  .sw-footer-social a { width: 32px; height: 32px; font-size: 0.95rem; }
 }
 
 /* ============================================================
    About Page Custom Theme (Refined)
    ============================================================ */
 .about-page-theme {
-  background-color: #f1ede4 !important;
+  background-color: var(--bg-main) !important;
   /* Exact Product Card Cream */
-  color: #0d1a63;
+  color: var(--text-main);
 }
 
 .about-page-theme .smartwood-title span,
 .about-page-theme .section-title,
 .about-page-theme .section-kicker {
-  color: #0d1a63 !important;
+  color: var(--text-main) !important;
 }
 
 .about-page-theme .smartwood-description {
-  color: rgba(13, 26, 99, 0.8) !important;
+  color: rgba(42, 32, 24, 0.8) !important;
   line-height: 1.8;
 }
 
@@ -3293,37 +3546,37 @@ select {
 }
 
 .about-page-theme .timeline-content {
-  background: #ffffff;
-  border: 1px solid rgba(13, 26, 99, 0.12);
-  box-shadow: 0 12px 32px rgba(13, 26, 99, 0.08);
+  background: var(--bg-main);
+  border: 1px solid rgba(42, 32, 24, 0.12);
+  box-shadow: 0 12px 32px rgba(42, 32, 24, 0.08);
 }
 
 .about-page-theme .timeline-content h3,
 .about-page-theme .timeline-content h3 i,
 .about-page-theme .timeline-content p,
 .about-page-theme .timeline-content .timeline-step {
-  color: #0d1a63 !important;
+  color: var(--text-main) !important;
 }
 
 .about-page-theme .timeline-content p {
-  color: rgba(13, 26, 99, 0.78) !important;
+  color: rgba(42, 32, 24, 0.78) !important;
 }
 
 .about-page-theme .timeline-content .timeline-step {
-  border-bottom-color: rgba(13, 26, 99, 0.15) !important;
+  border-bottom-color: rgba(42, 32, 24, 0.15) !important;
 }
 
 .about-page-theme .timeline-node {
-  background: #f1ede4;
-  box-shadow: 0 0 0 3px #0d1a63;
+  background: var(--bg-main);
+  box-shadow: 0 0 0 3px var(--text-main);
 }
 
 .about-page-theme .timeline::before {
-  background: rgba(13, 26, 99, 0.15);
+  background: rgba(42, 32, 24, 0.15);
 }
 
 .about-page-theme .timeline-item.visible .timeline-node {
-  box-shadow: 0 0 0 3px #0d1a63, 0 0 20px rgba(13, 26, 99, 0.15);
+  box-shadow: 0 0 0 3px var(--text-main), 0 0 20px rgba(42, 32, 24, 0.15);
 }
 
 /* Desktop-only refinements for the About page hero */
@@ -3335,14 +3588,14 @@ select {
 
   /* DISCOVER DESIGNS CTA — give it contrast against the cream background */
   .about-page-theme .hero-secondary-btn {
-    background: #0d1a63;
-    color: #f1ede4;
-    border: 1px solid #0d1a63;
+    background: var(--text-main);
+    color: var(--bg-main);
+    border: 1px solid var(--text-main);
   }
 
   .about-page-theme .hero-secondary-btn:hover {
-    background: #1A2CA3;
-    border-color: #1A2CA3;
+    background: var(--accent-deep);
+    border-color: var(--accent-deep);
     color: #ffffff;
   }
 }
@@ -3357,8 +3610,8 @@ select {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background: #ffffff;
-  color: var(--bg-main);
+  background: var(--bg-main);
+  color: var(--text-main);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 10000;
@@ -3409,7 +3662,7 @@ select {
   right: -80px;
   width: 280px;
   height: 280px;
-  background: radial-gradient(circle, rgba(34, 81, 164, 0.10), transparent 70%);
+  background: radial-gradient(circle, rgba(139, 111, 78, 0.10), transparent 70%);
 }
 
 .mobile-menu-orb-b {
@@ -3417,7 +3670,7 @@ select {
   left: -100px;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(13, 26, 99, 0.06), transparent 70%);
+  background: radial-gradient(circle, rgba(42, 32, 24, 0.06), transparent 70%);
 }
 
 /* Header */
@@ -3428,13 +3681,13 @@ select {
   align-items: center;
   justify-content: space-between;
   padding: 22px 24px;
-  border-bottom: 1px solid rgba(13, 26, 99, 0.12);
+  border-bottom: 1px solid rgba(42, 32, 24, 0.12);
 }
 
 .close-menu-btn {
-  background: rgba(13, 26, 99, 0.05);
-  border: 1px solid rgba(13, 26, 99, 0.18);
-  color: var(--bg-main);
+  background: rgba(42, 32, 24, 0.05);
+  border: 1px solid rgba(42, 32, 24, 0.18);
+  color: var(--text-main);
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -3448,9 +3701,9 @@ select {
 
 .close-menu-btn:hover,
 .close-menu-btn:active {
-  background: var(--bg-main);
-  border-color: var(--bg-main);
-  color: #ffffff;
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: var(--bg-main);
   transform: rotate(90deg);
 }
 
@@ -3471,7 +3724,7 @@ select {
   font-size: 0.7rem;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: rgba(13, 26, 99, 0.6);
+  color: rgba(42, 32, 24, 0.6);
   opacity: 1;
   margin-bottom: 18px;
   padding-left: 4px;
@@ -3494,13 +3747,13 @@ select {
   align-items: center;
   gap: 16px;
   padding: 22px 4px;
-  border-bottom: 1px solid rgba(13, 26, 99, 0.12);
+  border-bottom: 1px solid rgba(42, 32, 24, 0.12);
   font-family: var(--font-app);
   font-size: 1.85rem;
   font-weight: 900;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--bg-main);
+  color: var(--text-main);
   text-decoration: none;
   opacity: 0.95;
   transition: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
@@ -3508,14 +3761,14 @@ select {
 }
 
 .mobile-nav-link:first-child {
-  border-top: 1px solid rgba(13, 26, 99, 0.12);
+  border-top: 1px solid rgba(42, 32, 24, 0.12);
 }
 
 .mobile-nav-index {
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.15em;
-  color: rgba(13, 26, 99, 0.55);
+  color: rgba(42, 32, 24, 0.55);
   opacity: 1;
   min-width: 26px;
   font-family: var(--font-app);
@@ -3531,13 +3784,13 @@ select {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(13, 26, 99, 0.18);
+  border: 1px solid rgba(42, 32, 24, 0.18);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  color: var(--bg-main);
-  background: rgba(13, 26, 99, 0.04);
+  color: var(--text-main);
+  background: rgba(42, 32, 24, 0.04);
   transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   flex-shrink: 0;
 }
@@ -3558,16 +3811,16 @@ select {
 
 .mobile-nav-link.active .mobile-nav-index,
 .mobile-nav-link:hover .mobile-nav-index {
-  color: var(--bg-main);
+  color: var(--text-main);
   opacity: 1;
 }
 
 .mobile-nav-link.active .mobile-nav-arrow,
 .mobile-nav-link:hover .mobile-nav-arrow,
 .mobile-nav-link:active .mobile-nav-arrow {
-  background: var(--bg-main);
-  border-color: var(--bg-main);
-  color: #fff;
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: var(--bg-main);
   transform: translateX(4px);
 }
 
@@ -3608,28 +3861,28 @@ select {
 }
 
 .mobile-menu-pill-primary {
-  background: var(--bg-main);
-  color: #fff;
-  border: 1px solid var(--bg-main);
+  background: var(--text-main);
+  color: var(--bg-main);
+  border: 1px solid var(--text-main);
 }
 
 .mobile-menu-pill-primary:hover,
 .mobile-menu-pill-primary:active {
   background: var(--blue-accent);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(13, 26, 99, 0.25);
+  box-shadow: 0 12px 30px rgba(42, 32, 24, 0.25);
 }
 
 .mobile-menu-pill-ghost {
   background: transparent;
-  color: var(--bg-main);
-  border: 1px solid rgba(13, 26, 99, 0.2);
+  color: var(--text-main);
+  border: 1px solid rgba(42, 32, 24, 0.2);
 }
 
 .mobile-menu-pill-ghost:hover,
 .mobile-menu-pill-ghost:active {
-  background: rgba(13, 26, 99, 0.06);
-  border-color: var(--bg-main);
+  background: rgba(42, 32, 24, 0.06);
+  border-color: var(--text-main);
 }
 
 /* Footer */
@@ -3641,7 +3894,7 @@ select {
   justify-content: space-between;
   gap: 16px;
   padding: 18px 24px 22px;
-  border-top: 1px solid rgba(13, 26, 99, 0.12);
+  border-top: 1px solid rgba(42, 32, 24, 0.12);
 }
 
 .mobile-menu-lang {
@@ -3649,8 +3902,8 @@ select {
   align-items: center;
   gap: 8px;
   background: transparent;
-  border: 1px solid rgba(13, 26, 99, 0.2);
-  color: var(--bg-main);
+  border: 1px solid rgba(42, 32, 24, 0.2);
+  color: var(--text-main);
   padding: 9px 16px;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -3668,16 +3921,16 @@ select {
 
 .mobile-menu-lang:hover,
 .mobile-menu-lang:active {
-  background: var(--bg-main);
-  border-color: var(--bg-main);
-  color: #fff;
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: var(--bg-main);
 }
 
 .mobile-menu-tagline {
   font-size: 0.65rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(13, 26, 99, 0.6);
+  color: rgba(42, 32, 24, 0.6);
   opacity: 1;
   text-align: right;
   flex-shrink: 1;
@@ -3737,4 +3990,1045 @@ select {
   .mobile-menu-tagline {
     display: none;
   }
-}
+}
+
+/* ============================================================
+   HOMEPAGE 2026 REDESIGN
+   Composed in app/page.tsx (sections 1–10, see comment header).
+   All selectors are scoped under .home-2026 so they can't leak into
+   the legacy hero/slider/perspectives styles still defined above.
+   ============================================================ */
+
+.home-2026 {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-app);
+}
+
+/* --- Shared section utilities --- */
+.home-2026 .sw-section-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+  margin: 0 0 28px;
+}
+.home-2026 .sw-section-title-center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 720px;
+  margin-bottom: 48px;
+}
+
+.home-2026 .sw-body {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--text-soft);
+  margin: 0 0 18px;
+  max-width: 38ch;
+}
+
+/* Pill outlined CTA — "Discover Craftsmanship", "Learn More" arrow link */
+.home-2026 .sw-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 26px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--text-main);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+.home-2026 .sw-btn-outline:hover {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+.home-2026 .sw-btn-outline i {
+  font-size: 0.95rem;
+}
+
+/* Quiet inline arrow link — "Learn More →", "Learn Our Story →" */
+.home-2026 .sw-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--text-main);
+  padding-bottom: 4px;
+  transition: var(--transition-smooth);
+}
+.home-2026 .sw-link-arrow:hover { gap: 14px; }
+.home-2026 .sw-link-arrow-light {
+  color: var(--bg-main);
+  border-color: var(--bg-main);
+}
+
+/* === 1. Hero ==============================================
+   Clean split: solid cream copy panel on the left, niche photo on the
+   right with a hard vertical seam (no gradient/overlay). */
+.home-2026 .sw-hero {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-main);
+  min-height: 80vh;
+  overflow: hidden;
+}
+.home-2026 .sw-hero-copy {
+  flex: 0 0 42%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(36px, 6vw, 88px);
+  background: var(--bg-main);
+}
+.home-2026 .sw-hero-media {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.home-2026 .sw-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Shifted right so the lit niche + wood frame fill the panel. */
+  object-position: 62% center;
+  display: block;
+}
+.home-2026 .sw-hero-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  margin: 0 0 24px;
+  color: var(--text-main);
+}
+.home-2026 .sw-hero-body {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin: 0 0 36px;
+  max-width: 40ch;
+}
+
+/* === 2. Feature strip ===================================== */
+.home-2026 .sw-feature-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 3vw, 40px);
+  padding: 28px clamp(24px, 6vw, 80px);
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-main);
+}
+.home-2026 .sw-feature-cell {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-main);
+  justify-content: center;
+  text-align: center;
+}
+.home-2026 .sw-feature-cell i {
+  font-size: 1.25rem;
+  color: var(--text-main);
+  opacity: 0.85;
+}
+.home-2026 .sw-feature-divider {
+  position: absolute;
+  right: calc(clamp(16px, 3vw, 40px) * -0.5);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 28px;
+  background: var(--line-soft);
+}
+[dir="rtl"] .home-2026 .sw-feature-divider {
+  right: auto;
+  left: calc(clamp(16px, 3vw, 40px) * -0.5);
+}
+
+/* === 3. Excellence in Every Detail ======================== */
+.home-2026 .sw-excellence {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+}
+.home-2026 .sw-excellence-copy {
+  max-width: 460px;
+}
+.home-2026 .sw-excellence-copy .sw-section-title {
+  margin-bottom: 24px;
+}
+.home-2026 .sw-excellence-media {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  aspect-ratio: 16 / 11;
+  background: var(--bg-panel);
+}
+.home-2026 .sw-excellence-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === 4. Designed for Living =============================== */
+.home-2026 .sw-living {
+  padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+}
+.home-2026 .sw-living-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.home-2026 .sw-living-tile {
+  position: relative;
+  display: block;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-2026 .sw-living-tile:hover { transform: translateY(-4px); }
+.home-2026 .sw-living-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-2026 .sw-living-tile:hover img { transform: scale(1.04); }
+.home-2026 .sw-living-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(31, 24, 18, 0.55) 100%);
+  pointer-events: none;
+}
+.home-2026 .sw-living-label {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  z-index: 1;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+[dir="rtl"] .home-2026 .sw-living-label {
+  left: auto;
+  right: 20px;
+}
+
+/* === 5. Proudly Kuwaiti heritage banner =================== */
+.home-2026 .sw-heritage {
+  position: relative;
+  margin: clamp(32px, 5vw, 64px) clamp(24px, 6vw, 80px);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  color: var(--bg-main);
+  isolation: isolate;
+  min-height: 460px;
+}
+.home-2026 .sw-heritage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.home-2026 .sw-heritage-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(110deg,
+    rgba(31, 24, 18, 0.92) 0%,
+    rgba(31, 24, 18, 0.78) 45%,
+    rgba(31, 24, 18, 0.35) 100%);
+}
+.home-2026 .sw-heritage-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: clamp(40px, 6vw, 72px);
+}
+.home-2026 .sw-heritage-copy { max-width: 460px; }
+.home-2026 .sw-heritage-kicker {
+  color: var(--bg-main);
+  opacity: 0.85;
+}
+.home-2026 .sw-heritage-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  line-height: 1.08;
+  margin: 0 0 18px;
+  color: var(--bg-main);
+}
+.home-2026 .sw-heritage-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(242, 235, 224, 0.78);
+  margin: 0 0 22px;
+}
+.home-2026 .sw-heritage-badge {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(242, 235, 224, 0.55);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--bg-main);
+  flex-shrink: 0;
+}
+.home-2026 .sw-heritage-badge-top,
+.home-2026 .sw-heritage-badge-bot {
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+}
+.home-2026 .sw-heritage-badge-num {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 1;
+  margin: 4px 0;
+}
+
+/* === 6. German Quality. Timeless Strength. ================ */
+.home-2026 .sw-quality {
+  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+}
+.home-2026 .sw-quality-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
+}
+.home-2026 .sw-quality-cell {
+  text-align: center;
+}
+.home-2026 .sw-quality-cell i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  opacity: 0.85;
+}
+.home-2026 .sw-quality-title {
+  font-family: var(--font-app);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-main);
+  margin: 0 0 6px;
+}
+.home-2026 .sw-quality-text {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+  margin: 0 auto;
+  max-width: 30ch;
+}
+
+/* === 7. Quote card ======================================== */
+.home-2026 .sw-quote-wrap {
+  padding: 0 clamp(24px, 6vw, 80px) clamp(40px, 6vw, 80px);
+}
+.home-2026 .sw-quote {
+  position: relative;
+  background: var(--accent-deep);
+  color: var(--bg-main);
+  border-radius: var(--r-card);
+  padding: clamp(32px, 5vw, 56px) clamp(28px, 5vw, 80px);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.home-2026 .sw-quote-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(242, 235, 224, 0.4);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.home-2026 .sw-quote p {
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  font-weight: 400;
+  line-height: 1.35;
+  margin: 0;
+  color: var(--bg-main);
+}
+.home-2026 .sw-quote footer {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--bg-main);
+  border-bottom: 1px solid rgba(242, 235, 224, 0.5);
+  padding-bottom: 2px;
+}
+
+/* === 8. SmartWood Collection grid ========================= */
+.home-2026 .sw-collection {
+  padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 80px);
+  background: var(--bg-main);
+}
+.home-2026 .sw-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.home-2026 .sw-product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-main);
+  border: 1px solid var(--line-soft);
+  transition: var(--transition-smooth);
+}
+.home-2026 .sw-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+.home-2026 .sw-product-img {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+.home-2026 .sw-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-2026 .sw-product-card:hover .sw-product-img img { transform: scale(1.03); }
+.home-2026 .sw-product-meta {
+  padding: 18px 20px 22px;
+}
+.home-2026 .sw-product-name {
+  font-family: var(--font-app);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+  color: var(--text-main);
+}
+.home-2026 .sw-product-price {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.home-2026 .sw-product-price span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-left: 2px;
+  opacity: 0.75;
+}
+[dir="rtl"] .home-2026 .sw-product-price span { margin-left: 0; margin-right: 2px; }
+
+/* === 9. Mini benefit chips ================================ */
+.home-2026 .sw-benefits {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 clamp(24px, 6vw, 80px) clamp(40px, 6vw, 72px);
+}
+.home-2026 .sw-benefit-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+}
+.home-2026 .sw-benefit-chip i {
+  font-size: 1.4rem;
+  color: var(--text-main);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.home-2026 .sw-benefit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.home-2026 .sw-benefit-text strong {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.home-2026 .sw-benefit-text span {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+/* === 10. Compare Our Models (desktop only) ================= */
+.home-2026 .sw-compare {
+  padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 80px);
+}
+.home-2026 .sw-compare-table-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+.home-2026 .sw-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+.home-2026 .sw-compare-table thead th {
+  padding: 18px 24px;
+  font-family: var(--font-app);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--line-soft);
+}
+.home-2026 .sw-compare-table thead th.sw-compare-col-active {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+.home-2026 .sw-compare-table tbody th {
+  padding: 16px 24px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-soft);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-panel);
+}
+[dir="rtl"] .home-2026 .sw-compare-table tbody th { text-align: right; }
+.home-2026 .sw-compare-table tbody td {
+  padding: 16px 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-panel);
+}
+.home-2026 .sw-compare-table tbody td.sw-compare-col-active {
+  background: var(--surface-soft);
+  font-weight: 600;
+}
+.home-2026 .sw-compare-table tbody tr:last-child th,
+.home-2026 .sw-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ====================================================
+   RESPONSIVE (tablet + mobile breakpoints)
+   ==================================================== */
+
+/* Tablet: tighten 4-col grids to 2-col, keep hero side-by-side */
+@media (max-width: 991px) {
+  .home-2026 .sw-quality-grid,
+  .home-2026 .sw-collection-grid,
+  .home-2026 .sw-living-grid,
+  .home-2026 .sw-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-2026 .sw-compare { display: none; }
+
+  .home-2026 .sw-heritage-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .home-2026 .sw-heritage-badge {
+    width: 132px;
+    height: 132px;
+    align-self: flex-start;
+  }
+  .home-2026 .sw-heritage-badge-num { font-size: 2rem; }
+}
+
+/* Phone: image fills the hero but pulled back (shorter hero → wider slice)
+   so the wood backdrop + lit wardrobe both show. White copy overlaid on the
+   dark-wood left, with a filled-rectangle CTA. */
+@media (max-width: 767px) {
+  .home-2026 .sw-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+    /* Shorter than the desktop 80vh so object-fit shows a wider slice of
+       the scene (backdrop + wardrobe), not just the tight niche interior. */
+    height: 56vh;
+    flex-shrink: 0;
+  }
+  .home-2026 .sw-hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .home-2026 .sw-hero-media img {
+    /* Anchor so the dark walnut backdrop sits on the left under the text and
+       the lit niche shows on the right. */
+    object-position: 52% center;
+  }
+  .home-2026 .sw-hero-copy {
+    position: relative;
+    z-index: 2;
+    flex: none;
+    width: 100%;
+    background: transparent;
+    padding: 0 28px;
+    align-items: flex-start;
+  }
+  /* White copy over the dark wood. Subtle shadow for legibility (not a
+     fade overlay). */
+  .home-2026 .sw-hero-title {
+    color: #fff;
+    text-shadow: 0 2px 16px rgba(20, 14, 8, 0.5);
+  }
+  .home-2026 .sw-hero-body {
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 10px rgba(20, 14, 8, 0.55);
+    max-width: 60%;
+  }
+  /* Filled rectangle CTA — solid cream block, espresso text. */
+  .home-2026 .sw-hero-copy .sw-btn-outline {
+    border: none;
+    border-radius: 6px;
+    background: var(--bg-main);
+    color: var(--text-main);
+  }
+  .home-2026 .sw-hero-copy .sw-btn-outline:hover {
+    background: #fff;
+    color: var(--text-main);
+  }
+
+  .home-2026 .sw-feature-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 24px 20px;
+  }
+  .home-2026 .sw-feature-cell {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.7rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .home-2026 .sw-feature-cell i { font-size: 1.4rem; }
+  .home-2026 .sw-feature-divider { display: none; }
+
+  .home-2026 .sw-excellence {
+    grid-template-columns: 1fr;
+    padding: 48px 20px;
+  }
+  .home-2026 .sw-excellence-media {
+    aspect-ratio: 4 / 5;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .home-2026 .sw-living {
+    padding: 48px 0 48px 20px;
+  }
+  .home-2026 .sw-living .sw-section-title-center {
+    margin-right: 20px;
+    margin-bottom: 28px;
+  }
+  .home-2026 .sw-living-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .home-2026 .sw-living-grid::-webkit-scrollbar { display: none; }
+  .home-2026 .sw-living-tile {
+    flex: 0 0 70vw;
+    max-width: 280px;
+    scroll-snap-align: start;
+    aspect-ratio: 4 / 5;
+  }
+
+  .home-2026 .sw-quality { padding: 56px 20px; }
+  .home-2026 .sw-quality-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .home-2026 .sw-quality-cell {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    text-align: left;
+    align-items: start;
+    gap: 14px;
+  }
+  [dir="rtl"] .home-2026 .sw-quality-cell { text-align: right; }
+  .home-2026 .sw-quality-cell i { margin-bottom: 0; }
+  .home-2026 .sw-quality-text { max-width: none; margin: 0; }
+
+  .home-2026 .sw-collection {
+    padding: 40px 0 40px 20px;
+  }
+  .home-2026 .sw-collection .sw-section-title-center { margin-right: 20px; }
+  .home-2026 .sw-collection-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .home-2026 .sw-collection-grid::-webkit-scrollbar { display: none; }
+  .home-2026 .sw-product-card {
+    flex: 0 0 60vw;
+    max-width: 240px;
+    scroll-snap-align: start;
+  }
+
+  .home-2026 .sw-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0 20px 48px;
+  }
+  .home-2026 .sw-benefit-chip {
+    padding: 14px 14px;
+    gap: 10px;
+  }
+  .home-2026 .sw-benefit-text strong { font-size: 0.78rem; }
+  .home-2026 .sw-benefit-text span   { font-size: 0.72rem; }
+
+  .home-2026 .sw-heritage {
+    margin: 24px 16px;
+    min-height: 260px;
+  }
+  .home-2026 .sw-heritage-inner {
+    padding: 32px 28px;
+  }
+  .home-2026 .sw-heritage-title { font-size: 1.9rem; }
+
+  .home-2026 .sw-quote-wrap { padding: 0 20px 40px; }
+  .home-2026 .sw-quote { padding: 32px 24px; }
+}
+/* ============================================================
+   ABOUT US 2026 REDESIGN
+   Composed in app/about/page.tsx. Scoped under .about-2026.
+   ============================================================ */
+.about-2026 {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-app);
+}
+.about-2026 .sw-center { text-align: center; }
+
+.about-2026 .av-section-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+  margin: 0 0 24px;
+}
+.about-2026 .av-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+  margin: 0 0 18px;
+  max-width: 46ch;
+}
+.about-2026 .av-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid var(--text-main);
+  padding-bottom: 4px;
+  margin-top: 8px;
+  transition: var(--transition-smooth);
+}
+.about-2026 .av-link-arrow:hover { gap: 14px; }
+
+/* --- 1. Hero --- */
+.about-2026 .av-hero {
+  text-align: center;
+  padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 80px) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.about-2026 .av-hero-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 8px 0 20px;
+  color: var(--text-main);
+}
+.about-2026 .av-hero-sub {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text-soft);
+  max-width: 60ch;
+  margin: 0 auto clamp(40px, 6vw, 64px);
+}
+.about-2026 .av-hero-img {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+.about-2026 .av-hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+}
+
+/* --- 2. Story --- */
+.about-2026 .av-story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+}
+.about-2026 .av-story-img {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: var(--surface-soft);
+}
+.about-2026 .av-story-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- 3. Stats band --- */
+.about-2026 .av-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line-soft);
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  margin: 0 clamp(24px, 6vw, 80px);
+}
+.about-2026 .av-stat {
+  background: var(--bg-main);
+  padding: clamp(28px, 4vw, 44px) 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.about-2026 .av-stat-num {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  color: var(--text-main);
+}
+.about-2026 .av-stat-label {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  letter-spacing: 0.02em;
+  max-width: 20ch;
+}
+
+/* --- 4. Why SmartWood values --- */
+.about-2026 .av-why {
+  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+}
+.about-2026 .av-why-header {
+  text-align: center;
+  margin-bottom: clamp(40px, 6vw, 64px);
+}
+.about-2026 .av-value-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(20px, 2.5vw, 32px);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.about-2026 .av-value {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  padding: 32px 26px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.about-2026 .av-value.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.about-2026 .av-value-num {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--text-soft);
+  opacity: 0.6;
+}
+[dir="rtl"] .about-2026 .av-value-num { right: auto; left: 24px; }
+.about-2026 .av-value-icon {
+  font-size: 1.8rem;
+  color: var(--accent-warm);
+  display: block;
+  margin-bottom: 18px;
+}
+.about-2026 .av-value-title {
+  font-family: var(--font-app);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0 0 10px;
+}
+.about-2026 .av-value-text {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+  margin: 0;
+}
+
+/* --- 5. Quote / CTA --- */
+.about-2026 .av-cta-wrap {
+  padding: 0 clamp(24px, 6vw, 80px) clamp(48px, 7vw, 88px);
+}
+.about-2026 .av-cta {
+  background: var(--accent-deep);
+  color: var(--bg-main);
+  border-radius: var(--r-card);
+  padding: clamp(40px, 6vw, 72px) clamp(28px, 5vw, 80px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.about-2026 .av-cta-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(242, 235, 224, 0.4);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.about-2026 .av-cta-quote {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 22ch;
+  color: var(--bg-main);
+}
+.about-2026 .av-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+.about-2026 .av-cta-btn:hover { transform: translateY(-2px); }
+
+/* --- Responsive --- */
+@media (max-width: 991px) {
+  .about-2026 .av-value-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-2026 .av-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+  .about-2026 .av-story {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .about-2026 .av-story-img {
+    aspect-ratio: 4 / 3;
+    order: -1;
+  }
+  .about-2026 .av-hero-img { aspect-ratio: 4 / 3; }
+  .about-2026 .av-value-grid { grid-template-columns: 1fr; }
+}

@@ -155,7 +155,7 @@ export default function ProductPage() {
             <button
               onClick={() => setIsEditorOpen(false)}
               className="shadow-lg"
-              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
+              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
             >&times;</button>
             <FurnitureManager initialItem={item} onClose={() => setIsEditorOpen(false)} />
           </div>
@@ -171,7 +171,7 @@ export default function ProductPage() {
           overscroll-behavior: contain;
           scroll-behavior: auto;
           background: var(--sand-soft);
-          color: #0d1a63;
+          color: var(--text-main);
         }
         .pp-main .container { padding: 32px 40px 80px; }
         @media (max-width: 991px) { .pp-main .container { padding: 24px 24px 60px; } }
@@ -182,18 +182,18 @@ export default function ProductPage() {
           align-items: center;
           gap: 10px;
           font-size: 0.82rem;
-          color: rgba(13, 26, 99, 0.55);
+          color: rgba(42, 32, 24, 0.55);
           margin-bottom: 22px;
           flex-wrap: wrap;
         }
         .pp-crumbs a {
-          color: rgba(13, 26, 99, 0.55);
+          color: rgba(42, 32, 24, 0.55);
           text-decoration: none;
           transition: color 0.2s ease;
         }
-        .pp-crumbs a:hover { color: #0d1a63; }
+        .pp-crumbs a:hover { color: var(--text-main); }
         .pp-crumbs-sep { opacity: 0.5; }
-        .pp-crumbs-current { color: #0d1a63; font-weight: 600; }
+        .pp-crumbs-current { color: var(--text-main); font-weight: 600; }
 
         .pp-suggested {
           margin-top: 56px;
@@ -211,10 +211,10 @@ export default function ProductPage() {
           font-size: clamp(1.3rem, 2vw, 1.6rem);
           font-weight: 700;
           letter-spacing: -0.01em;
-          color: #0d1a63;
+          color: var(--text-main);
         }
         .pp-suggested-all {
-          color: rgba(13, 26, 99, 0.55);
+          color: rgba(42, 32, 24, 0.55);
           text-decoration: none;
           font-size: 0.85rem;
           font-weight: 600;
@@ -224,7 +224,7 @@ export default function ProductPage() {
           gap: 6px;
           transition: color 0.2s ease;
         }
-        .pp-suggested-all:hover { color: #0d1a63; }
+        .pp-suggested-all:hover { color: var(--text-main); }
 
         .pp-suggested-rail {
           display: grid;
@@ -255,28 +255,28 @@ export default function ProductPage() {
           /* Cream/navy palette matching the product detail card. */
           display: flex;
           flex-direction: column;
-          background: #faf8f4;
-          border: 1px solid rgba(13, 26, 99, 0.12);
+          background: var(--bg-panel);
+          border: 1px solid rgba(42, 32, 24, 0.12);
           border-radius: 16px;
           overflow: hidden;
           padding: 0;
           cursor: pointer;
           text-align: left;
           transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
-          color: #0d1a63;
+          color: var(--text-main);
         }
         :global([dir="rtl"]) .pp-suggested-card { text-align: right; }
         .pp-suggested-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 14px 32px rgba(34, 81, 164, 0.45);
-          border-color: rgba(13, 26, 99, 0.3);
+          box-shadow: 0 14px 32px rgba(139, 111, 78, 0.45);
+          border-color: rgba(42, 32, 24, 0.3);
         }
         .pp-suggested-img {
           position: relative;
           aspect-ratio: 4 / 3;
           overflow: hidden;
-          background: #ebe6db;
-          border-bottom: 1px solid rgba(13, 26, 99, 0.08);
+          background: var(--surface-soft);
+          border-bottom: 1px solid rgba(42, 32, 24, 0.08);
         }
         .pp-suggested-img img {
           width: 100%; height: 100%;
@@ -297,7 +297,7 @@ export default function ProductPage() {
           letter-spacing: 0.1em;
           padding: 3px 9px;
           border-radius: 999px;
-          box-shadow: 0 2px 6px rgba(13, 26, 99, 0.25);
+          box-shadow: 0 2px 6px rgba(42, 32, 24, 0.25);
         }
         :global([dir="rtl"]) .pp-suggested-badge { left: auto; right: 10px; }
         .pp-suggested-meta {
@@ -309,7 +309,7 @@ export default function ProductPage() {
         .pp-suggested-name {
           font-size: 0.95rem;
           font-weight: 700;
-          color: #0d1a63;
+          color: var(--text-main);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -319,7 +319,7 @@ export default function ProductPage() {
           gap: 8px;
           align-items: baseline;
           font-size: 0.9rem;
-          color: rgba(13, 26, 99, 0.65);
+          color: rgba(42, 32, 24, 0.65);
           font-weight: 600;
         }
         .pp-suggested-strike {

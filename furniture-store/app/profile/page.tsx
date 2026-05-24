@@ -169,14 +169,14 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>
         <p>{isRtl ? 'يرجى تسجيل الدخول لعرض هذه الصفحة' : 'Please log in to view this page'}</p>
       </main>
     );
   }
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'var(--bg-main)', height: '100%', color: 'var(--text-main)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       
       <main className="profile-main" style={{ maxWidth: '1300px', width: '100%', margin: '0 auto', display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
@@ -208,7 +208,7 @@ export default function ProfilePage() {
               </button>
               
               <div style={{ margin: 'auto 0 40px' }}>
-                 <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', borderRadius: 0 }}>
+                 <button onClick={logout} className="profile-tab-btn" style={{ color: '#ff6b6b', width: '100%', borderTop: '1px solid rgba(42,32,24,0.1)', paddingTop: '20px', borderRadius: 0 }}>
                     <i className="bi bi-box-arrow-right"></i> {isRtl ? 'تسجيل الخروج' : 'Logout'}
                  </button>
                  <button onClick={() => setShowDeleteConfirm(true)} className="profile-tab-btn" style={{ color: '#ff4d4d', width: '100%', opacity: 0.85, fontSize: '0.85rem' }}>
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                                 className="form-control"
                                 value={editName}
                                 onChange={(e) => setEditName(e.target.value)}
-                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '14px', height: '56px' }}
+                                style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid var(--line-soft)', color: 'var(--text-main)', borderRadius: '14px', height: '56px' }}
                              />
                           </div>
                           <div className="col-md-6">
@@ -245,7 +245,7 @@ export default function ProfilePage() {
                                 className="form-control"
                                 value={editPhone}
                                 onChange={(e) => setEditPhone(e.target.value)}
-                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '14px', height: '56px' }}
+                                style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid var(--line-soft)', color: 'var(--text-main)', borderRadius: '14px', height: '56px' }}
                              />
                           </div>
                        </div>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                    </div>
 
                    {isAddingAddress && (
-                      <form onSubmit={handleAddAddress} style={{ background: 'rgba(255,255,255,0.03)', padding: '30px', borderRadius: '24px', marginBottom: '30px', border: '1px solid var(--blue-deep)' }}>
+                      <form onSubmit={handleAddAddress} style={{ background: 'rgba(42,32,24,0.03)', padding: '30px', borderRadius: '24px', marginBottom: '30px', border: '1px solid var(--blue-deep)' }}>
                          <div className="row g-3">
                             <div className="col-md-4"><input type="text" className="form-control" placeholder={isRtl ? 'رقم المنزل' : 'House No.'} value={newAddress.house_no} onChange={(e) => setNewAddress({...newAddress, house_no: e.target.value})} /></div>
                             <div className="col-md-8"><input type="text" className="form-control" placeholder={isRtl ? 'الشارع' : 'Street'} value={newAddress.street} onChange={(e) => setNewAddress({...newAddress, street: e.target.value})} /></div>
@@ -421,7 +421,7 @@ export default function ProfilePage() {
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               autoFocus
               placeholder="DELETE"
-              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,77,77,0.4)', background: 'rgba(0,0,0,0.25)', color: 'white', marginBottom: '16px', fontFamily: 'var(--font-app), monospace', letterSpacing: '0.15em', textAlign: 'center', fontSize: '1rem' }}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,77,77,0.4)', background: 'rgba(42,32,24,0.05)', color: 'var(--text-main)', marginBottom: '16px', fontFamily: 'var(--font-app), monospace', letterSpacing: '0.15em', textAlign: 'center', fontSize: '1rem' }}
             />
             {deleteError && (
               <div style={{ background: 'rgba(255,77,77,0.1)', color: '#ff6b6b', padding: '10px', borderRadius: '8px', marginBottom: '14px', fontSize: '0.85rem' }}>
@@ -433,7 +433,7 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(''); }}
                 disabled={isDeleting}
-                style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid var(--line-soft)', color: 'white', borderRadius: '10px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '12px', background: 'transparent', border: '1px solid var(--line-soft)', color: 'var(--text-main)', borderRadius: '10px', fontWeight: 600, cursor: 'pointer' }}
               >
                 {isRtl ? 'إلغاء' : 'Cancel'}
               </button>
@@ -459,7 +459,7 @@ export default function ProfilePage() {
           padding: 16px 24px;
           border: 1px solid transparent;
           background: transparent;
-          color: white;
+          color: var(--text-main);
           border-radius: 16px;
           text-align: left;
           font-weight: 500;
@@ -467,25 +467,26 @@ export default function ProfilePage() {
           cursor: pointer;
         }
         .profile-tab-btn:hover {
-          background: rgba(255,255,255,0.03);
+          background: rgba(42, 32, 24, 0.05);
         }
         .profile-tab-btn.active {
-          background: var(--blue-deep);
-          border-color: var(--blue-main);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+          background: var(--text-main);
+          border-color: var(--text-main);
+          color: var(--bg-main);
+          box-shadow: 0 10px 20px rgba(42, 32, 24, 0.12);
         }
         .form-control {
-           background: rgba(255, 255, 255, 0.05) !important;
+           background: rgba(42, 32, 24, 0.04) !important;
            border: 1px solid var(--line-soft) !important;
-           color: white !important;
+           color: var(--text-main) !important;
            border-radius: 12px !important;
         }
         .transition-all {
           transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         input::placeholder {
-          color: white !important;
-          opacity: 0.35 !important;
+          color: var(--text-main) !important;
+          opacity: 0.4 !important;
         }
 
         @media (max-width: 900px) {

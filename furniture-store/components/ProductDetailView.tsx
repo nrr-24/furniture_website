@@ -6,6 +6,7 @@ import { FurnitureItem, Category, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useLanguage } from '../data/LanguageContext';
 import { useAuth } from '../data/AuthContext';
 import { useCart } from '../data/CartContext';
+import { useWishlist } from '../data/WishlistContext';
 
 
 const CUSTOM_KEYWORDS = /wood|door|kitchen|custom|خش|باب|أبواب|مطبخ|مطابخ|تفصيل/;
@@ -22,10 +23,23 @@ interface ProductDetailViewProps {
   onToggleFeatured?: () => void;
 }
 
+/* ============================================================
+ * Product detail view (Smartwood 2026 redesign)
+ *
+ * Visual brief: image 2 from the mockup pack — large product image
+ * on top, brand kicker, serif title, big price, circular color
+ * swatches, and side-by-side ADD TO CART + WISHLIST buttons.
+ *
+ * All carousel, variant, quantity, and cart wiring is preserved from
+ * the previous version. The CSS layer is the substantive change: new
+ * palette tokens, serif title, circular swatches, and the new button
+ * row. Wishlist is UI-only for now (no wishlist context exists).
+ * ============================================================ */
 export default function ProductDetailView({ item, category, onEdit, onToggleFeatured }: ProductDetailViewProps) {
   const { t, isRtl } = useLanguage();
   const { isCustomer, isAdmin } = useAuth();
   const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const router = useRouter();
 
   const allImages = useMemo(() => {
@@ -62,6 +76,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
   const [selectedType, setSelectedType] = useState<string | null>(item.types && item.types.length > 0 ? item.types[0] : null);
   const [selectedColor, setSelectedColor] = useState<string | null>(item.colors && item.colors.length > 0 ? item.colors[0] : null);
   const [qty, setQty] = useState(1);
+  const wishlisted = isWishlisted(item.id);
 
   // Reset selectors when the item changes (navigating between products on
   // the same route, e.g. via the "More from this collection" strip).
@@ -93,6 +108,13 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
     };
     for (let i = 0; i < qty; i++) addToCart(payload);
   };
+
+  // Brand kicker — show the category name when we have one, otherwise
+  // a generic "SMARTWOOD COLLECTION" label so the design always has the
+  // small uppercase eyebrow above the serif title (per image 2).
+  const kicker = category
+    ? (isRtl ? category.nameAr || category.name : category.name)
+    : (isRtl ? 'مجموعة سمارت وود' : 'SMARTWOOD COLLECTION');
 
   return (
     <div className="pd-wrap" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -136,9 +158,6 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
                 <div className="pd-counter" aria-live="polite">
                   {activeIdx + 1} / {allImages.length}
                 </div>
-                {/* Dot pagination — only renders on small screens (CSS controls
-                    visibility). Mirrors activeIdx and clicking a dot jumps
-                    to that slide, same as the thumb strip on desktop. */}
                 <div className="pd-dots" role="tablist" aria-label={isRtl ? 'الصور' : 'Images'}>
                   {allImages.map((_, i) => (
                     <button
@@ -158,8 +177,8 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         </div>
 
         <div className="pd-details">
+          <span className="pd-kicker">{kicker}</span>
           <h1 className="pd-title">{isRtl ? item.nameAr || item.name : item.name}</h1>
-          <div className="pd-title-underline" />
 
           <div className="pd-price-row">
             {hasSale ? (
@@ -168,15 +187,13 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
                 <span className="pd-sale-price">{activePrice} {t('currency')}</span>
               </>
             ) : (
-              <span className="pd-regular-price">{activePrice} {t('currency')}</span>
+              <span className="pd-regular-price">{activePrice} <span className="pd-currency">{t('currency')}</span></span>
             )}
           </div>
 
           <p className="pd-description">
-            <strong>{isRtl ? 'الوصف:' : 'Description:'}</strong>{' '}
             {isRtl ? item.descriptionAr || item.description : item.description}
           </p>
-          <div className="pd-desc-underline" />
 
           {item.types && item.types.length > 0 && (
             <div className="pd-selector-row">
@@ -239,21 +256,33 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
                 {!isCustom && isCustomer && (
                   <div className="pd-qty">
                     <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease">
-                      <i className="bi bi-chevron-left" />
+                      <i className="bi bi-dash" />
                     </button>
                     <span>{String(qty).padStart(2, '0')}</span>
                     <button onClick={() => setQty((q) => q + 1)} aria-label="Increase">
-                      <i className="bi bi-chevron-right" />
+                      <i className="bi bi-plus" />
                     </button>
                   </div>
                 )}
 
                 {(isCustom || isCustomer) ? (
-                  <button className="pd-cta" onClick={handleCta}>
-                    {isCustom
-                      ? (isRtl ? 'طلب عرض سعر' : 'GET QUOTE')
-                      : (isRtl ? 'أضف إلى العربة' : 'ADD TO CART')}
-                  </button>
+                  <div className="pd-action-row">
+                    <button className="pd-cta pd-cta-primary" onClick={handleCta}>
+                      {isCustom
+                        ? (isRtl ? 'طلب عرض سعر' : 'GET QUOTE')
+                        : (isRtl ? 'أضف إلى العربة' : 'ADD TO CART')}
+                    </button>
+                    {!isCustom && (
+                      <button
+                        className={`pd-cta pd-cta-wishlist ${wishlisted ? 'is-on' : ''}`}
+                        onClick={() => toggleWishlist(item.id)}
+                        aria-pressed={wishlisted}
+                      >
+                        <i className={`bi ${wishlisted ? 'bi-heart-fill' : 'bi-heart'}`} />
+                        <span>{isRtl ? 'المفضلة' : 'WISHLIST'}</span>
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   <div className="pd-login-hint">
                     {isRtl ? 'للتسوق، يرجى التسجيل' : 'Login to buy'}
@@ -268,28 +297,30 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
       <style jsx>{`
         .pd-wrap { width: 100%; }
         .pd-card {
-          /* Cream panel matching the homepage hero. Scoped color tokens used by
-             child rules below so we never leak these into global context. */
-          --pd-ink: #0d1a63;
-          --pd-ink-soft: rgba(13, 26, 99, 0.62);
-          --pd-line: rgba(13, 26, 99, 0.12);
-          --pd-surface: #faf8f4;
+          /* Scoped tokens — kept as a thin layer over the new global palette
+             so future tweaks to the product card don't perturb the rest of
+             the site. */
+          --pd-ink: var(--text-main);
+          --pd-ink-soft: var(--text-soft);
+          --pd-line: var(--line-soft);
+          --pd-surface: var(--bg-panel);
+          --pd-image-bg: var(--surface-soft);
 
           background: var(--pd-surface);
           color: var(--pd-ink);
-          border-radius: 24px;
+          border-radius: var(--r-card);
           overflow: hidden;
           display: flex;
           flex-direction: ${isRtl ? 'row-reverse' : 'row'};
-          min-height: 540px;
+          min-height: 560px;
           border: 1px solid var(--pd-line);
         }
         .pd-images {
           flex: 1.15;
           display: flex;
           flex-direction: row;
-          background: #fff;
-          min-height: 480px;
+          background: var(--pd-image-bg);
+          min-height: 500px;
         }
         .pd-thumbs {
           display: flex;
@@ -298,12 +329,12 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           padding: 18px 10px;
           overflow-y: auto;
           max-height: 640px;
-          background: rgba(13, 26, 99, 0.05);
+          background: rgba(42, 32, 24, 0.04);
         }
         .pd-thumb {
           width: 64px;
           height: 64px;
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
           border: 2px solid transparent;
           background: transparent;
@@ -343,8 +374,8 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           height: 42px;
           border: none;
           border-radius: 50%;
-          background: rgba(34, 81, 164, 0.72);
-          color: #fff;
+          background: rgba(31, 24, 18, 0.7);
+          color: var(--bg-main);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -357,7 +388,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
         }
         .pd-main-img:hover .pd-nav,
         .pd-nav:focus-visible { opacity: 1; }
-        .pd-nav:hover { background: rgba(34, 81, 164, 0.92); transform: translateY(-50%) scale(1.05); }
+        .pd-nav:hover { background: rgba(31, 24, 18, 0.9); transform: translateY(-50%) scale(1.05); }
         .pd-nav-prev { left: 14px; }
         .pd-nav-next { right: 14px; }
         :global([dir="rtl"]) .pd-nav-prev { left: auto; right: 14px; }
@@ -367,8 +398,8 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           position: absolute;
           bottom: 14px;
           right: 14px;
-          background: rgba(34, 81, 164, 0.72);
-          color: #fff;
+          background: rgba(31, 24, 18, 0.7);
+          color: var(--bg-main);
           font-size: 0.75rem;
           font-weight: 600;
           letter-spacing: 0.04em;
@@ -394,7 +425,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           z-index: 5;
           gap: 8px;
           padding: 6px 12px;
-          background: rgba(0, 0, 0, 0.32);
+          background: rgba(31, 24, 18, 0.55);
           backdrop-filter: blur(4px);
           border-radius: 999px;
           pointer-events: auto;
@@ -405,99 +436,139 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           border-radius: 50%;
           border: none;
           padding: 0;
-          background: rgba(255, 255, 255, 0.45);
+          background: rgba(242, 235, 224, 0.55);
           cursor: pointer;
           transition: background 0.2s ease, transform 0.2s ease, width 0.25s ease;
         }
-        .pd-dot:hover { background: rgba(255, 255, 255, 0.75); }
+        .pd-dot:hover { background: rgba(242, 235, 224, 0.85); }
         .pd-dot.is-active {
-          background: #fff;
-          /* Stretch the active dot horizontally for a clearer "you are here" cue. */
+          background: var(--bg-main);
           width: 22px;
           border-radius: 999px;
         }
 
         .pd-details {
           flex: 1;
-          padding: 44px 40px;
+          padding: 48px 44px;
           display: flex;
           flex-direction: column;
           overflow-y: auto;
         }
+
+        /* Brand kicker above the title — uppercase, tracked, soft. */
+        .pd-kicker {
+          font-family: var(--font-app);
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--pd-ink-soft);
+          margin-bottom: 14px;
+        }
+
         .pd-title {
-          font-size: clamp(1.8rem, 2.6vw, 2.4rem);
-          font-weight: 800;
+          font-family: var(--font-serif);
+          font-size: clamp(2rem, 3vw, 2.8rem);
+          font-weight: 500;
           color: var(--pd-ink);
-          margin: 0 0 6px;
-          letter-spacing: -0.01em;
-          line-height: 1.15;
+          margin: 0 0 18px;
+          letter-spacing: -0.015em;
+          line-height: 1.08;
         }
-        .pd-title-underline,
-        .pd-desc-underline {
-          width: 64px;
-          height: 2px;
-          background: var(--pd-ink);
-          opacity: 0.55;
-          margin-bottom: 22px;
-        }
+
         .pd-price-row {
           display: flex;
           align-items: baseline;
           gap: 14px;
-          margin-bottom: 24px;
+          margin-bottom: 22px;
           flex-wrap: wrap;
         }
-        .pd-regular-price { font-size: 1.7rem; font-weight: 700; color: var(--pd-ink); }
-        .pd-regular-price-strike { font-size: 1.15rem; color: var(--pd-ink-soft); text-decoration: line-through; text-decoration-thickness: 2px; }
-        .pd-sale-price { font-size: 1.8rem; font-weight: 800; color: #d93a3a; }
+        .pd-regular-price {
+          font-family: var(--font-app);
+          font-size: 1.85rem;
+          font-weight: 700;
+          color: var(--pd-ink);
+          letter-spacing: -0.01em;
+        }
+        .pd-currency {
+          font-size: 0.95rem;
+          font-weight: 600;
+          opacity: 0.75;
+          margin-left: 4px;
+        }
+        :global([dir="rtl"]) .pd-currency { margin-left: 0; margin-right: 4px; }
+        .pd-regular-price-strike {
+          font-size: 1.1rem;
+          color: var(--pd-ink-soft);
+          text-decoration: line-through;
+          text-decoration-thickness: 2px;
+        }
+        .pd-sale-price {
+          font-family: var(--font-app);
+          font-size: 1.85rem;
+          font-weight: 700;
+          color: #a8553a;
+        }
 
         .pd-description {
           color: var(--pd-ink-soft);
-          line-height: 1.75;
-          font-size: 0.98rem;
-          margin: 0 0 14px;
+          line-height: 1.7;
+          font-size: 0.96rem;
+          margin: 0 0 28px;
+          max-width: 56ch;
         }
-        .pd-description strong { color: var(--pd-ink); font-weight: 700; }
 
         .pd-selector-row {
           display: flex;
           align-items: center;
-          gap: 18px;
-          margin-bottom: 16px;
-          padding-bottom: 12px;
-          border-bottom: 1px solid var(--pd-line);
+          gap: 22px;
+          margin-bottom: 22px;
         }
         .pd-selector-label {
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           font-weight: 700;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.18em;
           color: var(--pd-ink-soft);
           text-transform: uppercase;
-          min-width: 58px;
+          min-width: 56px;
         }
         .pd-type-options, .pd-color-options {
           display: flex; gap: 10px; flex-wrap: wrap;
         }
         .pd-type-pill {
-          padding: 8px 16px; border-radius: 10px;
+          padding: 9px 18px;
+          border-radius: var(--r-pill);
           border: 1px solid var(--pd-line);
-          background: #fff; color: var(--pd-ink);
-          cursor: pointer; font-size: 0.85rem; font-weight: 600;
+          background: var(--bg-main);
+          color: var(--pd-ink);
+          cursor: pointer;
+          font-size: 0.82rem;
+          font-weight: 500;
+          letter-spacing: 0.02em;
           transition: all 0.2s ease;
         }
         .pd-type-pill:hover { border-color: var(--pd-ink); }
         .pd-type-pill.is-active {
-          background: var(--pd-ink); color: var(--pd-surface);
+          background: var(--pd-ink);
+          color: var(--bg-main);
           border-color: var(--pd-ink);
         }
+
+        /* Circular color swatches (per image 2 mockup) — slightly larger
+           than the old rounded squares, with a clean ring on active. */
         .pd-color-swatch {
-          width: 34px; height: 34px; border-radius: 8px;
-          border: 2px solid var(--pd-line);
-          padding: 0; cursor: pointer; transition: all 0.2s ease;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid var(--pd-line);
+          padding: 0;
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .pd-color-swatch:hover { transform: scale(1.08); }
         .pd-color-swatch.is-active {
-          border-color: var(--pd-ink); transform: scale(1.08);
-          box-shadow: 0 0 0 2px var(--pd-surface), 0 0 0 4px var(--pd-ink);
+          transform: scale(1.1);
+          box-shadow: 0 0 0 2px var(--pd-surface), 0 0 0 3px var(--pd-ink);
         }
 
         .pd-footer {
@@ -506,44 +577,93 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           display: flex;
           flex-direction: column;
           gap: 14px;
+          border-top: 1px solid var(--pd-line);
         }
+
+        /* Quantity stepper — pill-shaped, sits above the action row. */
         .pd-qty {
-          display: flex; align-items: center; justify-content: flex-end; gap: 14px;
-          padding: 6px 10px;
-          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          padding: 8px 14px;
+          background: var(--bg-main);
           border: 1px solid var(--pd-line);
-          border-radius: 10px;
+          border-radius: var(--r-pill);
           width: fit-content;
-          align-self: flex-end;
+          align-self: ${isRtl ? 'flex-start' : 'flex-start'};
         }
         .pd-qty button {
-          width: 30px; height: 30px; border: none; background: transparent;
-          color: var(--pd-ink); cursor: pointer; border-radius: 6px;
-          display: flex; align-items: center; justify-content: center;
+          width: 30px;
+          height: 30px;
+          border: none;
+          background: transparent;
+          color: var(--pd-ink);
+          cursor: pointer;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.1rem;
         }
-        .pd-qty button:hover { background: rgba(13, 26, 99, 0.08); }
-        .pd-qty span { font-weight: 700; min-width: 28px; text-align: center; color: var(--pd-ink); }
+        .pd-qty button:hover { background: rgba(42, 32, 24, 0.06); }
+        .pd-qty span { font-weight: 600; min-width: 28px; text-align: center; color: var(--pd-ink); }
+
+        /* Action row — ADD TO CART (solid espresso) + WISHLIST (outlined),
+           sized 65/35 on desktop, stacks 1fr/1fr on mobile. */
+        .pd-action-row {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr;
+          gap: 12px;
+        }
 
         .pd-cta {
-          width: 100%; padding: 18px;
-          background: var(--pd-ink); color: var(--pd-surface);
-          border: none; border-radius: 14px;
-          font-size: 1.05rem; font-weight: 700; letter-spacing: 0.08em;
+          padding: 18px;
+          border: none;
+          border-radius: var(--r-pill);
+          font-family: var(--font-app);
+          font-size: 0.88rem;
+          font-weight: 600;
+          letter-spacing: 0.16em;
           cursor: pointer;
-          transition: transform 0.15s ease, opacity 0.15s ease;
+          transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s ease, color 0.2s ease;
+          text-transform: uppercase;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
         }
-        .pd-cta:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        .pd-cta-primary {
+          background: var(--pd-ink);
+          color: var(--bg-main);
+        }
+        .pd-cta-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        .pd-cta-wishlist {
+          background: transparent;
+          color: var(--pd-ink);
+          border: 1px solid var(--pd-ink);
+        }
+        .pd-cta-wishlist:hover { background: var(--pd-ink); color: var(--bg-main); }
+        .pd-cta-wishlist.is-on {
+          background: var(--pd-ink);
+          color: var(--bg-main);
+        }
+        .pd-cta-wishlist i { font-size: 1rem; }
+
         .pd-cta-edit {
-          background: #2e5bff; color: #fff;
+          background: var(--accent-deep); color: var(--bg-main);
           display: inline-flex; align-items: center; justify-content: center; gap: 10px;
         }
+
         .pd-feature-toggle {
           width: 100%; padding: 12px 16px;
           display: inline-flex; align-items: center; justify-content: center; gap: 10px;
           background: rgba(181, 138, 0, 0.08); color: #8a6700;
           border: 1px solid rgba(181, 138, 0, 0.35);
-          border-radius: 12px;
-          font-size: 0.9rem; font-weight: 700; letter-spacing: 0.02em;
+          border-radius: var(--r-pill);
+          font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em;
           cursor: pointer;
           transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
         }
@@ -558,6 +678,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           color: #8a6700;
         }
         .pd-feature-toggle i { color: #b58a00; }
+
         .pd-login-hint {
           text-align: center; color: var(--pd-ink-soft); font-size: 0.9rem; padding: 14px;
         }
@@ -566,64 +687,54 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
            block's internal layout flips so the main image sits above a
            horizontal thumbnail strip — much better than the awkward
            thumbs-on-left + main-on-right that gets squashed on narrow widths. */
-        /* Tablet-down: card stacks (image on top, details below). The image
-           block's internal layout flips so the main image sits above a
-           horizontal thumbnail strip — much better than the awkward
-           thumbs-on-left + main-on-right that gets squashed on narrow widths. */
         @media (max-width: 960px) {
           .pd-card {
             flex-direction: column !important;
             min-height: auto;
-            border-radius: 20px;
+            border-radius: var(--r-card);
           }
           .pd-images {
             min-height: auto;
           }
           .pd-main-img {
-            aspect-ratio: 16 / 11;
+            aspect-ratio: 4 / 3;
             min-height: 0;
-            max-height: 44vh;
+            max-height: 56vh;
           }
           /* Drop the thumbnail strip on small screens — replaced by the
              dot pagination overlay inside the main image. */
           .pd-thumbs { display: none !important; }
           .pd-dots { display: inline-flex; }
-          /* Move the counter to the top corner so it doesn't collide with
-             the dots that now sit at the bottom-center. */
           .pd-counter { top: 12px; bottom: auto; right: 12px; }
           [dir="rtl"] .pd-counter { right: auto; left: 12px; }
-          .pd-details { padding: 22px 22px; }
-          .pd-title { font-size: clamp(1.25rem, 3.6vw, 1.55rem); }
-          .pd-title-underline,
-          .pd-desc-underline { margin-bottom: 14px; width: 48px; }
-          .pd-price-row { gap: 10px; margin-bottom: 16px; }
-          .pd-regular-price { font-size: 1.2rem; }
-          .pd-sale-price { font-size: 1.3rem; }
-          .pd-regular-price-strike { font-size: 0.9rem; }
-          .pd-description { font-size: 0.88rem; line-height: 1.55; }
-          .pd-selector-row { gap: 14px; margin-bottom: 12px; padding-bottom: 10px; }
-          .pd-selector-label { font-size: 0.7rem; letter-spacing: 0.12em; min-width: 50px; }
-          .pd-type-pill { padding: 6px 12px; font-size: 0.78rem; }
+          .pd-details { padding: 28px 24px 24px; }
+          .pd-kicker { margin-bottom: 10px; font-size: 0.66rem; }
+          .pd-title { font-size: clamp(1.6rem, 5.5vw, 2rem); margin-bottom: 14px; }
+          .pd-price-row { gap: 10px; margin-bottom: 18px; }
+          .pd-regular-price, .pd-sale-price { font-size: 1.45rem; }
+          .pd-regular-price-strike { font-size: 0.95rem; }
+          .pd-description { font-size: 0.9rem; line-height: 1.6; margin-bottom: 22px; }
+          .pd-selector-row { gap: 16px; margin-bottom: 18px; }
+          .pd-selector-label { font-size: 0.7rem; letter-spacing: 0.14em; min-width: 50px; }
+          .pd-type-pill { padding: 7px 14px; font-size: 0.78rem; }
           .pd-color-swatch { width: 28px; height: 28px; }
-          .pd-footer { padding-top: 18px; gap: 10px; }
-          .pd-cta { padding: 14px; font-size: 0.95rem; }
+          .pd-footer { padding-top: 20px; gap: 12px; }
+          .pd-action-row { grid-template-columns: 1fr 1fr; }
+          .pd-cta { padding: 15px; font-size: 0.82rem; letter-spacing: 0.12em; }
           .pd-feature-toggle { font-size: 0.82rem; padding: 10px 14px; }
         }
         @media (max-width: 600px) {
-          .pd-card { border-radius: 16px; }
-          .pd-main-img { aspect-ratio: 4 / 3; max-height: 40vh; }
-          .pd-thumb { width: 46px; height: 46px; }
-          .pd-details { padding: 18px 16px; }
-          .pd-title { font-size: clamp(1.15rem, 5vw, 1.4rem); }
-          .pd-price-row { margin-bottom: 12px; }
-          .pd-regular-price { font-size: 1.1rem; }
-          .pd-sale-price { font-size: 1.2rem; }
-          .pd-description { font-size: 0.85rem; }
-          .pd-selector-row { gap: 10px; margin-bottom: 10px; padding-bottom: 8px; }
+          .pd-main-img { aspect-ratio: 4 / 3; max-height: 48vh; }
+          .pd-details { padding: 22px 18px 20px; }
+          .pd-title { font-size: 1.6rem; }
+          .pd-price-row { margin-bottom: 14px; }
+          .pd-regular-price, .pd-sale-price { font-size: 1.3rem; }
+          .pd-description { font-size: 0.85rem; margin-bottom: 20px; }
+          .pd-selector-row { gap: 12px; margin-bottom: 14px; }
           .pd-selector-label { min-width: 44px; }
-          .pd-type-pill { padding: 5px 10px; font-size: 0.75rem; }
-          .pd-cta { padding: 12px; font-size: 0.9rem; border-radius: 12px; }
-          .pd-feature-toggle { font-size: 0.78rem; padding: 9px 12px; border-radius: 10px; }
+          .pd-type-pill { padding: 6px 12px; font-size: 0.74rem; }
+          .pd-cta { padding: 13px; font-size: 0.78rem; }
+          .pd-feature-toggle { font-size: 0.76rem; padding: 9px 12px; }
         }
       `}</style>
     </div>

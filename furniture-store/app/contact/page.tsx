@@ -99,7 +99,7 @@ export default function ContactPage() {
           <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>
             {isRtl ? 'تواصل معنا' : 'Contact Us'}
           </h2>
-          <p style={{ color: 'rgba(13, 26, 99, 0.7)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
+          <p style={{ color: 'rgba(42, 32, 24, 0.7)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
             {isRtl
               ? 'نحن هنا لتحويل رؤيتك إلى واقع. تواصل معنا اليوم لتحصل على استشارتك.'
               : 'We are here to turn your vision into reality. Reach out to us today for a consultation.'}
@@ -297,13 +297,13 @@ export default function ContactPage() {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: rgba(13, 26, 99, 0.06);
+          background: rgba(42, 32, 24, 0.06);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 20px;
-          border: 1px solid rgba(13, 26, 99, 0.12);
-          color: #0d1a63;
+          border: 1px solid rgba(42, 32, 24, 0.12);
+          color: var(--text-main);
         }
         .contact-info-label {
           margin: 0 0 8px;
@@ -314,7 +314,7 @@ export default function ContactPage() {
           text-align: center;
         }
         .contact-info-text {
-          color: rgba(13, 26, 99, 0.6);
+          color: rgba(42, 32, 24, 0.6);
           margin: 0;
           font-size: 0.95rem;
           text-align: center;
@@ -327,9 +327,9 @@ export default function ContactPage() {
         /* Contact form — cream/navy palette matching the homepage hero & product detail card.
            Scoped tokens so no other page is affected. */
         .contact-form-panel {
-          --cf-ink: #0d1a63;
-          --cf-ink-soft: rgba(13, 26, 99, 0.62);
-          --cf-line: rgba(13, 26, 99, 0.14);
+          --cf-ink: var(--text-main);
+          --cf-ink-soft: rgba(42, 32, 24, 0.62);
+          --cf-line: rgba(42, 32, 24, 0.14);
           --cf-surface: var(--sand-soft);
 
           background: var(--cf-surface);
@@ -381,15 +381,15 @@ export default function ContactPage() {
         .contact-form-panel .contact-input:focus {
           outline: none;
           border-color: var(--cf-ink);
-          box-shadow: 0 0 0 3px rgba(13, 26, 99, 0.18);
+          box-shadow: 0 0 0 3px rgba(42, 32, 24, 0.18);
         }
         .contact-form-panel .contact-input::placeholder {
-          color: rgba(13, 26, 99, 0.4);
+          color: rgba(42, 32, 24, 0.4);
         }
 
         .contact-form-panel select.contact-input {
           appearance: none;
-          /* Chevron stroked in navy (#0d1a63) — URL-encoded for data URI */
+          /* Chevron stroked in navy (var(--text-main)) — URL-encoded for data URI */
           background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d1a63' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
           background-repeat: no-repeat;
           background-position: right 14px center;
@@ -455,11 +455,11 @@ export default function ContactPage() {
           letter-spacing: 0.08em;
           cursor: pointer;
           transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-          box-shadow: 0 8px 22px rgba(34, 81, 164, 0.35);
+          box-shadow: 0 8px 22px rgba(139, 111, 78, 0.35);
         }
         .contact-form-panel .contact-submit:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 12px 30px rgba(34, 81, 164, 0.5);
+          box-shadow: 0 12px 30px rgba(139, 111, 78, 0.5);
         }
         .contact-form-panel .contact-submit:disabled {
           opacity: 0.65;

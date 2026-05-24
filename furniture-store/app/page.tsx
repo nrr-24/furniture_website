@@ -1,349 +1,322 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../data/LanguageContext';
-import { useAuth } from '../data/AuthContext';
-import { useCart } from '../data/CartContext';
 import { FurnitureItem, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
-import FurnitureManager from '../components/FurnitureManager';
+import { HOME_ASSETS, LIVING_TILES } from '../data/homeAssets';
 import Footer from '../components/layout/Footer';
 
-const HERO_BANNERS = [
-  {
-    id: 'beez',
-    titleEn: 'BEEZ COLLECTION',
-    titleAr: 'مجموعة بيز',
-    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0003_013.jpg',
-    mobileImage: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0003_013.jpg',
-    link: '/shop'
-  }
+/* ============================================================
+ * Homepage (Smartwood 2026 redesign)
+ *
+ * Sections, top→bottom:
+ *   1. Hero — split editorial layout (image right, copy left)
+ *   2. Feature strip — 4 inline icon+label items
+ *   3. Excellence in Every Detail — 2-col with hardware closeup
+ *   4. Designed for Living — 4-card category grid
+ *   5. Proudly Kuwaiti — heritage banner with 26+ badge
+ *   6. German Quality — 4-up feature row
+ *   7. Quote card — "we craft legacy" pull quote (mobile-first surface)
+ *   8. SmartWood Collection — 4 product cards from Supabase
+ *   9. Mini benefit chips — Custom / Craftsmanship / Sustainable / Support
+ *  10. Compare Our Models — desktop-only spec table
+ *
+ * Strings are inlined as `isRtl ? ar : en` for parity with the rest of
+ * the codebase (centralized keys also exist in LanguageContext).
+ * All image references live in data/homeAssets.ts — that's the single
+ * place to swap placeholder photography for the real Smartwood shots.
+ * ============================================================ */
+
+// Pillar icons for the 4-up feature strip + "German Quality" row.
+// Using Bootstrap Icons since the project already loads the font.
+const FEATURE_PILLARS = [
+  { key: 'years',       icon: 'bi-patch-check',  enLabel: '26+ Years of Excellence',   arLabel: 'أكثر من 26 سنة من التميز' },
+  { key: 'wood',        icon: 'bi-tree',         enLabel: 'German Wood',               arLabel: 'خشب ألماني' },
+  { key: 'accessories', icon: 'bi-bounding-box', enLabel: 'German & Austrian Accessories', arLabel: 'إكسسوارات ألمانية ونمساوية' },
+  { key: 'techniques',  icon: 'bi-diagram-3',    enLabel: 'Latest Techniques',         arLabel: 'أحدث التقنيات' },
 ];
 
-const HERO_HOTSPOTS = [
+const QUALITY_FEATURES = [
   {
-    id: 'cnc',
-    top: '45%',
-    left: '75%',
-    titleEn: 'Advanced CNC Precision',
-    titleAr: 'دقة CNC المتقدمة',
-    textEn: 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
-    textAr: 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.',
-    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0003_030.jpg'
+    key: 'wood',
+    icon: 'bi-tree',
+    enTitle: 'Premium German Wood',
+    arTitle: 'خشب ألماني فاخر',
+    enText: 'Sourced for durability and natural beauty.',
+    arText: 'مصدره مختار من أجل المتانة والجمال الطبيعي.',
   },
   {
-    id: 'materials',
-    top: '20%',
-    left: '50%',
-    titleEn: 'Premium Sourcing',
-    titleAr: 'مصادر مواد فاخرة',
-    textEn: 'Sustainable woods tested to withstand the Gulf\'s unique climate.',
-    textAr: 'خشب مستدام تم اختباره لتحمل مناخ الخليج الفريد.',
-    image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0024_009.jpg'
+    key: 'accessories',
+    icon: 'bi-bounding-box',
+    enTitle: 'German & Austrian Accessories',
+    arTitle: 'إكسسوارات ألمانية ونمساوية',
+    enText: 'Precision hardware for smooth performance.',
+    arText: 'أجهزة دقيقة لأداء سلس.',
   },
   {
-    id: 'kuwait',
-    top: '25%',
-    left: '88%',
-    titleEn: 'Made in Kuwait',
-    titleAr: 'صُنع في الكويت',
-    textEn: 'A national brand committed to local excellence and superior support.',
-    textAr: 'علامة وطنية تلتزم بالتميز المحلي ودعم أفضل لعملائنا.',
-  }
+    key: 'techniques',
+    icon: 'bi-diagram-3',
+    enTitle: 'Advanced Techniques',
+    arTitle: 'تقنيات متقدمة',
+    enText: 'Latest technology for perfect finishes.',
+    arText: 'أحدث التقنيات لتشطيب مثالي.',
+  },
+  {
+    key: 'lasting',
+    icon: 'bi-gear',
+    enTitle: 'Built to Last',
+    arTitle: 'بُني ليدوم',
+    enText: 'Furniture that stands the test of time.',
+    arText: 'أثاث يصمد أمام اختبار الزمن.',
+  },
 ];
 
+const MINI_BENEFITS = [
+  { key: 'custom',     icon: 'bi-pencil',      enTitle: 'Custom Designs',     arTitle: 'تصاميم مخصصة',  enSub: 'Tailored to your space',   arSub: 'مُصممة لمساحتك' },
+  { key: 'craft',      icon: 'bi-hammer',      enTitle: 'Expert Craftsmanship', arTitle: 'حرفية متمرسة',  enSub: 'Attention to every detail', arSub: 'اهتمام بكل تفصيل' },
+  { key: 'sustain',    icon: 'bi-leaf',        enTitle: 'Sustainable Choice', arTitle: 'خيار مستدام',  enSub: 'Responsibly sourced',      arSub: 'مصدرها مسؤول' },
+  { key: 'support',    icon: 'bi-headset',     enTitle: 'After Sales Support', arTitle: 'دعم ما بعد البيع', enSub: 'We care, always',         arSub: 'نهتم بكم دائماً' },
+];
 
-
-
-/**
- * Column-based responsive image grid for the homepage hero's right aside.
- * Pattern adapted from https://www.w3schools.com/howto/howto_css_image_grid_responsive.asp —
- * each outer array is a column; nested items stack top-to-bottom, with per-item
- * flex weights below producing varied sizing.
- */
-const HERO_GRID_COLUMNS: { src: string }[][] = [
-  [
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0028_005.jpg' },
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0002_014.jpg' },
-  ],
-  [
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg' },
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0001_001.jpg' },
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0025_008.jpg' },
-  ],
-  [
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg' },
-    { src: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg' },
-  ],
+// Compare-table specs are not (yet) modeled in the Supabase products table,
+// so each visible column gets a stub block of attributes keyed by index.
+// Phase 7 (or a follow-up DB migration) can replace this with real fields.
+const COMPARE_SPECS = [
+  { enKey: 'Wood Finish',  arKey: 'نوع الخشب',     vals: ['Walnut',    'Oak',        'Maple'] },
+  { enKey: 'Coverage',     arKey: 'التغطية',       vals: ['Full',      'Standard',   'Standard'] },
+  { enKey: 'Warranty',     arKey: 'الضمان',        vals: ['10 years',  '5 years',    '5 years'] },
+  { enKey: 'Hardware',     arKey: 'الإكسسوارات',   vals: ['Blum',      'Hettich',    'Hettich'] },
 ];
 
 export default function HomePage() {
-  const { t, isRtl } = useLanguage();
-  const { isAdmin, isCustomer } = useAuth();
-  const { addToCart } = useCart();
+  const { isRtl } = useLanguage();
   const { items, initialized } = useFurniture();
-  const [showManager, setShowManager] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<FurnitureItem | null>(null);
-
-  const currentHero = HERO_BANNERS[0]; // Easily swap index or find by ID
-
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll logic for slider
-  useEffect(() => {
-    if (!sliderRef.current) return;
-    const interval = setInterval(() => {
-      if (sliderRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-        // If we are at the end, scroll to beginning safely, else scroll by one item width
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          sliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          sliderRef.current.scrollBy({ left: 350, behavior: 'smooth' });
-        }
-      }
-    }, 2000); // Trigger every 2s
-    return () => clearInterval(interval);
-  }, []);
 
   if (!initialized) return null;
 
+  // Top 4 items for the Collection grid; first 3 also feed the Compare table.
+  const featuredItems: FurnitureItem[] = items.slice(0, 4);
+  const compareItems: FurnitureItem[] = items.slice(0, 3);
+
+  const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
+
   return (
-    <main className="app-content" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* 1. Hero Section (The First Impression) */}
-      <section className="hero-viewport home-hero">
-        {/* Background Layer with entrance animation */}
-        <div className="hero-bg-static">
-          <picture>
-            <img src={currentHero.image} alt="" />
-          </picture>
+    <main className="app-content home-2026" dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* === 1. Hero =========================================== */}
+      <section className="sw-hero">
+        <div className="sw-hero-copy">
+          <h1 className="sw-hero-title">
+            {isRtl ? (
+              <>
+                صُنع ليدوم.
+                <br />
+                خُلق ليلهم.
+              </>
+            ) : (
+              <>
+                Built to last.
+                <br />
+                Made to inspire.
+              </>
+            )}
+          </h1>
+          <p className="sw-hero-body">
+            {isRtl
+              ? 'مصنع سمارت وود هو رائد في الكويت في صناعة الأثاث الفاخر منذ أكثر من 26 سنة.'
+              : 'SmartWood factory has been a leader in the kuwaiti high-end furniture for more than 26 years.'}
+          </p>
+          <Link href="/about" className="sw-btn-outline">
+            <span>{isRtl ? 'اكتشف الحرفية' : 'Discover Craftsmanship'}</span>
+            <i className={`bi ${arrow}`}></i>
+          </Link>
         </div>
 
-        {/* Hotspots for Desktop */}
-        <div className="hero-hotspots-container">
-          {HERO_HOTSPOTS.map((spot) => (
-            <div
-              key={spot.id}
-              className="hero-hotspot"
-              style={isRtl ? { top: spot.top, right: spot.left } : { top: spot.top, left: spot.left }}
-            >
-              <div className="hotspot-trigger">
-                <div className="hotspot-dot" />
-                <div className="hotspot-pulse" />
-              </div>
-              <div className="hotspot-tooltip">
-                <div className="tooltip-content">
-                  {spot.image && (
-                    <div className="tooltip-img">
-                      <img src={spot.image} alt="" />
-                    </div>
-                  )}
-                  <div className="tooltip-text">
-                    <h4>{isRtl ? spot.titleAr : spot.titleEn}</h4>
-                    <p>{isRtl ? spot.textAr : spot.textEn}</p>
-                  </div>
-                </div>
-              </div>
+        <div className="sw-hero-media" aria-hidden="true">
+          <img src={HOME_ASSETS.hero.src} alt="" />
+        </div>
+      </section>
 
-            </div>
+      {/* === 2. Feature strip ================================== */}
+      <section className="sw-feature-strip">
+        {FEATURE_PILLARS.map((p, idx) => (
+          <div key={p.key} className="sw-feature-cell">
+            <i className={`bi ${p.icon}`}></i>
+            <span>{isRtl ? p.arLabel : p.enLabel}</span>
+            {idx < FEATURE_PILLARS.length - 1 && <span className="sw-feature-divider" aria-hidden="true" />}
+          </div>
+        ))}
+      </section>
+
+      {/* === 3. Excellence in Every Detail ===================== */}
+      <section className="sw-excellence">
+        <div className="sw-excellence-copy">
+          <span className="section-kicker">{isRtl ? 'وعدنا' : 'OUR PROMISE'}</span>
+          <h2 className="sw-section-title">
+            {isRtl ? 'تميّز في كل تفصيل' : (<>Excellence in<br />Every Detail</>)}
+          </h2>
+          <p className="sw-body">
+            {isRtl
+              ? 'نستخدم الخشب الألماني عالي الجودة وأحدث التقنيات والحلول، وإكسسوارات ألمانية ونمساوية فاخرة.'
+              : 'We use high quality German wood, latest techniques and solutions, and premium German & Austrian accessories.'}
+          </p>
+          <p className="sw-body">
+            {isRtl
+              ? 'كل قطعة مصنوعة بدقة، مبنية لتدوم لأجيال.'
+              : 'Every piece is crafted with precision, built to last for generations.'}
+          </p>
+          <Link href="/about" className="sw-link-arrow">
+            <span>{isRtl ? 'اقرأ المزيد' : 'Learn More'}</span>
+            <i className={`bi ${arrow}`}></i>
+          </Link>
+        </div>
+        <div className="sw-excellence-media">
+          <img src={HOME_ASSETS.hardware.src} alt={isRtl ? 'مفصلة ألمانية فاخرة' : 'Premium German hinge'} />
+        </div>
+      </section>
+
+      {/* === 4. Designed for Living. Crafted for Life. ========= */}
+      <section className="sw-living">
+        <h2 className="sw-section-title sw-section-title-center">
+          {isRtl ? 'مصمم للحياة. مصنوع للأبد.' : 'Designed for Living. Crafted for Life.'}
+        </h2>
+        <div className="sw-living-grid">
+          {LIVING_TILES.map((c) => (
+            <Link key={c.key} href={c.href} className="sw-living-tile">
+              <img src={c.src} alt={isRtl ? c.arLabel : c.enLabel} />
+              <span className="sw-living-label">{isRtl ? c.arLabel : c.enLabel}</span>
+            </Link>
           ))}
         </div>
+      </section>
 
-        <div className="home-hero-content">
-          {/* Left Side: Copy, Gallery, Actions */}
-          <div className="split-left">
-
-            <h1 style={{ fontWeight: 800, fontSize: 'clamp(2.5rem, 8vw, 4rem)', letterSpacing: 'normal', lineHeight: 1.1, textAlign: isRtl ? 'right' : 'left' }}>
-              <span style={{ fontWeight: 800 }}>
-                {isRtl ? 'سمارت وود:' : 'Smartwood:'}
-              </span>
-              <br />
-              <span>
-                {isRtl ? 'حيث الطبيعة تلتقي بالدقة.' : 'Nature Meets Precision.'}
-              </span>
-            </h1>
-
-            <div className="hero-main-content-fade-in">
-              <p className="smartwood-description" style={{ textAlign: isRtl ? 'right' : 'left', lineHeight: 1.6, marginInline: '0' }}>
-                {isRtl
-                  ? 'إعادة تعريف مفهوم النجارة الفاخرة في الكويت. تصاميم داخلية تعبر عن قصتك.'
-                  : 'Redefining luxury woodworking in Kuwait. Bespoke interiors that tell your story.'}
-              </p>
-
-              <div className="hero-main-actions" style={{ marginBottom: '40px' }}>
-                <Link href="/shop" className="hero-primary-btn" style={{ textDecoration: 'none' }}>
-                  {isRtl ? 'استكشف الفن' : 'Explore the Art'}
-                </Link>
-                <Link href="/contact" className="hero-secondary-btn" style={{ textDecoration: 'none' }}>
-                  {isRtl ? 'تواصل معنا' : 'Connect with Us'}
-                </Link>
-              </div>
-
-              {/* Persistent Feature Box - Dynamic First Product */}
-              {items && items.length > 0 && (
-                <Link href={`/shop/product/${items[0].id}`} className="hero-feature-box" style={{ textDecoration: 'none' }}>
-                  <div className="feature-box-content">
-                    <div className="feature-box-img">
-                      <img src={items[0].image || FALLBACK_IMAGE} alt={isRtl ? items[0].nameAr : items[0].name} />
-                    </div>
-                    <div className="feature-box-text">
-                      <h4>{isRtl ? items[0].nameAr : items[0].name}</h4>
-                      <p style={{ wordSpacing: '0.15em' }}>{isRtl ? items[0].descriptionAr : items[0].description}</p>
-                    </div>
-                  </div>
-                </Link>
-              )}
-            </div>
-
+      {/* === 5. Proudly Kuwaiti banner ========================= */}
+      <section className="sw-heritage">
+        <img className="sw-heritage-bg" src={HOME_ASSETS.factory.src} alt="" aria-hidden="true" />
+        <div className="sw-heritage-scrim" aria-hidden="true" />
+        <div className="sw-heritage-inner">
+          <div className="sw-heritage-copy">
+            <span className="section-kicker sw-heritage-kicker">EST. 1998</span>
+            <h2 className="sw-heritage-title">
+              {isRtl ? (<>كويتيون بفخر.<br />ملهَمون عالمياً.</>) : (<>Proudly Kuwaiti.<br />Globally Inspired.</>)}
+            </h2>
+            <p className="sw-heritage-body">
+              {isRtl
+                ? 'مصنع سمارت وود رائد في الكويت في صناعة الأثاث الفاخر منذ أكثر من 26 سنة.'
+                : 'SmartWood factory has been a leader in the kuwaiti high-end furniture for more than 26 years.'}
+            </p>
+            <Link href="/about" className="sw-link-arrow sw-link-arrow-light">
+              <span>{isRtl ? 'اكتشف قصتنا' : 'Learn Our Story'}</span>
+              <i className={`bi ${arrow}`}></i>
+            </Link>
+          </div>
+          <div className="sw-heritage-badge" aria-hidden="true">
+            <span className="sw-heritage-badge-top">{isRtl ? 'سنوات من' : 'YEARS OF'}</span>
+            <span className="sw-heritage-badge-num">26+</span>
+            <span className="sw-heritage-badge-bot">{isRtl ? 'التميّز' : 'EXCELLENCE'}</span>
           </div>
         </div>
       </section>
 
-      {/* 2. Horizontal Scroll Gallery (The New Slider) */}
-      <section className="horizontal-slider-section">
-        <div className="slider-header">
-          <span className="section-kicker">{isRtl ? 'تصاميمنا المذهلة' : 'Our Stunning Designs'}</span>
-          <h2 className="section-title">{isRtl ? 'معرض الصور' : 'Gallery Experience'}</h2>
-        </div>
-        <div className="slider-track" ref={sliderRef} style={{ scrollBehavior: 'smooth' }}>
-          {[
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0001_001.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0028_005.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0002_014.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0025_008.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0003_007.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0004_012.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/16x9_0000_002.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0029_004.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0031_002.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0032_001.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0000_016.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0003_013.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0005_011.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0006_010.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0012_004.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/4x5_0013_003.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0000_010.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0001_009.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0002_008.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0004_006.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0006_004.jpg", link: "/shop" },
-            { src: "https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0007_003.jpg", link: "/shop" }
-          ].map((item, i) => (
-            <div key={i} className="slider-item">
-              <img src={item.src} alt="" loading="lazy" />
-              <div className="slider-overlay" />
+      {/* === 6. German Quality. Timeless Strength. ============= */}
+      <section className="sw-quality">
+        <h2 className="sw-section-title sw-section-title-center">
+          {isRtl ? 'جودة ألمانية. متانة خالدة.' : 'German Quality. Timeless Strength.'}
+        </h2>
+        <div className="sw-quality-grid">
+          {QUALITY_FEATURES.map((q) => (
+            <div key={q.key} className="sw-quality-cell">
+              <i className={`bi ${q.icon}`}></i>
+              <h3 className="sw-quality-title">{isRtl ? q.arTitle : q.enTitle}</h3>
+              <p className="sw-quality-text">{isRtl ? q.arText : q.enText}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 3. More Perspectives — Editorial 3-Column Layout */}
-      <section className="home-perspectives">
-        <div className="home-perspectives-header">
-          <h2 className="section-title home-perspectives-title">
-            {isRtl ? 'وجهات نظر أخرى' : 'More Perspectives'}
-          </h2>
-        </div>
-
-        <div className="home-perspectives-grid">
-          {/* Column 1 (LEFT, offset DOWN): card top, image bottom — warm wood tones */}
-          <Link href="/shop#all-designs" className="perspective-col perspective-col-down perspective-wood">
-            <div className="perspective-card">
-              <h3>{isRtl ? 'الخشب الدافئ' : 'Warm Wood Craft'}</h3>
-              <p>
-                {isRtl
-                  ? 'مساحات يجتمع فيها الجوز المصنوع يدوياً والتفاصيل الدقيقة. قطع تحمل دفء الطبيعة إلى كل زاوية.'
-                  : 'Spaces where hand-finished walnut meets subtle joinery. Warm, tactile pieces made to anchor your living rooms and libraries.'}
-              </p>
-              <span className="perspective-cta">
-                {isRtl ? 'استكشف المساحات' : 'Explore Living Spaces'}
-                <i className={isRtl ? 'bi bi-arrow-left' : 'bi bi-arrow-right'}></i>
-              </span>
-            </div>
-            <div className="perspective-img">
-              <img src="/images/home/perspective-1-wood.png" alt={isRtl ? 'مساحة معيشة خشبية' : 'Warm wood living space'} />
-            </div>
-          </Link>
-
-          {/* Column 2 (MIDDLE, stays UP): image top, card bottom — cream focal */}
-          <Link href="/shop#all-designs" className="perspective-col perspective-col-up perspective-cream">
-            <div className="perspective-img">
-              <img src="/images/home/perspective-2-beige.png" alt={isRtl ? 'تصميم أنيق' : 'Timeless elegance'} />
-            </div>
-            <div className="perspective-card">
-              <h3>{isRtl ? 'تبحث عن أناقة خالدة؟' : 'Looking for Timeless Elegance?'}</h3>
-              <p>
-                {isRtl
-                  ? 'اكتشف مجموعتنا الكاملة — تصاميم مصنوعة لتضفي الجمال والوظيفة على أي مساحة.'
-                  : 'Explore our full range of furniture, crafted to bring beauty and functionality to any space.'}
-              </p>
-              <span className="perspective-cta">
-                {isRtl ? 'استكشف المجموعات' : 'Explore Collections'}
-                <i className={isRtl ? 'bi bi-arrow-left' : 'bi bi-arrow-right'}></i>
-              </span>
-            </div>
-          </Link>
-
-          {/* Column 3 (RIGHT, offset DOWN): card top, image bottom — cool slate */}
-          <Link href="/about#timeline" className="perspective-col perspective-col-down perspective-slate">
-            <div className="perspective-card">
-              <h3>{isRtl ? 'دقة بلا حدود' : 'Precision, Refined'}</h3>
-              <p>
-                {isRtl
-                  ? 'آلات CNC المتقدمة تلتقي بتفاصيل دقيقة. كل حافة، كل مفصلة، محسوبة بدقّة الميليمتر.'
-                  : 'Advanced CNC machinery meets obsessive detail. Every edge, every fitting, engineered to the millimeter.'}
-              </p>
-              <span className="perspective-cta">
-                {isRtl ? 'اكتشف الحرفية' : 'See the Craftsmanship'}
-                <i className={isRtl ? 'bi bi-arrow-left' : 'bi bi-arrow-right'}></i>
-              </span>
-            </div>
-            <div className="perspective-img">
-              <img src="/images/home/perspective-3-slate.png" alt={isRtl ? 'دقة الحرفية' : 'Precision craft'} />
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* 4. Full-bleed Craftsmanship Feature */}
-      <section className="home-feature">
-        <img className="home-feature-img" src="/images/home/feature-wide.png" alt={isRtl ? 'حرفية سمارت وود' : 'Smartwood craftsmanship'} />
-        <div className="home-feature-overlay" />
-        <div className="home-feature-content">
-          <span className="section-kicker home-feature-kicker">
-            {isRtl ? 'من التصميم إلى التنفيذ' : 'From Concept to Completion'}
-          </span>
-          <h2 className="home-feature-title">
-            {isRtl ? (
-              <>حرفيّة<br />تُصنع بالدقّة<span className="home-feature-dot">.</span></>
-            ) : (
-              <>Craftsmanship,<br />Engineered to Last<span className="home-feature-dot">.</span></>
-            )}
-          </h2>
-          <p className="home-feature-text">
+      {/* === 7. Quote card ===================================== */}
+      <section className="sw-quote-wrap">
+        <blockquote className="sw-quote">
+          <span className="sw-quote-mark" aria-hidden="true">99</span>
+          <p>
             {isRtl
-              ? 'آلات CNC المتقدمة، نظام Odoo الذكي، وأيدي حرفيين كويتيين — كل قطعة رحلة من التصميم الرقمي إلى التركيب النهائي في منزلك.'
-              : 'Advanced CNC machinery, the Odoo workflow system, and master Kuwaiti craftsmen — every piece is a journey from digital design to final installation in your home.'}
+              ? 'نحن لا نصنع أثاثاً فقط، نحن نصنع إرثاً.'
+              : "We don't just build furniture, we craft legacy."}
           </p>
-          <Link href="/about" className="home-feature-btn">
-            {isRtl ? 'اكتشف الحرفية' : 'See the Craftsmanship'}
-            <i className="bi bi-arrow-right"></i>
-          </Link>
+          <footer>— SmartWood</footer>
+        </blockquote>
+      </section>
+
+      {/* === 8. SmartWood Collection =========================== */}
+      <section className="sw-collection">
+        <h2 className="sw-section-title sw-section-title-center">
+          {isRtl ? 'مجموعة سمارت وود' : 'SmartWood Collection'}
+        </h2>
+        <div className="sw-collection-grid">
+          {featuredItems.map((item) => (
+            <Link key={item.id} href={`/shop/product/${item.id}`} className="sw-product-card">
+              <div className="sw-product-img">
+                <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr || item.name : item.name} />
+              </div>
+              <div className="sw-product-meta">
+                <h3 className="sw-product-name">{isRtl ? item.nameAr || item.name : item.name}</h3>
+                <p className="sw-product-price">
+                  {item.price.toLocaleString()} <span>{isRtl ? 'د.ك' : 'KWD'}</span>
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
+
+      {/* === 9. Mini benefit chips ============================= */}
+      <section className="sw-benefits">
+        {MINI_BENEFITS.map((b) => (
+          <div key={b.key} className="sw-benefit-chip">
+            <i className={`bi ${b.icon}`}></i>
+            <div className="sw-benefit-text">
+              <strong>{isRtl ? b.arTitle : b.enTitle}</strong>
+              <span>{isRtl ? b.arSub : b.enSub}</span>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* === 10. Compare Our Models (desktop only) ============= */}
+      {compareItems.length >= 2 && (
+        <section className="sw-compare">
+          <h2 className="sw-section-title sw-section-title-center">
+            {isRtl ? 'قارن بين موديلاتنا' : 'Compare Our Models'}
+          </h2>
+          <div className="sw-compare-table-wrap">
+            <table className="sw-compare-table">
+              <thead>
+                <tr>
+                  <th aria-hidden="true"></th>
+                  {compareItems.map((item, i) => (
+                    <th key={item.id} className={i === 0 ? 'sw-compare-col-active' : ''}>
+                      {isRtl ? item.nameAr || item.name : item.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARE_SPECS.map((spec) => (
+                  <tr key={spec.enKey}>
+                    <th scope="row">{isRtl ? spec.arKey : spec.enKey}</th>
+                    {spec.vals.slice(0, compareItems.length).map((v, i) => (
+                      <td key={i} className={i === 0 ? 'sw-compare-col-active' : ''}>{v}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       <Footer />
-
-      <style jsx>{`
-        .glider-track::-webkit-scrollbar { display: none; }
-        .glider-track { -ms-overflow-style: none; scrollbar-width: none; }
-        .glider-item:hover .glider-overlay { opacity: 1; }
-        .glider-item { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-        .glider-item:hover { transform: scale(1.02); }
-      `}</style>
     </main>
   );
 }

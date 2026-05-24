@@ -19,6 +19,12 @@ export function makeCartLineId(productId: string, color?: string | null, type?: 
   return `${productId}::${color ?? ''}::${type ?? ''}`;
 }
 
+export interface AppliedPromo {
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
+}
+
 interface CartContextProps {
   cart: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity' | 'id'>) => void;
@@ -29,6 +35,12 @@ interface CartContextProps {
   totalItems: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  // Promo / discount
+  promo: AppliedPromo | null;
+  discount: number;
+  finalTotal: number;
+  applyPromo: (code: string) => Promise<{ ok: boolean; error?: string }>;
+  removePromo: () => void;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
@@ -228,9 +240,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
 
+  // --- Promo / discount ---
+  const [promo, setPromo] = useState<AppliedPromo | null>(null);
+
+  const discount = (() => {
+    if (!promo) return 0;
+    const raw = promo.type === 'percent' ? (totalPrice * promo.value) / 100 : promo.value;
+    // Never discount below zero.
+    return Math.min(raw, totalPrice);
+  })();
+
+  const finalTotal = Math.max(0, totalPrice - discount);
+
+  const applyPromo = async (code: string): Promise<{ ok: boolean; error?: string }> => {
+    const trimmed = code.trim();
+    if (!trimmed) return { ok: false, error: 'Enter a code' };
+    try {
+      const res = await fetch(`/api/promo?code=${encodeURIComponent(trimmed)}`);
+      const json = await res.json();
+      if (!res.ok || !json.valid) {
+        return { ok: false, error: json.error || 'Invalid code' };
+      }
+      setPromo({ code: json.code, type: json.discount_type, value: Number(json.discount_value) });
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Could not validate code' };
+    }
+  };
+
+  const removePromo = () => setPromo(null);
+
+  // Drop the promo when the cart empties so a stale code can't linger.
+  useEffect(() => {
+    if (cart.length === 0 && promo) setPromo(null);
+  }, [cart.length, promo]);
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, totalPrice, totalItems, isCartOpen, setIsCartOpen }}
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, totalPrice, totalItems, isCartOpen, setIsCartOpen, promo, discount, finalTotal, applyPromo, removePromo }}
     >
       {children}
     </CartContext.Provider>

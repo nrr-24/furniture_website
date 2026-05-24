@@ -5,254 +5,313 @@ import Link from 'next/link';
 import { useLanguage } from '../../data/LanguageContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
+import { useWishlist } from '../../data/WishlistContext';
 import { FALLBACK_IMAGE } from '../../data/furnitureData';
+import { usePathname, useRouter } from 'next/navigation';
 
 const LEGACY_PLACEHOLDER = '/images/LOGO/image.png';
 const cartImg = (src: string) => (!src || src === LEGACY_PLACEHOLDER ? FALLBACK_IMAGE : src);
-import { usePathname } from 'next/navigation';
+
+// 2026 redesign nav structure: Home / Craftsmanship / Collection.
+type NavItem = { href: string; key: 'home' | 'craftsmanship' | 'collection' };
+const NAV_ITEMS: NavItem[] = [
+    { href: '/',      key: 'home' },
+    { href: '/about', key: 'craftsmanship' },
+    { href: '/shop',  key: 'collection' },
+];
+
+const NAV_LABEL: Record<NavItem['key'], { en: string; ar: string }> = {
+    home:          { en: 'Home',          ar: 'الرئيسية' },
+    craftsmanship: { en: 'Craftsmanship', ar: 'الحرفية' },
+    collection:    { en: 'Collection',    ar: 'المجموعات' },
+};
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const { language, setLanguage, isRtl, t } = useLanguage();
+    const { language, isRtl, t, setLanguage } = useLanguage();
     const { user, logout, isAdmin } = useAuth();
-    const { cart, removeFromCart, updateQuantity, totalItems, totalPrice, isCartOpen, setIsCartOpen } = useCart();
+    const { cart, removeFromCart, updateQuantity, totalItems, totalPrice, isCartOpen, setIsCartOpen,
+            clearCart, promo, discount, finalTotal, applyPromo, removePromo } = useCart();
+    const { count: wishlistCount } = useWishlist();
     const pathname = usePathname();
+    const router = useRouter();
 
-    const isCustomer = !user || user.role === 'customer';
     const isAdminView = pathname?.startsWith('/admin');
+
+    // --- Promo + checkout state ---
+    const [promoInput, setPromoInput] = useState('');
+    const [promoError, setPromoError] = useState('');
+    const [promoBusy, setPromoBusy] = useState(false);
+    const [checkingOut, setCheckingOut] = useState(false);
+
+    const handleApplyPromo = async () => {
+        setPromoError('');
+        setPromoBusy(true);
+        const res = await applyPromo(promoInput);
+        setPromoBusy(false);
+        if (!res.ok) setPromoError(res.error || 'Invalid code');
+        else setPromoInput('');
+    };
+
+    const handleCheckout = async () => {
+        if (cart.length === 0) return;
+        // Require login to place an order.
+        if (!user) {
+            setIsCartOpen(false);
+            router.push('/login');
+            return;
+        }
+        setCheckingOut(true);
+        try {
+            const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    items: cart.map((i) => ({
+                        productId: i.productId,
+                        quantity: i.quantity,
+                        price: i.price,
+                        selectedColor: i.selectedColor ?? null,
+                        selectedType: i.selectedType ?? null,
+                    })),
+                    subtotal: totalPrice,
+                    discount,
+                    promoCode: promo?.code ?? null,
+                }),
+            });
+            const json = await res.json();
+            if (res.ok && json.orderId) {
+                await clearCart();
+                removePromo();
+                setIsCartOpen(false);
+                router.push(`/order/${json.orderId}`);
+            } else {
+                setPromoError(json.error || 'Checkout failed. Please try again.');
+            }
+        } catch {
+            setPromoError('Checkout failed. Please try again.');
+        } finally {
+            setCheckingOut(false);
+        }
+    };
 
     const toggleLanguage = () => {
         setLanguage(language === 'en' ? 'ar' : 'en');
     };
 
+    // The active pill matches the current path exactly (Home only on "/").
+    const isPillActive = (item: NavItem) => {
+        if (item.href === '/') return pathname === '/';
+        return pathname === item.href;
+    };
+
     return (
         <>
-        <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
-            <Link href="/" className="brand-link">
-                <img
-                    src={`/images/LOGO/smartwood-${language}-blue.svg`}
-                    alt="SmartWood Logo"
-                    className="brand-logo-img"
-                    style={{ height: '32px', width: 'auto' }}
-                />
-            </Link>
+            <nav id="navbar" dir={isRtl ? 'rtl' : 'ltr'}>
+                {/* === Brand === */}
+                <Link href="/" className="brand-link" aria-label="SmartWood — Home">
+                    <img
+                        src={`/images/LOGO/smartwood-${language}-black.svg`}
+                        alt="SmartWood"
+                        className="brand-logo-img"
+                    />
+                </Link>
 
-            <div className="nav-center-pills d-none d-lg-flex">
-                <Link href="/" className={`nav-pill-link ${pathname === '/' ? 'active' : ''}`}>{t('home')}</Link>
-                <Link href="/shop" className={`nav-pill-link ${pathname === '/shop' ? 'active' : ''}`}>{t('collections')}</Link>
-                <Link href="/about" className={`nav-pill-link ${pathname === '/about' ? 'active' : ''}`}>{t('craftsmanship')}</Link>
-            </div>
-
-            <div className="nav-right-actions">
-                <button
-                    className="d-lg-none"
-                    onClick={() => setIsMobileMenuOpen(true)}
-                    aria-label="Open Menu"
-                    style={{ background: 'transparent', border: 'none', color: 'var(--bg-main)', fontSize: '1.6rem', padding: '0 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                >
-                    <i className="bi bi-list"></i>
-                </button>
-                <button
-                    className="nav-icon-btn d-none d-lg-flex"
-                    style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}
-                    onClick={toggleLanguage}
-                    title={t('switchLang')}
-                >
-                    {language === 'en' ? 'AR' : 'EN'}
-                </button>
-
-                {/* Authentication & Profile Controls */}
-                {user ? (
-                    <div className="d-none d-lg-flex align-items-center gap-3">
-                        {isAdmin && (
-                            <Link href="/admin/users" style={{ color: 'var(--bg-main)', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}>
-                                {isRtl ? 'لوحة المشرف' : 'ADMIN PANEL'}
-                            </Link>
-                        )}
-
-                        {/* Profile Link - Hidden in Admin View */}
-                        {!isAdmin && (
-                            <Link
-                                href="/profile"
-                                className="nav-icon-btn"
-                                title={isRtl ? 'الملف الشخصي' : 'My Profile'}
-                                style={{ fontSize: '1.4rem', color: 'var(--bg-main)', opacity: 0.85, textDecoration: 'none' }}
-                            >
-                                <i className="bi bi-person-circle"></i>
-                            </Link>
-                        )}
-
-                        <button
-                            onClick={logout}
-                            style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
+                {/* === Center pill nav (desktop) === */}
+                <div className="nav-pill-bar d-none d-lg-flex" role="navigation">
+                    {NAV_ITEMS.map((item) => (
+                        <Link
+                            key={item.key}
+                            href={item.href}
+                            className={`nav-pill-link ${isPillActive(item) ? 'active' : ''}`}
                         >
-                            {isRtl ? 'تسجيل الخروج' : 'LOG OUT'}
-                        </button>
-                    </div>
-                ) : (
-                    <div className="d-none d-lg-flex align-items-center gap-3">
-                        <Link href="/login" style={{ color: 'var(--bg-main)', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 500, letterSpacing: '0.5px' }}>
-                            {isRtl ? 'تسجيل الدخول' : 'LOG IN'}
+                            {isRtl ? NAV_LABEL[item.key].ar : NAV_LABEL[item.key].en}
                         </Link>
-                        <Link href="/signup" style={{ color: 'white', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600, padding: '6px 16px', background: 'var(--bg-main)', borderRadius: '20px', letterSpacing: '0.5px' }}>
-                            {isRtl ? 'حساب جديد' : 'SIGN UP'}
+                    ))}
+                </div>
+
+                {/* === Right actions === */}
+                <div className="nav-right-actions">
+                    {/* Wishlist */}
+                    {!isAdminView && (
+                        <Link
+                            href="/wishlist"
+                            className="nav-icon-square"
+                            aria-label={isRtl ? 'المفضلة' : 'Wishlist'}
+                            title={isRtl ? 'المفضلة' : 'Wishlist'}
+                        >
+                            <i className={`bi ${wishlistCount > 0 ? 'bi-heart-fill' : 'bi-heart'}`}></i>
+                            {wishlistCount > 0 && (
+                                <span className="nav-cart-badge" aria-hidden="true">{wishlistCount}</span>
+                            )}
                         </Link>
-                    </div>
-                )}
-
-                {!isAdminView && (
-                    <Link href="/contact" className="contact-cta-btn d-none d-lg-inline-flex" style={{ background: 'transparent', border: '1px solid var(--bg-main)', color: 'var(--bg-main)', textDecoration: 'none' }}>
-                        {isRtl ? 'تواصل معنا' : 'CONTACT US'}
-                    </Link>
-                )}
-            </div>
-        </nav>
-
-            {/* Floating Cart FAB - HIDDEN for Admins */}
-            {!isAdmin && !isAdminView && (
-                <button
-                    className="floating-cart-fab pulse"
-                    onClick={() => setIsCartOpen(true)}
-                    style={{
-                        position: 'fixed',
-                        bottom: 'max(24px, env(safe-area-inset-bottom))',
-                        right: isRtl ? 'auto' : 'max(24px, env(safe-area-inset-right))',
-                        left: isRtl ? 'max(24px, env(safe-area-inset-left))' : 'auto',
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '50%',
-                        background: 'var(--blue-deep)',
-                        color: 'white',
-                        border: 'none',
-                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
-                        zIndex: 1500,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.5rem',
-                        cursor: 'pointer',
-                        transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                    }}
-                >
-                    <i className="bi bi-cart3"></i>
-                    {totalItems > 0 && (
-                        <span style={{
-                            position: 'absolute',
-                            top: '-5px',
-                            right: isRtl ? 'auto' : '-5px',
-                            left: isRtl ? '-5px' : 'auto',
-                            background: '#ff4d4d',
-                            color: 'white',
-                            minWidth: '22px',
-                            height: '22px',
-                            borderRadius: '11px',
-                            fontSize: '0.75rem',
-                            fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: '0 6px',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.3)'
-                        }}>
-                            {totalItems}
-                        </span>
                     )}
-                </button>
-            )}
 
-            {/* Cart Sidebar Modal */}
-            <div 
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        zIndex: 2000,
-                        opacity: isCartOpen ? 1 : 0,
-                        visibility: isCartOpen ? 'visible' : 'hidden',
-                        transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-                        display: 'flex',
-                        justifyContent: 'flex-end'
-                    }}
-                    onClick={() => setIsCartOpen(false)}
-                >
-                    <div
-                        className="cart-sidebar-panel"
-                        style={{
-                            width: '450px',
-                            maxWidth: '100%',
-                            backgroundColor: 'var(--bg-main)',
-                            height: '100%',
-                            padding: '30px',
-                            paddingBottom: 'max(30px, env(safe-area-inset-bottom))',
-                            boxShadow: '-10px 0 40px rgba(0,0,0,0.4)',
-                            overflowY: 'auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            transform: isCartOpen ? 'translateX(0)' : 'translateX(100%)',
-                            transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-                            borderLeft: '1px solid var(--line-soft)'
-                        }}
-                        onClick={(e) => e.stopPropagation()}
+                    {/* Cart icon — replaces the old floating FAB. Same setIsCartOpen wiring. */}
+                    {!isAdmin && !isAdminView && (
+                        <button
+                            className="nav-icon-square nav-icon-cart"
+                            onClick={() => setIsCartOpen(true)}
+                            aria-label={isRtl ? `عربة التسوق، ${totalItems} عناصر` : `Shopping cart, ${totalItems} items`}
+                        >
+                            <i className="bi bi-bag"></i>
+                            {totalItems > 0 && (
+                                <span className="nav-cart-badge" aria-hidden="true">{totalItems}</span>
+                            )}
+                        </button>
+                    )}
+
+                    {/* Language toggle — desktop-only; mobile has it in the overlay footer */}
+                    <button
+                        className="nav-lang-btn d-none d-lg-inline-flex"
+                        onClick={toggleLanguage}
+                        title={t('switchLang')}
+                        aria-label={t('switchLang')}
                     >
+                        {language === 'en' ? 'AR' : 'EN'}
+                    </button>
+
+                    {/* Auth controls — desktop only. Profile icon when logged in, login/signup
+                        pills when not. All auth surfaces collapsed into mobile-menu pills on
+                        small screens to keep the header iconography clean per the mockup. */}
+                    {user ? (
+                        <div className="nav-auth-group d-none d-lg-flex">
+                            {isAdmin && (
+                                <Link href="/admin/users" className="nav-text-link">
+                                    {isRtl ? 'لوحة المشرف' : 'ADMIN'}
+                                </Link>
+                            )}
+                            {!isAdmin && (
+                                <Link
+                                    href="/profile"
+                                    className="nav-icon-square"
+                                    aria-label={isRtl ? 'الملف الشخصي' : 'Profile'}
+                                    title={isRtl ? 'الملف الشخصي' : 'Profile'}
+                                >
+                                    <i className="bi bi-person"></i>
+                                </Link>
+                            )}
+                            <button onClick={logout} className="nav-text-link nav-text-link-danger">
+                                {isRtl ? 'خروج' : 'LOG OUT'}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="nav-auth-group d-none d-lg-flex">
+                            <Link href="/login" className="nav-text-link">
+                                {isRtl ? 'دخول' : 'LOG IN'}
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* Hamburger (mobile only) */}
+                    <button
+                        className="nav-icon-square nav-icon-hamburger d-lg-none"
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        aria-label={isRtl ? 'فتح القائمة' : 'Open menu'}
+                    >
+                        <i className="bi bi-list"></i>
+                    </button>
+                </div>
+            </nav>
+
+            {/* === Cart Sidebar Modal === */}
+            <div
+                style={{
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'rgba(31, 24, 18, 0.45)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    zIndex: 2000,
+                    opacity: isCartOpen ? 1 : 0,
+                    visibility: isCartOpen ? 'visible' : 'hidden',
+                    transition: 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+                    display: 'flex',
+                    justifyContent: 'flex-end'
+                }}
+                onClick={() => setIsCartOpen(false)}
+            >
+                <div
+                    className="cart-sidebar-panel"
+                    style={{
+                        width: '460px',
+                        maxWidth: '100%',
+                        backgroundColor: 'var(--bg-panel)',
+                        color: 'var(--text-main)',
+                        height: '100%',
+                        padding: '30px',
+                        paddingBottom: 'max(30px, env(safe-area-inset-bottom))',
+                        boxShadow: '-10px 0 40px rgba(42, 32, 24, 0.18)',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transform: isCartOpen ? 'translateX(0)' : 'translateX(100%)',
+                        transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+                        borderLeft: '1px solid var(--line-soft)'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <div className="d-flex justify-content-between align-items-center mb-5">
-                        <h3 style={{ margin: 0, fontWeight: 700, letterSpacing: '1px' }}>{isRtl ? 'عربة التسوق' : 'Shopping Cart'}</h3>
+                        <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontWeight: 500, letterSpacing: '0', fontSize: '1.75rem' }}>
+                            {isRtl ? 'عربة التسوق' : 'Shopping Cart'}
+                        </h3>
                         <button
                             onClick={() => setIsCartOpen(false)}
-                            style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', width: '36px', height: '36px', borderRadius: '50%', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }}
+                            aria-label={isRtl ? 'إغلاق' : 'Close cart'}
+                            style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', width: '36px', height: '36px', borderRadius: '50%', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }}
                         >
-                            &times;
+                            <i className="bi bi-x-lg" style={{ fontSize: '0.95rem' }}></i>
                         </button>
                     </div>
 
                     <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
                         {cart.length === 0 ? (
-                            <div style={{ textAlign: 'center', marginTop: '60px', opacity: 0.5 }}>
-                                <i className="bi bi-cart-x" style={{ fontSize: '3rem', display: 'block', marginBottom: '15px' }}></i>
-                                <p style={{ fontSize: '1.1rem' }}>{isRtl ? 'العربة فارغة حالياً' : 'Your cart is empty.'}</p>
+                            <div style={{ textAlign: 'center', marginTop: '60px', color: 'var(--text-soft)' }}>
+                                <i className="bi bi-bag" style={{ fontSize: '3rem', display: 'block', marginBottom: '15px', opacity: 0.4 }}></i>
+                                <p style={{ fontSize: '1.05rem' }}>{isRtl ? 'العربة فارغة حالياً' : 'Your cart is empty.'}</p>
                             </div>
                         ) : (
-                            <div className="d-flex flex-column gap-4">
+                            <div className="d-flex flex-column gap-3">
                                 {cart.map((item) => {
                                     const hasVariant = !!(item.selectedColor || item.selectedType);
                                     const isCssColor = !!item.selectedColor && /^(#|rgb|hsl|[a-zA-Z]+$)/.test(item.selectedColor);
                                     return (
-                                    <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--line-soft)' }}>
-                                        <img src={cartImg(item.image)} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px' }} />
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <h5 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 600 }}>{item.name}</h5>
-                                            {hasVariant && (
-                                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', margin: '0 0 6px', fontSize: '0.78rem', color: 'var(--text-soft)', opacity: 0.85 }}>
-                                                    {item.selectedType && <span>{item.selectedType}</span>}
-                                                    {item.selectedType && item.selectedColor && <span style={{ opacity: 0.5 }}>•</span>}
-                                                    {item.selectedColor && (
-                                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                                            {isCssColor && (
-                                                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.selectedColor, border: '1px solid rgba(255,255,255,0.2)' }} />
-                                                            )}
-                                                            <span>{item.selectedColor}</span>
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                            <p style={{ margin: 0, color: 'var(--blue-main)', fontSize: '1rem', fontWeight: 700 }}>{item.price} {t('currency')}</p>
-                                        </div>
-                                        <div className="d-flex flex-column align-items-center gap-2">
-                                            <div className="d-flex align-items-center gap-3" style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '8px' }}>
-                                                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', color: 'white', padding: 0 }}>-</button>
-                                                <span style={{ minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ background: 'none', border: 'none', color: 'white', padding: 0 }}>+</button>
+                                        <div key={item.id} className="d-flex gap-3 align-items-center" style={{ padding: '14px', background: 'var(--bg-main)', borderRadius: '18px', border: '1px solid var(--line-soft)' }}>
+                                            <img src={cartImg(item.image)} alt={item.name} style={{ width: '72px', height: '72px', objectFit: 'cover', borderRadius: '12px' }} />
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <h5 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 600, fontFamily: 'var(--font-app)' }}>{item.name}</h5>
+                                                {hasVariant && (
+                                                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', margin: '0 0 6px', fontSize: '0.78rem', color: 'var(--text-soft)' }}>
+                                                        {item.selectedType && <span>{item.selectedType}</span>}
+                                                        {item.selectedType && item.selectedColor && <span style={{ opacity: 0.5 }}>•</span>}
+                                                        {item.selectedColor && (
+                                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                                                {isCssColor && (
+                                                                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.selectedColor, border: '1px solid var(--line-soft)' }} />
+                                                                )}
+                                                                <span>{item.selectedColor}</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                <p style={{ margin: 0, color: 'var(--text-main)', fontSize: '1rem', fontWeight: 700 }}>{item.price} {t('currency')}</p>
                                             </div>
-                                            <button
-                                                onClick={() => removeFromCart(item.id)}
-                                                style={{ background: 'transparent', border: 'none', color: '#ff4d4d', fontSize: '0.8rem', opacity: 0.7 }}
-                                            >
-                                                {isRtl ? 'إزالة' : 'Remove'}
-                                            </button>
+                                            <div className="d-flex flex-column align-items-center gap-2">
+                                                <div className="d-flex align-items-center gap-3" style={{ background: 'var(--surface-soft)', padding: '4px 10px', borderRadius: '999px', color: 'var(--text-main)' }}>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity" style={{ background: 'none', border: 'none', color: 'inherit', padding: 0, cursor: 'pointer' }}>−</button>
+                                                    <span style={{ minWidth: '18px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600 }}>{item.quantity}</span>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity" style={{ background: 'none', border: 'none', color: 'inherit', padding: 0, cursor: 'pointer' }}>+</button>
+                                                </div>
+                                                <button
+                                                    onClick={() => removeFromCart(item.id)}
+                                                    style={{ background: 'transparent', border: 'none', color: '#a8553a', fontSize: '0.78rem', opacity: 0.85, cursor: 'pointer' }}
+                                                >
+                                                    {isRtl ? 'إزالة' : 'Remove'}
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
                                     );
                                 })}
                             </div>
@@ -260,20 +319,81 @@ export default function Navbar() {
                     </div>
 
                     {cart.length > 0 && (
-                        <div style={{ paddingTop: '30px', borderTop: '1px solid var(--line-soft)', marginTop: '30px' }}>
-                            <div className="d-flex justify-content-between mb-4">
-                                <span style={{ fontSize: '1.1rem', opacity: 0.7 }}>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
-                                <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>{totalPrice.toLocaleString()} {t('currency')}</span>
+                        <div style={{ paddingTop: '24px', borderTop: '1px solid var(--line-soft)', marginTop: '24px' }}>
+                            {/* Promo code */}
+                            {promo ? (
+                                <div className="d-flex justify-content-between align-items-center mb-3" style={{ padding: '10px 14px', background: 'var(--surface-soft)', borderRadius: '12px' }}>
+                                    <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>
+                                        <i className="bi bi-tag-fill" style={{ marginInlineEnd: '6px' }}></i>{promo.code}
+                                    </span>
+                                    <button onClick={removePromo} style={{ background: 'transparent', border: 'none', color: 'var(--text-soft)', fontSize: '0.78rem', cursor: 'pointer' }}>
+                                        {isRtl ? 'إزالة' : 'Remove'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="mb-3">
+                                    <div className="d-flex gap-2">
+                                        <input
+                                            value={promoInput}
+                                            onChange={(e) => { setPromoInput(e.target.value); setPromoError(''); }}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleApplyPromo(); }}
+                                            placeholder={isRtl ? 'كود الخصم' : 'Promo code'}
+                                            style={{ flex: 1, minWidth: 0, padding: '12px 14px', background: 'var(--bg-main)', border: '1px solid var(--line-soft)', borderRadius: '12px', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                                        />
+                                        <button
+                                            onClick={handleApplyPromo}
+                                            disabled={promoBusy || !promoInput.trim()}
+                                            style={{ padding: '0 18px', background: 'var(--surface-soft)', border: '1px solid var(--line-soft)', borderRadius: '12px', color: 'var(--text-main)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', opacity: promoBusy || !promoInput.trim() ? 0.5 : 1 }}
+                                        >
+                                            {isRtl ? 'تطبيق' : 'Apply'}
+                                        </button>
+                                    </div>
+                                    {promoError && <p style={{ color: '#a8553a', fontSize: '0.76rem', margin: '6px 2px 0' }}>{promoError}</p>}
+                                </div>
+                            )}
+
+                            {/* Totals */}
+                            <div className="d-flex justify-content-between mb-2">
+                                <span style={{ fontSize: '0.92rem', color: 'var(--text-soft)' }}>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}</span>
+                                <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{totalPrice.toLocaleString()} {t('currency')}</span>
                             </div>
-                            <button className="hero-primary-btn w-100 shadow-lg" style={{ minHeight: '64px', fontSize: '1.1rem', borderRadius: '18px' }}>
-                                {isRtl ? 'إتمام الطلب' : 'CHECKOUT NOW'}
+                            {discount > 0 && (
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span style={{ fontSize: '0.92rem', color: '#a8553a' }}>{isRtl ? 'الخصم' : 'Discount'}</span>
+                                    <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#a8553a' }}>−{discount.toLocaleString()} {t('currency')}</span>
+                                </div>
+                            )}
+                            <div className="d-flex justify-content-between align-items-baseline mb-4" style={{ paddingTop: '10px', borderTop: '1px solid var(--line-soft)' }}>
+                                <span style={{ fontSize: '1rem' }}>{isRtl ? 'الإجمالي' : 'Total'}</span>
+                                <span style={{ fontSize: '1.4rem', fontWeight: 700, fontFamily: 'var(--font-serif)' }}>{finalTotal.toLocaleString()} {t('currency')}</span>
+                            </div>
+
+                            <button
+                                onClick={handleCheckout}
+                                disabled={checkingOut}
+                                style={{
+                                    width: '100%',
+                                    minHeight: '56px',
+                                    fontSize: '0.9rem',
+                                    borderRadius: 'var(--r-pill)',
+                                    background: 'var(--text-main)',
+                                    color: 'var(--bg-main)',
+                                    border: 'none',
+                                    fontWeight: 600,
+                                    letterSpacing: '0.12em',
+                                    textTransform: 'uppercase',
+                                    cursor: checkingOut ? 'wait' : 'pointer',
+                                    opacity: checkingOut ? 0.7 : 1
+                                }}
+                            >
+                                {checkingOut ? (isRtl ? 'جارٍ المعالجة...' : 'Processing...') : (isRtl ? 'إتمام الطلب' : 'Checkout')}
                             </button>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Full-Screen Mobile Menu Overlay */}
+            {/* === Full-Screen Mobile Menu Overlay === */}
             <div
                 className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}
                 dir={isRtl ? 'rtl' : 'ltr'}
@@ -285,14 +405,10 @@ export default function Navbar() {
                 </div>
 
                 <div className="mobile-menu-header stagger-item">
-                    <Link
-                        href="/"
-                        className="brand-link"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    <Link href="/" className="brand-link" onClick={() => setIsMobileMenuOpen(false)}>
                         <img
-                            src={`/images/LOGO/smartwood-${language}-blue.svg`}
-                            alt="SmartWood Logo"
+                            src={`/images/LOGO/smartwood-${language}-black.svg`}
+                            alt="SmartWood"
                             className="brand-logo-img"
                             style={{ height: '28px', width: 'auto' }}
                         />
@@ -313,19 +429,21 @@ export default function Navbar() {
 
                     <nav className="mobile-menu-links">
                         {[
-                            { href: '/', label: t('home') },
-                            { href: '/shop', label: t('collections') },
-                            { href: '/about', label: t('craftsmanship') },
-                            { href: '/contact', label: isRtl ? 'تواصل معنا' : 'Contact' },
-                        ].map((item, idx) => (
+                            ...NAV_ITEMS.map((item, idx) => ({
+                                idx,
+                                href: item.href,
+                                label: isRtl ? NAV_LABEL[item.key].ar : NAV_LABEL[item.key].en,
+                            })),
+                            { idx: NAV_ITEMS.length, href: '/contact', label: isRtl ? 'تواصل معنا' : 'Contact' },
+                        ].map((item) => (
                             <Link
-                                key={item.href}
+                                key={`${item.href}-${item.idx}`}
                                 href={item.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className={`mobile-nav-link stagger-item ${pathname === item.href ? 'active' : ''}`}
                             >
                                 <span className="mobile-nav-index">
-                                    {String(idx + 1).padStart(2, '0')}
+                                    {String(item.idx + 1).padStart(2, '0')}
                                 </span>
                                 <span className="mobile-nav-label">{item.label}</span>
                                 <span className="mobile-nav-arrow" aria-hidden="true">
@@ -403,37 +521,6 @@ export default function Navbar() {
                     </span>
                 </div>
             </div>
-
-            <style jsx global>{`
-                .floating-cart-fab:hover {
-                    transform: scale(1.1) translateY(-5px);
-                }
-                .floating-cart-fab:active {
-                    transform: scale(0.95);
-                }
-                .pulse {
-                    animation: pulse-animation 2s infinite;
-                }
-                @keyframes pulse-animation {
-                    0% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0.4); }
-                    70% { box-shadow: 0 0 0 20px rgba(13, 26, 99, 0); }
-                    100% { box-shadow: 0 0 0 0px rgba(13, 26, 99, 0); }
-                }
-                @media (max-width: 600px) {
-                    .floating-cart-fab {
-                        width: 56px !important;
-                        height: 56px !important;
-                        font-size: 1.3rem !important;
-                    }
-                    .cart-sidebar-panel {
-                        padding: 20px !important;
-                    }
-                    .cart-sidebar-panel h3 {
-                        font-size: 1.2rem !important;
-                    }
-                }
-
-            `}</style>
         </>
     );
 }

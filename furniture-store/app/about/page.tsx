@@ -1,163 +1,170 @@
 'use client';
 
+import Link from 'next/link';
 import { useLanguage } from '../../data/LanguageContext';
 import { useEffect, useRef } from 'react';
 import Footer from '../../components/layout/Footer';
 
-export default function AboutPage() {
-  const { t, isRtl } = useLanguage();
-  const timelineRef = useRef<HTMLDivElement>(null);
+/* ============================================================
+ * About Us (Smartwood 2026 redesign)
+ *
+ * Editorial story page in the cream + espresso design language:
+ *   1. Hero — centered headline + wide image
+ *   2. Story — two-column copy + image ("Our Promise")
+ *   3. Stats band — 26+ years, precision, materials, origin
+ *   4. Why SmartWood — values grid (the old timeline, restyled)
+ *   5. Quote / CTA — espresso card
+ * Strings inline as `isRtl ? ar : en` for parity with the rest of
+ * the site. Imagery pulled from /public/images/home.
+ * ============================================================ */
 
+const HERO_IMG = '/images/home/about-hero.png';
+const STORY_IMG = '/images/home/living-wardrobes.png';
+
+export default function AboutPage() {
+  const { isRtl } = useLanguage();
+  const revealRef = useRef<HTMLDivElement>(null);
+  const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
+
+  // Fade-up reveal for the value cards as they scroll into view.
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
+          if (entry.isIntersecting) entry.target.classList.add('visible');
         });
       },
       { threshold: 0.15 }
     );
-
-    const items = timelineRef.current?.querySelectorAll('.timeline-item');
+    const items = revealRef.current?.querySelectorAll('.av-value');
     items?.forEach((item) => observer.observe(item));
-
     return () => observer.disconnect();
   }, []);
 
-  const timelineData = [
+  const STATS = [
+    { num: '26+', en: 'Years of Excellence', ar: 'سنة من التميّز' },
+    { num: '100%', en: 'CNC Precision', ar: 'دقة CNC' },
+    { num: 'DE·AT', en: 'German & Austrian Hardware', ar: 'إكسسوارات ألمانية ونمساوية' },
+    { num: 'KW', en: 'Proudly Made in Kuwait', ar: 'صُنع بفخر في الكويت' },
+  ];
+
+  const VALUES = [
     {
       icon: 'bi-cpu',
-      title: isRtl ? 'دقة CNC المتقدمة' : 'Advanced CNC Precision',
-      description: isRtl
-        ? 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.'
-        : 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0003_030.jpg',
-      step: '01',
+      enTitle: 'Advanced CNC Precision',
+      arTitle: 'دقة CNC المتقدمة',
+      enText: 'Fully automated machinery ensures 100% accuracy in every cut, carve, and finish.',
+      arText: 'آلات آلية بالكامل تضمن دقة 100٪ في كل قطع ونحت وتشطيب.',
     },
     {
       icon: 'bi-geo-alt',
-      title: isRtl ? 'بفخر صُنع في الكويت' : 'Proudly Made in Kuwait',
-      description: isRtl
-        ? 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع ودعم أفضل.'
-        : 'A national brand committed to local excellence, faster delivery, and superior support.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0007_026.jpg',
-      step: '02',
+      enTitle: 'Proudly Made in Kuwait',
+      arTitle: 'بفخر صُنع في الكويت',
+      enText: 'A national brand committed to local excellence, faster delivery, and superior support.',
+      arText: 'علامة وطنية تلتزم بالتميز المحلي وتسليم أسرع ودعم أفضل.',
     },
     {
       icon: 'bi-tree',
-      title: isRtl ? 'مصادر مواد فاخرة' : 'Premium Material Sourcing',
-      description: isRtl
-        ? 'خشب مستدام تم اختباره لتحمل مناخ الخليج الفريد.'
-        : 'Sourcing the finest sustainable woods tested to withstand the Gulf\'s unique climate.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0024_009.jpg',
-      step: '03',
+      enTitle: 'Premium Material Sourcing',
+      arTitle: 'مصادر مواد فاخرة',
+      enText: "Sourcing the finest sustainable woods, tested to withstand the Gulf's unique climate.",
+      arText: 'خشب مستدام تم اختياره بعناية لتحمل مناخ الخليج الفريد.',
     },
     {
       icon: 'bi-clock-history',
-      title: isRtl ? 'تجربة سلسة' : 'Streamlined Experience',
-      description: isRtl
-        ? 'سير عمل رقمي يضمن الشفافية والدقة والتسليم في الوقت المحدد.'
-        : 'Digitalized production workflow guaranteeing transparency, precision, and on-time delivery.',
-      image: 'https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/1x1_0032_001.jpg',
-      step: '04',
+      enTitle: 'Streamlined Experience',
+      arTitle: 'تجربة سلسة',
+      enText: 'A digitalized production workflow guaranteeing transparency, precision, and on-time delivery.',
+      arText: 'سير عمل رقمي يضمن الشفافية والدقة والتسليم في الوقت المحدد.',
     },
   ];
 
   return (
-    <main className="app-content about-page-theme" dir={isRtl ? 'rtl' : 'ltr'}>
-
-      {/* 1. Heritage Split Section — matches Home hero sizing with nav clearance */}
-      <section className="lumiere-split hero-viewport">
-        {/* Left Side: Copy & Info */}
-        <div className="split-left" style={{ justifyContent: 'center' }}>
-
-          {/* <span className="section-kicker animate-fade-up" style={{ marginBottom: '16px', display: 'block', animationDelay: '0.2s' }}>
-            {isRtl ? 'التراث والابتكار' : 'The Heritage & Innovation'}
-          </span> */}
-
-          <h1 className="smartwood-title" style={{ fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', fontWeight: 300, letterSpacing: '-0.02em', marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <span className="text-showup" style={{ animationDelay: '0.05s' }}>{isRtl ? 'من' : 'ABOUT'}</span>
-            <span className="text-reveal" style={{ animationDelay: '0.3s', fontWeight: 600 }}>{isRtl ? 'نحن' : 'US'}</span>
-          </h1>
-
-          <p className="smartwood-description animate-fade-up" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '20px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.5s' }}>
-            {isRtl
-              ? 'في سمارت وود، نحن لا نقوم فقط بتشكيل الخشب؛ نحن نصنع إرثاً. بصفتنا مصنعاً كويتياً رائداً، فقد وضعنا معياراً جديداً في صناعة النجارة والأخشاب.'
-              : 'At Smartwood, we don\u2019t just process wood; we craft legacies. As a leading Kuwaiti factory, we have established a new benchmark in the joinery and woodworking industry.'
-            }
-          </p>
-
-          <p className="smartwood-description animate-fade-up desktop-only-text" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--text-soft)', marginBottom: '32px', maxWidth: '600px', lineHeight: 1.75, animationDelay: '1.7s' }}>
-            {isRtl
-              ? 'من خلال دمج تكنولوجيا CNC الأكثر تقدماً في العالم مع نظام إدارة Odoo المتطور، نضمن رحلة سلسة من التصميم المبدئي إلى التنفيذ الخالي من العيوب. مهمتنا هي تزويد السوق الكويتي بحلول خشبية مستدامة وراقية تنافس المعايير العالمية.'
-              : 'By integrating the world\u2019s most advanced CNC technology with the sophisticated Odoo management system, we ensure a seamless journey from conceptual design to flawless execution. Our mission is to provide the Kuwaiti market with sustainable, high-end wood solutions that rival international standards.'
-            }
-          </p>
-
-          <div className="hero-main-actions d-flex gap-3 animate-fade-up" style={{ animationDelay: '1.9s' }}>
-            <a href="/shop" className="hero-secondary-btn" style={{ padding: 'clamp(12px, 3vw, 16px) clamp(24px, 6vw, 40px)', borderRadius: '12px' }}>
-              {isRtl ? 'استكشف تصاميمنا' : 'DISCOVER DESIGNS'}
-            </a>
-          </div>
-
-        </div>
-
-        {/* Right Side: Process edge-to-edge image */}
-        <div className="split-right">
-          <div className="split-right-img-container reveal-container">
-            <img
-              src="https://aaadpzivgyvnqukutccg.supabase.co/storage/v1/object/public/product-images/9x16_0004_006.jpg"
-              alt={isRtl ? 'صناعة الأثاث' : 'Furniture Crafting'}
-              className="reveal-inner-img"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
-            />
-            <div className="hero-overlay-dark"></div>
-
-            {/* Corner Text overlay inside the image */}
-            <div style={{
-              position: 'absolute',
-              bottom: 'clamp(24px, 6vw, 100px)',
-              left: 'clamp(20px, 5vw, 60px)',
-              right: 'clamp(20px, 5vw, 60px)',
-              color: 'rgba(255,255,255,0.9)',
-              textAlign: isRtl ? 'right' : 'left'
-            }}>
-              <span style={{ fontSize: '0.9rem', letterSpacing: '0.1em' }}>02 /</span>
-              <h3 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', fontWeight: 300, margin: 0, lineHeight: 1.2 }}>
-                {isRtl ? 'صُنع في' : 'MADE IN'}<br />
-                <span style={{ fontWeight: 700 }}>{isRtl ? 'الكويت' : 'KUWAIT'}</span>
-              </h3>
-            </div>
-          </div>
+    <main className="app-content about-2026" dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* === 1. Hero =========================================== */}
+      <section className="av-hero">
+        <span className="section-kicker">{isRtl ? 'قصتنا' : 'OUR STORY'}</span>
+        <h1 className="av-hero-title">
+          {isRtl ? (<>نصنع الإرث<br />منذ 1998.</>) : (<>Crafting Legacy<br />Since 1998.</>)}
+        </h1>
+        <p className="av-hero-sub">
+          {isRtl
+            ? 'في سمارت وود، لا نشكّل الخشب فحسب — بل نصنع إرثاً يدوم لأجيال.'
+            : "At SmartWood, we don't just shape wood — we craft a legacy built to last for generations."}
+        </p>
+        <div className="av-hero-img">
+          <img src={HERO_IMG} alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood craftsmanship'} />
         </div>
       </section>
 
-      {/* 2. Why Smartwood? — Timeline */}
-      <section className="timeline-section" id="timeline">
-        <div className="timeline-section-header">
-          <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'The Competitive Edge'}</span>
-          <h2 className="section-title" style={{ marginBottom: '0' }}>{isRtl ? 'لماذا سمارت وود؟' : 'Why Smartwood?'}</h2>
+      {/* === 2. Story ========================================== */}
+      <section className="av-story">
+        <div className="av-story-copy">
+          <span className="section-kicker">{isRtl ? 'وعدنا' : 'OUR PROMISE'}</span>
+          <h2 className="av-section-title">
+            {isRtl ? 'إرث من الجودة' : (<>A Legacy<br />of Quality</>)}
+          </h2>
+          <p className="av-body">
+            {isRtl
+              ? 'بصفتنا مصنعاً كويتياً رائداً، وضعنا معياراً جديداً في صناعة النجارة والأخشاب الفاخرة منذ أكثر من 26 عاماً.'
+              : 'As a leading Kuwaiti factory, we have set a new benchmark in fine joinery and woodworking for more than 26 years.'}
+          </p>
+          <p className="av-body">
+            {isRtl
+              ? 'بدمج أحدث تقنيات CNC في العالم مع نظام Odoo المتطور، نضمن رحلة سلسة من التصميم إلى التنفيذ الخالي من العيوب — بحلول خشبية مستدامة تنافس المعايير العالمية.'
+              : "By integrating the world's most advanced CNC technology with the Odoo management system, we ensure a seamless journey from design to flawless execution — sustainable, high-end wood solutions that rival international standards."}
+          </p>
+          <Link href="/shop" className="av-link-arrow">
+            <span>{isRtl ? 'استكشف تصاميمنا' : 'Discover Designs'}</span>
+            <i className={`bi ${arrow}`}></i>
+          </Link>
         </div>
+        <div className="av-story-img">
+          <img src={STORY_IMG} alt={isRtl ? 'تصاميم سمارت وود' : 'SmartWood designs'} />
+        </div>
+      </section>
 
-        <div className="timeline" ref={timelineRef}>
-          {timelineData.map((item, index) => (
-            <div key={index} className="timeline-item">
-              <div className="timeline-node"></div>
-              <div className="timeline-content">
-                <span className="timeline-step">{item.step}</span>
-                <h3>
-                  <i className={`bi ${item.icon}`}></i>
-                  {item.title}
-                </h3>
-                <p>{item.description}</p>
-              </div>
-              <div className="timeline-img-wrap">
-                <img src={item.image} alt={item.title} />
-              </div>
+      {/* === 3. Stats band ===================================== */}
+      <section className="av-stats">
+        {STATS.map((s) => (
+          <div key={s.num} className="av-stat">
+            <span className="av-stat-num">{s.num}</span>
+            <span className="av-stat-label">{isRtl ? s.ar : s.en}</span>
+          </div>
+        ))}
+      </section>
+
+      {/* === 4. Why SmartWood — values ========================= */}
+      <section className="av-why" ref={revealRef}>
+        <div className="av-why-header">
+          <span className="section-kicker">{isRtl ? 'الميزة التنافسية' : 'THE COMPETITIVE EDGE'}</span>
+          <h2 className="av-section-title sw-center">{isRtl ? 'لماذا سمارت وود؟' : 'Why SmartWood?'}</h2>
+        </div>
+        <div className="av-value-grid">
+          {VALUES.map((v, i) => (
+            <div key={i} className="av-value" style={{ transitionDelay: `${i * 80}ms` }}>
+              <span className="av-value-num">{String(i + 1).padStart(2, '0')}</span>
+              <i className={`bi ${v.icon} av-value-icon`}></i>
+              <h3 className="av-value-title">{isRtl ? v.arTitle : v.enTitle}</h3>
+              <p className="av-value-text">{isRtl ? v.arText : v.enText}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* === 5. Quote / CTA ==================================== */}
+      <section className="av-cta-wrap">
+        <div className="av-cta">
+          <span className="av-cta-mark" aria-hidden="true">99</span>
+          <p className="av-cta-quote">
+            {isRtl
+              ? 'نحن لا نصنع أثاثاً فقط، نحن نصنع إرثاً.'
+              : "We don't just build furniture, we craft legacy."}
+          </p>
+          <Link href="/contact" className="av-cta-btn">
+            {isRtl ? 'تواصل معنا' : 'Get in Touch'}
+            <i className={`bi ${arrow}`}></i>
+          </Link>
         </div>
       </section>
 

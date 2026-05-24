@@ -334,17 +334,40 @@ export default function ShopPage() {
 
           {/* 2. Main Gallery Area */}
           <div className="shop-gallery" id="all-designs">
+            {/* Horizontal category tabs (mockup style) */}
+            <div className="shop-tabs" role="tablist" aria-label={isRtl ? 'الفئات' : 'Categories'}>
+              <button
+                role="tab"
+                aria-selected={selectedCategoryId === null}
+                onClick={clearFilter}
+                className={`shop-tab ${selectedCategoryId === null ? 'is-active' : ''}`}
+              >
+                {isRtl ? 'الكل' : 'All'}
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  role="tab"
+                  aria-selected={selectedCategoryId === cat.id}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  className={`shop-tab ${selectedCategoryId === cat.id ? 'is-active' : ''}`}
+                >
+                  {isRtl ? cat.nameAr : cat.name}
+                </button>
+              ))}
+            </div>
+
             {/* Header / Filter Status */}
             {/* Unity Header */}
             <div className="shop-header-samsung" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 style={{ margin: 0, fontWeight: 800, fontSize: '2rem', color: 'var(--bg-main)', letterSpacing: '-0.02em' }}>
+                <h2 style={{ margin: 0, fontWeight: 800, fontSize: '2rem', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
                   {selectedCategoryId
                     ? (isRtl ? categories.find(c => c.id === selectedCategoryId)?.nameAr : categories.find(c => c.id === selectedCategoryId)?.name)
                     : (isRtl ? 'جميع التصاميم' : 'All Designs')
                   }
                 </h2>
-                <p style={{ margin: '4px 0 0', color: 'rgba(13, 26, 99, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
+                <p style={{ margin: '4px 0 0', color: 'rgba(42, 32, 24, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
                   {filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0)} {isRtl ? 'قطعة متوفرة' : 'items found'}
                 </p>
               </div>
@@ -353,7 +376,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => setIsCategoryManagerOpen(true)}
                   className="hero-secondary-btn py-2 px-4 shadow-sm"
-                  style={{ fontSize: '0.85rem', borderRadius: '12px', border: '1.5px solid var(--bg-main)', color: 'var(--bg-main)', fontWeight: 700 }}
+                  style={{ fontSize: '0.85rem', borderRadius: '12px', border: '1.5px solid var(--bg-main)', color: 'var(--text-main)', fontWeight: 700 }}
                 >
                   <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
                 </button>
@@ -365,10 +388,10 @@ export default function ShopPage() {
               <div key={group.id} id={`category-${group.id}`} style={{ marginBottom: selectedCategoryId ? '0' : '60px' }}>
                 {!selectedCategoryId && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(13, 26, 99, 0.4)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(42, 32, 24, 0.4)' }}>
                       {isRtl ? group.nameAr : group.name}
                     </h3>
-                    <div style={{ flex: 1, height: '1px', background: 'rgba(13, 26, 99, 0.1)' }}></div>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(42, 32, 24, 0.1)' }}></div>
                   </div>
                 )}
 
@@ -432,7 +455,7 @@ export default function ShopPage() {
                                     height: '12px', 
                                     borderRadius: '50%', 
                                     background: c, 
-                                    border: '1px solid rgba(13, 26, 99, 0.1)',
+                                    border: '1px solid rgba(42, 32, 24, 0.1)',
                                     boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)'
                                   }} 
                                 />
@@ -441,7 +464,7 @@ export default function ShopPage() {
                           )}
 
                           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px', justifyContent: 'center', width: '100%' }}>
-                            <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--bg-main)', margin: 0 }}>
+                            <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
                               {item.salePrice ?? item.price} {t('currency')}
                             </span>
                             {item.salePrice && item.salePrice < item.price && (
@@ -480,7 +503,7 @@ export default function ShopPage() {
                               }
 
                               return (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(13, 26, 99, 0.04)', padding: '4px 10px', borderRadius: '999px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(42, 32, 24, 0.04)', padding: '4px 10px', borderRadius: '999px' }}>
                                   <button
                                     onClick={(e) => { 
                                       e.stopPropagation(); 
@@ -495,14 +518,14 @@ export default function ShopPage() {
                                   >
                                     <i className={`bi ${qty === 1 ? 'bi-trash3-fill' : 'bi-dash-lg'}`} style={{ fontSize: '0.9rem' }}></i>
                                   </button>
-                                  <span style={{ fontWeight: 800, color: 'var(--bg-main)', minWidth: '18px', textAlign: 'center', fontSize: '0.85rem' }}>{qty}</span>
+                                  <span style={{ fontWeight: 800, color: 'var(--text-main)', minWidth: '18px', textAlign: 'center', fontSize: '0.85rem' }}>{qty}</span>
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (!cartItem) return;
                                       updateQuantity(cartItem.id, qty + 1);
                                     }}
-                                    style={{ border: 'none', background: 'none', color: 'var(--bg-main)', padding: '4px', display: 'flex', alignItems: 'center' }}
+                                    style={{ border: 'none', background: 'none', color: 'var(--text-main)', padding: '4px', display: 'flex', alignItems: 'center' }}
                                   >
                                     <i className="bi bi-plus-lg" style={{ fontSize: '0.9rem' }}></i>
                                   </button>
@@ -550,7 +573,7 @@ export default function ShopPage() {
               right: isRtl ? 'auto' : 'max(24px, env(safe-area-inset-right))',
               left: isRtl ? 'max(24px, env(safe-area-inset-left))' : 'auto',
               zIndex: 1000,
-              background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50px',
+              background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50px',
               padding: '16px 32px', fontSize: '1.1rem', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px'
             }}
@@ -595,7 +618,7 @@ export default function ShopPage() {
           >
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.5rem' }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
-              <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>&times;</button>
+              <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'var(--text-main)', border: 'none', color: 'var(--text-main)', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>&times;</button>
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'var(--bg-main)', borderRadius: '16px', border: '1px solid var(--line-soft)' }}>
@@ -659,7 +682,7 @@ export default function ShopPage() {
             <button
               onClick={() => setIsEditorOpen(false)}
               className="shadow-lg"
-              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
+              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
             >&times;</button>
             <FurnitureManager initialItem={itemToEdit || undefined} onClose={() => setIsEditorOpen(false)} />
           </div>
@@ -679,6 +702,40 @@ export default function ShopPage() {
         @media (max-width: 991px) { .shop-main .container { padding: 0 24px; } }
         @media (max-width: 600px) { .shop-main .container { padding: 0 16px; } }
 
+        /* Horizontal category tabs (2026 redesign) */
+        .shop-tabs {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          padding: 4px 0 18px;
+          margin-bottom: 24px;
+          border-bottom: 1px solid var(--line-soft);
+          scrollbar-width: none;
+        }
+        .shop-tabs::-webkit-scrollbar { display: none; }
+        .shop-tab {
+          flex-shrink: 0;
+          padding: 9px 20px;
+          border-radius: var(--r-pill);
+          border: 1px solid var(--line-soft);
+          background: transparent;
+          color: var(--text-main);
+          font-family: var(--font-app);
+          font-size: 0.82rem;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: var(--transition-smooth);
+        }
+        .shop-tab:hover { background: var(--surface-soft); }
+        .shop-tab.is-active {
+          background: var(--text-main);
+          color: var(--bg-main);
+          border-color: var(--text-main);
+        }
+
         /* Rotating Collection Showcase (self-contained, full-bleed image + scrim) */
         .shop-showcase {
           position: relative;
@@ -690,7 +747,7 @@ export default function ShopPage() {
           margin-bottom: 10px;
           overflow: hidden;
           isolation: isolate;
-          background: #0a0f2e;
+          background: var(--accent-deep);
           /* Scope layout + paint so scrolling never needs to recompute anything
              inside this hero — the absolute slides and Ken Burns animation
              stay contained. */
@@ -815,7 +872,7 @@ export default function ShopPage() {
           padding: 14px 28px;
           margin-top: 6px;
           background: #fff;
-          color: #0a0f2e;
+          color: var(--accent-deep);
           border: none;
           border-radius: 999px;
           font-size: 0.95rem;
@@ -823,11 +880,11 @@ export default function ShopPage() {
           letter-spacing: 0.04em;
           cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-          box-shadow: 0 10px 28px rgba(34, 81, 164, 0.5);
+          box-shadow: 0 10px 28px rgba(139, 111, 78, 0.5);
         }
         .shop-showcase-cta:hover {
           transform: translateY(-1px);
-          box-shadow: 0 14px 36px rgba(34, 81, 164, 0.65);
+          box-shadow: 0 14px 36px rgba(139, 111, 78, 0.65);
         }
         .shop-showcase-cta i { font-size: 0.9rem; }
 
@@ -860,7 +917,7 @@ export default function ShopPage() {
         }
         .shop-showcase-dot.is-active {
           background: #fff;
-          color: #0a0f2e;
+          color: var(--accent-deep);
           border-color: #fff;
         }
         .shop-showcase-dot span {
@@ -939,7 +996,7 @@ export default function ShopPage() {
           background: var(--blue-deep);
           border-color: var(--blue-accent);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(34, 81, 164, 0.42);
+          box-shadow: 0 6px 20px rgba(139, 111, 78, 0.42);
         }
         .shop-category-pill:hover i {
           opacity: 1;
@@ -987,26 +1044,26 @@ export default function ShopPage() {
           justify-content: center;
           font-size: 1.15rem;
           cursor: pointer;
-          box-shadow: 0 6px 18px rgba(34, 81, 164, 0.5);
+          box-shadow: 0 6px 18px rgba(139, 111, 78, 0.5);
           transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                       box-shadow 0.25s ease,
                       background 0.2s ease;
         }
         .cart-fab-add:hover {
           transform: translateY(-3px) scale(1.06);
-          box-shadow: 0 12px 28px rgba(34, 81, 164, 0.62), 0 0 0 4px rgba(226, 218, 204, 0.18);
+          box-shadow: 0 12px 28px rgba(139, 111, 78, 0.62), 0 0 0 4px rgba(242, 235, 224, 0.18);
           background: #fff;
         }
         .cart-fab-add:active {
           transform: translateY(-1px) scale(0.96);
-          box-shadow: 0 4px 12px rgba(34, 81, 164, 0.55);
+          box-shadow: 0 4px 12px rgba(139, 111, 78, 0.55);
         }
         .cart-fab-add i {
           line-height: 1;
         }
 
         .admin-action-btn:hover { transform: scale(1.1); transition: 0.2s; }
-        .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(34, 81, 164, 0.75) !important; }
+        .fixed-add-btn:hover { transform: translateY(-3px); transition: 0.3s; box-shadow: 0 15px 40px rgba(139, 111, 78, 0.75) !important; }
         .category-modal::-webkit-scrollbar { width: 6px; }
         .category-modal::-webkit-scrollbar-thumb { background: var(--line-soft); border-radius: 10px; }
 
@@ -1083,16 +1140,16 @@ export default function ShopPage() {
           background: var(--sand-soft);
           border-radius: 14px;
           overflow: hidden;
-          box-shadow: 0 4px 14px rgba(34, 81, 164, 0.3);
-          border: 1px solid rgba(13, 26, 99, 0.12);
+          box-shadow: 0 4px 14px rgba(139, 111, 78, 0.3);
+          border: 1px solid rgba(42, 32, 24, 0.12);
           cursor: pointer;
           transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
           display: flex;
           flex-direction: column;
         }
         .compact-card:hover {
-          box-shadow: 0 12px 28px rgba(34, 81, 164, 0.4);
-          border-color: rgba(13, 26, 99, 0.3);
+          box-shadow: 0 12px 28px rgba(139, 111, 78, 0.4);
+          border-color: rgba(42, 32, 24, 0.3);
         }
         .compact-img-wrapper {
           position: relative;
@@ -1100,7 +1157,7 @@ export default function ShopPage() {
           height: 140px;
           overflow: hidden;
           background: #fff;
-          border-bottom: 1px solid rgba(13, 26, 99, 0.08);
+          border-bottom: 1px solid rgba(42, 32, 24, 0.08);
         }
         .compact-img-wrapper img {
           width: 100%;
@@ -1115,7 +1172,7 @@ export default function ShopPage() {
           position: absolute;
           top: 10px;
           left: 10px;
-          background: #0d1a63;
+          background: var(--text-main);
           color: var(--sand-soft);
           font-size: 0.6rem;
           font-weight: 800;
@@ -1123,7 +1180,7 @@ export default function ShopPage() {
           border-radius: 999px;
           letter-spacing: 1px;
           text-transform: uppercase;
-          box-shadow: 0 2px 6px rgba(34, 81, 164, 0.35);
+          box-shadow: 0 2px 6px rgba(139, 111, 78, 0.35);
         }
         [dir="rtl"] .compact-tag { left: auto; right: 10px; }
         .compact-info {
@@ -1135,7 +1192,7 @@ export default function ShopPage() {
         .compact-title {
           font-size: 0.9rem;
           font-weight: 700;
-          color: #0d1a63;
+          color: var(--text-main);
           margin: 0;
           white-space: nowrap;
           overflow: hidden;
@@ -1143,7 +1200,7 @@ export default function ShopPage() {
         }
         .compact-price {
           font-size: 0.78rem;
-          color: rgba(13, 26, 99, 0.65);
+          color: rgba(42, 32, 24, 0.65);
           font-weight: 600;
         }
 
@@ -1158,12 +1215,12 @@ export default function ShopPage() {
           padding: 1.2em;
           z-index: 1;
           overflow: hidden;
-          box-shadow: 0 8px 24px rgba(34, 81, 164, 0.4);
+          box-shadow: 0 8px 24px rgba(139, 111, 78, 0.4);
           transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.4s ease;
         }
         .shop-item-card:hover {
           transform: translateY(-6px) scale(1.02);
-          box-shadow: 0 16px 40px rgba(34, 81, 164, 0.6), 0 0 0 1px rgba(255,255,255,0.1);
+          box-shadow: 0 16px 40px rgba(139, 111, 78, 0.6), 0 0 0 1px rgba(255,255,255,0.1);
         }
         .card-bg-layer {
           position: absolute;
@@ -1182,7 +1239,7 @@ export default function ShopPage() {
         .card-overlay {
           position: absolute;
           top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(to top, rgba(6, 10, 35, 0.95) 0%, rgba(6, 10, 35, 0.6) 20%, transparent 45%);
+          background: linear-gradient(to top, rgba(31, 24, 18, 0.95) 0%, rgba(31, 24, 18, 0.6) 20%, transparent 45%);
         }
         .card-content {
           color: white;

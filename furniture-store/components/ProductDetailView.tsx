@@ -632,6 +632,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           align-items: center;
           justify-content: center;
           gap: 10px;
+          white-space: nowrap;
         }
 
         .pd-cta-primary {
@@ -719,8 +720,9 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           .pd-type-pill { padding: 7px 14px; font-size: 0.78rem; }
           .pd-color-swatch { width: 28px; height: 28px; }
           .pd-footer { padding-top: 20px; gap: 12px; }
-          .pd-action-row { grid-template-columns: 1fr 1fr; }
-          .pd-cta { padding: 15px; font-size: 0.82rem; letter-spacing: 0.12em; }
+          /* Keep ADD TO CART wider than WISHLIST so its label fits one line. */
+          .pd-action-row { grid-template-columns: 1.4fr 1fr; }
+          .pd-cta { padding: 15px 12px; font-size: 0.78rem; letter-spacing: 0.05em; gap: 8px; }
           .pd-feature-toggle { font-size: 0.82rem; padding: 10px 14px; }
         }
         @media (max-width: 600px) {
@@ -733,7 +735,7 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           .pd-selector-row { gap: 12px; margin-bottom: 14px; }
           .pd-selector-label { min-width: 44px; }
           .pd-type-pill { padding: 6px 12px; font-size: 0.74rem; }
-          .pd-cta { padding: 13px; font-size: 0.78rem; }
+          .pd-cta { padding: 14px 10px; font-size: 0.74rem; letter-spacing: 0.04em; }
           .pd-feature-toggle { font-size: 0.76rem; padding: 9px 12px; }
         }
       `}</style>

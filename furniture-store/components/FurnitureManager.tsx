@@ -69,6 +69,25 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
     isFeatured: initialItem?.isFeatured ?? false,
   });
 
+  // Admins enter a discount %, not an absolute sale price. We still STORE an
+  // absolute salePrice (computed on submit) so nothing downstream changes.
+  // When editing an existing sale, back-compute the % from the saved prices.
+  const [discountPct, setDiscountPct] = useState<string>(() => {
+    const p = initialItem?.price ?? 0;
+    const sp = initialItem?.salePrice ?? null;
+    if (p > 0 && sp != null && sp > 0 && sp < p) {
+      return String(Math.round((1 - sp / p) * 100));
+    }
+    return '';
+  });
+
+  // Live computed sale price from the entered % (null = no valid discount).
+  const computedSalePrice = (() => {
+    const pct = parseFloat(discountPct);
+    if (isNaN(pct) || pct <= 0 || pct >= 100 || !(formData.price > 0)) return null;
+    return Math.round(formData.price * (1 - pct / 100) * 100) / 100;
+  })();
+
   const [uploading, setUploading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
 
@@ -254,6 +273,8 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
       name: formData.name.trim() || 'Unnamed Item',
       nameAr: formData.nameAr.trim() || 'منتج غير مسمى',
       image: formData.image.trim(),
+      // Persist the absolute sale price derived from the entered discount %.
+      salePrice: computedSalePrice,
     };
 
     if (initialItem) {
@@ -305,28 +326,28 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
             <div className="col-md-6">
               <label className="form-label small opacity-75">Name (EN)</label>
               <input
-                type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
+                type="text" className="form-control fm-input form-control-sm"
                 value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div className="col-md-6">
               <label className="form-label small opacity-75">الاسم (AR)</label>
               <input
-                type="text" className="form-control bg-dark text-white border-secondary form-control-sm"
+                type="text" className="form-control fm-input form-control-sm"
                 value={formData.nameAr} onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
               />
             </div>
             <div className="col-md-6">
               <label className="form-label small opacity-75">Description (EN)</label>
               <textarea
-                className="form-control bg-dark text-white border-secondary form-control-sm" rows={2}
+                className="form-control fm-input form-control-sm" rows={2}
                 value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required
               />
             </div>
             <div className="col-md-6">
               <label className="form-label small opacity-75">الوصف (AR)</label>
               <textarea
-                className="form-control bg-dark text-white border-secondary form-control-sm" rows={2}
+                className="form-control fm-input form-control-sm" rows={2}
                 value={formData.descriptionAr} onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })} required
               />
             </div>
@@ -387,7 +408,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               <div className="d-flex gap-2">
                 <input
                   type="text"
-                  className="form-control bg-dark text-white border-secondary form-control-sm"
+                  className="form-control fm-input form-control-sm"
                   value={urlInput}
                   onChange={e => setUrlInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addUrlImage(); } }}
@@ -406,9 +427,9 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
             <div className="col-md-4">
               <label className="form-label small opacity-75">Price</label>
               <div className="input-group input-group-sm">
-                <span className="input-group-text bg-dark border-secondary text-white">$</span>
+                <span className="input-group-text fm-input">$</span>
                 <input
-                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
+                  type="number" step="0.01" min="0" className="form-control fm-input"
                   value={formData.price}
                   onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
                   onFocus={(e) => { if(formData.price === 0) e.target.value = ''; }}
@@ -417,21 +438,27 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               </div>
             </div>
             <div className="col-md-4">
-              <label className="form-label small opacity-75">Sale Price (optional)</label>
+              <label className="form-label small opacity-75">{isRtl ? 'نسبة الخصم (اختياري)' : 'Discount % (optional)'}</label>
               <div className="input-group input-group-sm">
-                <span className="input-group-text bg-dark border-secondary text-white">$</span>
                 <input
-                  type="number" step="0.01" min="0" className="form-control bg-dark text-white border-secondary"
-                  value={formData.salePrice ?? ''}
-                  onChange={e => setFormData({ ...formData, salePrice: e.target.value === '' ? null : parseFloat(e.target.value) })}
-                  placeholder="Leave blank if not on sale"
+                  type="number" step="1" min="0" max="99" className="form-control fm-input"
+                  value={discountPct}
+                  onChange={e => setDiscountPct(e.target.value)}
+                  placeholder={isRtl ? 'مثال: ٢٠' : 'e.g. 20'}
                 />
+                <span className="input-group-text fm-input">%</span>
               </div>
+              {computedSalePrice != null && (
+                <div className="small mt-1" style={{ color: 'var(--text-soft)' }}>
+                  {isRtl ? 'السعر بعد الخصم: ' : 'Sale price: '}
+                  {computedSalePrice.toLocaleString()} {t('currency')}
+                </div>
+              )}
             </div>
             <div className="col-md-4">
               <label className="form-label small opacity-75">{isRtl ? 'الفئة' : 'Category'}</label>
               <select
-                className="form-select bg-dark text-white border-secondary form-select-sm"
+                className="form-select fm-input form-select-sm"
                 value={formData.categoryId}
                 onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
                 required
@@ -449,7 +476,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               <label className="form-label small opacity-75">Colors (hex or css color)</label>
               <div className="d-flex flex-wrap gap-2 mb-2">
                 {(formData.colors || []).map(c => (
-                  <div key={c} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '8px' }}>
+                  <div key={c} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-panel)', border: '1px solid var(--line-soft)', padding: '4px 8px', borderRadius: '8px' }}>
                     <span style={{ width: '18px', height: '18px', borderRadius: '4px', background: c, border: '1px solid var(--line-soft)' }} />
                     <span style={{ fontSize: '0.8rem' }}>{c}</span>
                     <button type="button" onClick={() => removeColor(c)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', padding: 0, fontSize: '1rem' }}>×</button>
@@ -466,7 +493,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
                 />
                 <input
                   type="text"
-                  className="form-control bg-dark text-white border-secondary form-control-sm"
+                  className="form-control fm-input form-control-sm"
                   placeholder="#FFD700 or 'burlywood' — press Enter"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -483,7 +510,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               <label className="form-label small opacity-75">Types / Variants</label>
               <div className="d-flex flex-wrap gap-2 mb-2">
                 {(formData.types || []).map(type => (
-                  <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                  <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-panel)', border: '1px solid var(--line-soft)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.85rem' }}>
                     <span>{type}</span>
                     <button type="button" onClick={() => removeType(type)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', padding: 0, fontSize: '1rem' }}>×</button>
                   </div>
@@ -491,7 +518,7 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
               </div>
               <input
                 type="text"
-                className="form-control bg-dark text-white border-secondary form-control-sm"
+                className="form-control fm-input form-control-sm"
                 placeholder="e.g. Oak, Walnut — press Enter to add"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -504,21 +531,18 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
             </div>
 
             <div className="col-12">
-              <label
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, isFeatured: !formData.isFeatured })}
+                aria-pressed={!!formData.isFeatured}
                 className="d-inline-flex align-items-center gap-2"
                 style={{ cursor: 'pointer', padding: '8px 14px', background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.25)', borderRadius: '10px' }}
               >
-                <input
-                  type="checkbox"
-                  checked={!!formData.isFeatured}
-                  onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
-                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                />
-                <i className={`bi ${formData.isFeatured ? 'bi-star-fill' : 'bi-star'}`} style={{ color: '#ffd700', fontSize: '1rem' }}></i>
+                <i className={`bi ${formData.isFeatured ? 'bi-star-fill' : 'bi-star'}`} style={{ color: '#ffd700', fontSize: '1.1rem' }}></i>
                 <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
                   {isRtl ? 'عرض كمنتج مميّز على صفحة المجموعات' : 'Featured on Collections page'}
                 </span>
-              </label>
+              </button>
             </div>
             <div className="col-12 mt-3 d-flex gap-2">
               <button type="submit" className="hero-primary-btn flex-grow-1 py-2" style={{ borderRadius: '8px', border: 'none' }}>
@@ -533,6 +557,25 @@ export default function FurnitureManager({ initialItem, onClose }: FurnitureMana
           </div>
         </form>
       </div>
+
+      <style jsx>{`
+        /* Cream-theme inputs (replaced the old bg-dark/text-white Bootstrap
+           classes that rendered as dark boxes on the light Edit Item modal). */
+        .fm-input {
+          background: var(--bg-panel) !important;
+          color: var(--text-main) !important;
+          border: 1px solid var(--line-soft) !important;
+        }
+        .fm-input::placeholder { color: var(--text-soft); opacity: 1; }
+        .fm-input:focus {
+          background: var(--bg-panel) !important;
+          color: var(--text-main) !important;
+          border-color: var(--text-main) !important;
+          box-shadow: 0 0 0 2px rgba(42, 32, 24, 0.08) !important;
+        }
+        /* Bootstrap renders <option> using the OS palette, but force readable. */
+        .fm-input option { color: var(--text-main); background: var(--bg-panel); }
+      `}</style>
     </div>
   );
 }

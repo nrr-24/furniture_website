@@ -82,7 +82,7 @@ const COMPARE_SPECS = [
 ];
 
 export default function HomePage() {
-  const { isRtl } = useLanguage();
+  const { isRtl, language } = useLanguage();
   const { items, initialized } = useFurniture();
 
   if (!initialized) return null;
@@ -140,7 +140,7 @@ export default function HomePage() {
           </p>
           <img
             className="sw-hero-signature"
-            src="/images/LOGO/smartwood-en-white.svg"
+            src={`/images/LOGO/smartwood-${language}-white.svg`}
             alt=""
             aria-hidden="true"
           />

@@ -187,8 +187,13 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
               </span>
             ) : hasSale ? (
               <>
-                <span className="pd-regular-price-strike">{regularPrice} {t('currency')}</span>
                 <span className="pd-sale-price">{activePrice} {t('currency')}</span>
+                <span className="pd-regular-price-strike">{regularPrice} {t('currency')}</span>
+                {regularPrice > 0 && (
+                  <span className="pd-discount-badge">
+                    -{Math.round((1 - activePrice / regularPrice) * 100)}%
+                  </span>
+                )}
               </>
             ) : (
               <span className="pd-regular-price">{activePrice} <span className="pd-currency">{t('currency')}</span></span>
@@ -517,6 +522,16 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           font-size: 1.85rem;
           font-weight: 700;
           color: #a8553a;
+        }
+        .pd-discount-badge {
+          align-self: center;
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #fff;
+          background: #c0392b;
+          border-radius: 8px;
+          padding: 3px 9px;
+          letter-spacing: 0.02em;
         }
 
         .pd-description {

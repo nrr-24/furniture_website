@@ -199,12 +199,12 @@ export default function AdminUsersPage() {
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} style={{ padding: 'clamp(24px, 5vw, 40px) clamp(16px, 5vw, 60px)', flex: 1, overflowY: 'auto', background: 'var(--bg-main)' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1000px', width: '100%', margin: '0 auto' }}>
 
         {/* Header Section */}
         <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <span className="section-kicker" style={{ fontSize: '0.8rem', opacity: 0.6, letterSpacing: '2px' }}>{isRtl ? 'نظام التحكم' : 'ACCESS CONTROL'}</span>
+            <span className="section-kicker" style={{ fontSize: '0.8rem', letterSpacing: '2px' }}>{isRtl ? 'نظام التحكم' : 'ACCESS CONTROL'}</span>
             <h1 className="smartwood-title" style={{ fontSize: 'clamp(1.8rem, 6vw, 3rem)', margin: 0 }}>
               {isRtl ? 'إدارة المستخدمين' : 'User Base'}
             </h1>
@@ -221,28 +221,28 @@ export default function AdminUsersPage() {
 
         {/* Floating Create User Form */}
         {isFormVisible && (
-          <div className="furniture-card p-4 mb-5" style={{ background: 'var(--bg-panel)', border: '1px solid var(--blue-deep)' }}>
+          <div className="furniture-card p-4 mb-5" style={{ background: 'var(--bg-panel)', border: '1px solid var(--line-soft)' }}>
             <h4 style={{ marginBottom: '20px', fontSize: '1.2rem' }}>{isRtl ? 'إضافة مستخدم جديد للنظام' : 'Provision New System Access'}</h4>
             <form onSubmit={handleCreateUser} className="row g-3">
               <div className="col-md-5">
                 <input
                   type="email"
-                  className="form-control bg-dark text-white border-secondary"
+                  className="form-control"
                   placeholder={isRtl ? 'البريد الإلكتروني' : 'Email Address'}
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '10px', height: '48px', background: 'var(--bg-main)', color: 'var(--text-main)', border: '1px solid var(--line-soft)' }}
                   required
                 />
               </div>
               <div className="col-md-5">
                 <input
                   type="password"
-                  className="form-control bg-dark text-white border-secondary"
+                  className="form-control"
                   placeholder={isRtl ? 'كلمة المرور' : 'Secure Password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '10px', height: '48px', background: 'var(--bg-main)', color: 'var(--text-main)', border: '1px solid var(--line-soft)' }}
                   required
                 />
               </div>
@@ -260,14 +260,14 @@ export default function AdminUsersPage() {
           <i className="bi bi-search" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}></i>
           <input
             type="text"
-            className="form-control border-0"
+            className="form-control"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              color: 'white',
+              background: 'var(--bg-panel)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--line-soft)',
               padding: '16px 20px 16px 50px',
               borderRadius: '16px',
               fontSize: '1rem',
-              backdropFilter: 'blur(10px)'
             }}
             placeholder={isRtl ? 'تصفية حسب البريد أو الاسم أو الدور...' : 'Filter by email, name or role...'}
             value={searchQuery}
@@ -335,7 +335,7 @@ export default function AdminUsersPage() {
 
                 {/* Expanded Detail Panel */}
                 {isExpanded && (
-                  <div style={{ padding: '0 24px 30px', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.1)' }}>
+                  <div style={{ padding: '0 24px 30px', borderTop: '1px solid var(--line-soft)', background: 'var(--bg-main)' }}>
                     <div className="row g-4 mt-2">
                       {/* Left Side: Profile Edit */}
                       <div className="col-md-6">
@@ -374,7 +374,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       {/* Right Side: Order History */}
-                      <div className="col-md-6" style={{ borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div className="col-md-6" style={{ borderLeft: '1px solid var(--line-soft)' }}>
                         <h5 style={{ fontSize: '0.9rem', opacity: 0.5, marginBottom: '20px', letterSpacing: '1px' }}>TRANSACTION LOGS</h5>
                         <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
                           {loadingOrders ? (
@@ -384,14 +384,14 @@ export default function AdminUsersPage() {
                           ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                               {detailOrders.map(order => (
-                                <div key={order.id} style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
+                                <div key={order.id} style={{ padding: '12px 16px', background: 'var(--bg-panel)', borderRadius: '14px', border: '1px solid var(--line-soft)', fontSize: '0.85rem' }}>
                                   <div className="d-flex justify-content-between mb-2">
                                     <span style={{ fontWeight: 700 }}>#{order.id.substring(0,8)}</span>
                                     <span style={{ opacity: 0.6 }}>{order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</span>
                                   </div>
                                   <div className="d-flex justify-content-between align-items-center">
                                     <span style={{ color: 'var(--blue-main)', fontWeight: 700 }}>{order.order_items?.reduce((s: number, i: any) => s + (i.price * i.quantity), 0) || order.total_amount} {t('currency')}</span>
-                                    <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)' }}>{order.status}</span>
+                                    <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', padding: '2px 8px', borderRadius: '4px', background: 'var(--bg-main)', color: 'var(--text-soft)' }}>{order.status}</span>
                                   </div>
                                 </div>
                               ))}
@@ -423,8 +423,8 @@ export default function AdminUsersPage() {
           transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         input::placeholder {
-          color: white !important;
-          opacity: 0.35 !important;
+          color: var(--text-soft) !important;
+          opacity: 1 !important;
         }
         .admin-label {
           display: block;
@@ -435,25 +435,25 @@ export default function AdminUsersPage() {
         }
         .admin-input {
           width: 100%;
-          background: rgba(0,0,0,0.3);
+          background: var(--bg-main);
           border: 1px solid var(--line-soft);
           border-radius: 10px;
           padding: 10px 14px;
-          color: white;
+          color: var(--text-main);
           font-size: 0.9rem;
           transition: 0.2s;
         }
         .admin-input:focus {
-          border-color: var(--blue-main);
+          border-color: var(--text-main);
           outline: none;
         }
         .admin-input::placeholder {
-           color: rgba(255, 255, 255, 0.4);
+           color: var(--text-soft);
         }
         @media (max-width: 767px) {
           .user-card .col-md-6 {
             border-left: none !important;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid var(--line-soft);
             padding-top: 24px;
           }
           .user-card .col-md-6:first-child {

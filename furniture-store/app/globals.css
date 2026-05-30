@@ -126,7 +126,9 @@
 
   /* Typography */
   --font-app: 'UbuntuArabic', 'MontserratArabic', sans-serif;
-  --font-serif: var(--font-cormorant), 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  /* UbuntuArabic is first so Arabic headings use it; its Arabic-only
+     unicode-range means Latin headings skip it and fall through to Cormorant. */
+  --font-serif: 'UbuntuArabic', var(--font-cormorant), 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
 
   /* Geometry */
   --r-card: 24px;
@@ -177,6 +179,15 @@ h3 {
 h1 { font-weight: 500; }
 h2 { font-weight: 500; }
 h3 { font-weight: 600; }
+
+/* Something in the bundled CSS applies a content-based max-width to headings
+   and paragraphs, shrink-wrapping them so they pin to the LEFT inside centered
+   containers (kicker centered, title/subtext drifting left). Reset it here.
+   Intentional caps (.sw-section-title-center: 720px, .cr-material-text: 32ch,
+   .sw-hero-body: 40ch, etc.) all use classes, so they still win by specificity. */
+h1, h2, h3, h4, h5, h6, p {
+  max-width: none;
+}
 
 /* Small uppercase kicker — used above section titles in the new design.
    Example: "OUR PROMISE", "EST. 1998". */
@@ -1384,13 +1395,15 @@ select {
 
 .hero-secondary-btn {
   background: transparent;
-  color: var(--sand-soft);
-  border: 1px solid var(--sand-soft);
+  /* was var(--sand-soft) — near-cream text/border that was invisible on the
+     cream surfaces (Cancel, Edit Categories). */
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
 }
 
 .hero-secondary-btn:hover {
-  background: rgba(242, 235, 224, 0.1);
-  /* Cream hint */
+  background: var(--text-main);
+  color: var(--bg-main);
   transform: translateY(-2px);
 }
 
@@ -1434,7 +1447,9 @@ select {
 .section-kicker {
   display: inline-block;
   margin-bottom: 10px;
-  color: var(--sand-soft);
+  /* was var(--sand-soft) — a near-cream chip color that rendered invisible as
+     text on the cream page (dark-theme leftover). */
+  color: var(--text-soft);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;

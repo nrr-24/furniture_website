@@ -5168,21 +5168,18 @@ select {
   overflow: hidden;
 }
 .about-2026 .av-hero-right-content { position: relative; z-index: 2; }
-.about-2026 .hero-signature-text {
+.about-2026 .hero-signature-logo {
   position: absolute;
   bottom: 40px;
   right: 40px;
-  font-family: 'SydneySignature', 'Playfair Display', 'Georgia', serif;
-  font-size: 2.2rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.95);
-  letter-spacing: 0.08em;
+  width: clamp(110px, 11vw, 150px);
+  height: auto;
+  opacity: 0.95;
   z-index: 2;
   pointer-events: none;
   user-select: none;
-  -webkit-font-smoothing: antialiased;
 }
-[dir="rtl"] .about-2026 .hero-signature-text { right: auto; left: 40px; }
+[dir="rtl"] .about-2026 .hero-signature-logo { right: auto; left: 40px; }
 .about-2026 .av-hero-right .av-hero-title {
   color: #fff;
   font-family: var(--font-serif);
@@ -5258,13 +5255,13 @@ select {
   .about-2026 .av-hero-right { flex: none; width: 100%; padding: 28px 24px 18px; }
   .about-2026 .av-hero-right .av-hero-title { font-size: 2.2rem; }
   /* Signature flows under the copy instead of overlapping the card. */
-  .about-2026 .hero-signature-text {
+  .about-2026 .hero-signature-logo {
     position: static;
     display: block;
     margin-top: 22px;
-    font-size: 1.9rem;
+    width: 130px;
   }
-  [dir="rtl"] .about-2026 .hero-signature-text { left: auto; }
+  [dir="rtl"] .about-2026 .hero-signature-logo { left: auto; }
 }
 
 /* Kicker contrast fix — the soft token was too faint against cream, so the

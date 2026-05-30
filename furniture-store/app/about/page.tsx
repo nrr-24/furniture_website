@@ -21,7 +21,7 @@ import Footer from '../../components/layout/Footer';
  * ============================================================ */
 
 export default function CraftsmanshipPage() {
-  const { isRtl } = useLanguage();
+  const { isRtl, language } = useLanguage();
   const { items } = useFurniture();
   // Prefer a priced item so the hero card never shows "0 KWD".
   const featuredProduct = useMemo(
@@ -189,7 +189,7 @@ export default function CraftsmanshipPage() {
                 : 'SmartWood factory has been a leader in the Kuwaiti high-end furniture for more than 26 years.'}
             </p>
           </div>
-          <span className="hero-signature-text">SmartWood</span>
+          <img className="hero-signature-logo" src={`/images/LOGO/smartwood-${language}-white.svg`} alt="" aria-hidden="true" />
         </div>
       </section>
 

@@ -23,7 +23,11 @@ import Footer from '../../components/layout/Footer';
 export default function CraftsmanshipPage() {
   const { isRtl } = useLanguage();
   const { items } = useFurniture();
-  const featuredProduct = useMemo(() => items[0] || null, [items]);
+  // Prefer a priced item so the hero card never shows "0 KWD".
+  const featuredProduct = useMemo(
+    () => items.find((i) => i.price > 0) || items[0] || null,
+    [items]
+  );
   const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
 
   useEffect(() => {
@@ -161,11 +165,13 @@ export default function CraftsmanshipPage() {
                 <span className="hero-glass-title">
                   {isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name}
                 </span>
-                <div className="hero-glass-price-wrap">
-                  <span className="hero-glass-price">
-                    {isRtl ? `${featuredProduct.price} د.ك` : `${featuredProduct.price} KWD`}
-                  </span>
-                </div>
+                {featuredProduct.price > 0 && (
+                  <div className="hero-glass-price-wrap">
+                    <span className="hero-glass-price">
+                      {isRtl ? `${featuredProduct.price} د.ك` : `${featuredProduct.price} KWD`}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </Link>

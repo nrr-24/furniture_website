@@ -29,15 +29,6 @@ import Footer from '../components/layout/Footer';
  * place to swap placeholder photography for the real Smartwood shots.
  * ============================================================ */
 
-// Pillar icons for the 4-up feature strip + "German Quality" row.
-// Using Bootstrap Icons since the project already loads the font.
-const FEATURE_PILLARS = [
-  { key: 'years',       icon: 'bi-patch-check',  enLabel: '26+ Years of Excellence',   arLabel: 'أكثر من 26 سنة من التميز' },
-  { key: 'wood',        icon: 'bi-tree',         enLabel: 'German Wood',               arLabel: 'خشب ألماني' },
-  { key: 'accessories', icon: 'bi-bounding-box', enLabel: 'German & Austrian Accessories', arLabel: 'إكسسوارات ألمانية ونمساوية' },
-  { key: 'techniques',  icon: 'bi-diagram-3',    enLabel: 'Latest Techniques',         arLabel: 'أحدث التقنيات' },
-];
-
 const QUALITY_FEATURES = [
   {
     key: 'wood',
@@ -100,13 +91,33 @@ export default function HomePage() {
   const featuredItems: FurnitureItem[] = items.slice(0, 4);
   const compareItems: FurnitureItem[] = items.slice(0, 3);
 
+  // Hero product card — prefer a priced item so we never show "0 KWD".
+  const heroProduct: FurnitureItem | undefined =
+    items.find((i) => i.price > 0) || items[0];
+
   const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
 
   return (
     <main className="app-content home-2026" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* === 1. Hero =========================================== */}
+      {/* === 1. Hero — dark editorial card =====================
+          Niche photo (left) with floating feature badges, dark copy panel
+          (right) with a blue ray graphic + script signature, and a floating
+          product card overlapping the bottom seam. */}
       <section className="sw-hero">
+        <div className="sw-hero-media">
+          <img src={HOME_ASSETS.hero.src} alt="" />
+          <span className="sw-hero-badge sw-hero-badge-tl">
+            <i className="bi bi-tree" aria-hidden="true"></i>
+            <span>{isRtl ? 'خشب ألماني فاخر' : 'Premium German Wood'}</span>
+          </span>
+          <span className="sw-hero-badge sw-hero-badge-bl">
+            <i className="bi bi-bounding-box" aria-hidden="true"></i>
+            <span>{isRtl ? 'إكسسوارات ألمانية ونمساوية' : 'German & Austrian Accessories'}</span>
+          </span>
+        </div>
+
         <div className="sw-hero-copy">
+          <span className="sw-hero-rays" aria-hidden="true" />
           <h1 className="sw-hero-title">
             {isRtl ? (
               <>
@@ -127,52 +138,96 @@ export default function HomePage() {
               ? 'مصنع سمارت وود هو رائد في الكويت في صناعة الأثاث الفاخر منذ أكثر من 26 سنة.'
               : 'SmartWood factory has been a leader in the kuwaiti high-end furniture for more than 26 years.'}
           </p>
-          <Link href="/about" className="sw-btn-outline">
-            <span>{isRtl ? 'اكتشف الحرفية' : 'Discover Craftsmanship'}</span>
-            <i className={`bi ${arrow}`}></i>
+          <img
+            className="sw-hero-signature"
+            src="/images/LOGO/smartwood-en-white.svg"
+            alt=""
+            aria-hidden="true"
+          />
+        </div>
+
+        {heroProduct && (
+          <Link href={`/shop/product/${heroProduct.id}`} className="sw-hero-product">
+            <span className="sw-hero-product-thumb">
+              <img src={heroProduct.image || FALLBACK_IMAGE} alt="" />
+            </span>
+            <span className="sw-hero-product-info">
+              <span className="sw-hero-product-name">
+                {isRtl ? heroProduct.nameAr || heroProduct.name : heroProduct.name}
+              </span>
+              {heroProduct.price > 0 && (
+                <span className="sw-hero-product-price">
+                  {heroProduct.price.toLocaleString()} <em>{isRtl ? 'د.ك' : 'KWD'}</em>
+                </span>
+              )}
+            </span>
           </Link>
-        </div>
-
-        <div className="sw-hero-media" aria-hidden="true">
-          <img src={HOME_ASSETS.hero.src} alt="" />
-        </div>
+        )}
       </section>
 
-      {/* === 2. Feature strip ================================== */}
-      <section className="sw-feature-strip">
-        {FEATURE_PILLARS.map((p, idx) => (
-          <div key={p.key} className="sw-feature-cell">
-            <i className={`bi ${p.icon}`}></i>
-            <span>{isRtl ? p.arLabel : p.enLabel}</span>
-            {idx < FEATURE_PILLARS.length - 1 && <span className="sw-feature-divider" aria-hidden="true" />}
-          </div>
-        ))}
-      </section>
-
-      {/* === 3. Excellence in Every Detail ===================== */}
+      {/* === 3. Excellence in Every Detail =====================
+          Centered title; left = two stacked feature cards (image + copy),
+          right = body copy followed by a 3-icon pillar row. */}
       <section className="sw-excellence">
-        <div className="sw-excellence-copy">
-          <span className="section-kicker">{isRtl ? 'وعدنا' : 'OUR PROMISE'}</span>
-          <h2 className="sw-section-title">
-            {isRtl ? 'تميّز في كل تفصيل' : (<>Excellence in<br />Every Detail</>)}
-          </h2>
-          <p className="sw-body">
-            {isRtl
-              ? 'نستخدم الخشب الألماني عالي الجودة وأحدث التقنيات والحلول، وإكسسوارات ألمانية ونمساوية فاخرة.'
-              : 'We use high quality German wood, latest techniques and solutions, and premium German & Austrian accessories.'}
-          </p>
-          <p className="sw-body">
-            {isRtl
-              ? 'كل قطعة مصنوعة بدقة، مبنية لتدوم لأجيال.'
-              : 'Every piece is crafted with precision, built to last for generations.'}
-          </p>
-          <Link href="/about" className="sw-link-arrow">
-            <span>{isRtl ? 'اقرأ المزيد' : 'Learn More'}</span>
-            <i className={`bi ${arrow}`}></i>
-          </Link>
-        </div>
-        <div className="sw-excellence-media">
-          <img src={HOME_ASSETS.hardware.src} alt={isRtl ? 'مفصلة ألمانية فاخرة' : 'Premium German hinge'} />
+        <h2 className="sw-section-title sw-section-title-center">
+          {isRtl ? 'تميّز في كل تفصيل' : 'Excellence in Every Detail'}
+        </h2>
+        <div className="sw-excellence-grid">
+          <div className="sw-excellence-cards">
+            <article className="sw-feature-card">
+              <div className="sw-feature-card-img">
+                <img src={HOME_ASSETS.hardware.src} alt={isRtl ? 'أجهزة ألمانية دقيقة' : 'Precision German hardware'} />
+              </div>
+              <div className="sw-feature-card-text">
+                <h3>{isRtl ? 'أجهزة ألمانية دقيقة' : (<>Precision<br />German Hardware</>)}</h3>
+                <p>
+                  {isRtl
+                    ? 'مصممة لأداء سلس وموثوقية تدوم طويلاً.'
+                    : 'Engineered for smooth performance and lasting reliability.'}
+                </p>
+              </div>
+            </article>
+            <article className="sw-feature-card">
+              <div className="sw-feature-card-img">
+                <img src={HOME_ASSETS.joinery.src} alt={isRtl ? 'نجارة خشبية متقنة' : 'Masterful wood joinery'} />
+              </div>
+              <div className="sw-feature-card-text">
+                <h3>{isRtl ? 'نجارة خشبية متقنة' : (<>Masterful<br />Wood Joinery</>)}</h3>
+                <p>
+                  {isRtl
+                    ? 'مصنوعة بدقة، صُممت لتدوم.'
+                    : 'Built with precision, designed to endure.'}
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <div className="sw-excellence-copy">
+            <p className="sw-body">
+              {isRtl
+                ? 'نستخدم الخشب الألماني عالي الجودة وأحدث التقنيات والحلول، وإكسسوارات ألمانية ونمساوية فاخرة.'
+                : 'We use high quality German wood, latest techniques and solutions, and premium German & Austrian accessories.'}
+            </p>
+            <p className="sw-body">
+              {isRtl
+                ? 'كل قطعة مصنوعة بدقة، مبنية لتدوم لأجيال.'
+                : 'Every piece is crafted with precision, built to last for generations.'}
+            </p>
+            <div className="sw-excellence-icons">
+              <div className="sw-excellence-icon">
+                <i className="bi bi-tree" aria-hidden="true"></i>
+                <span>{isRtl ? 'خشب ألماني' : 'German Wood'}</span>
+              </div>
+              <div className="sw-excellence-icon">
+                <i className="bi bi-gear" aria-hidden="true"></i>
+                <span>{isRtl ? 'إكسسوارات ألمانية ونمساوية' : (<>German &amp;<br />Austrian<br />Accessories</>)}</span>
+              </div>
+              <div className="sw-excellence-icon">
+                <i className="bi bi-diagram-3" aria-hidden="true"></i>
+                <span>{isRtl ? 'أحدث التقنيات' : (<>Latest<br />Techniques</>)}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

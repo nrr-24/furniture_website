@@ -181,7 +181,11 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           <h1 className="pd-title">{isRtl ? item.nameAr || item.name : item.name}</h1>
 
           <div className="pd-price-row">
-            {hasSale ? (
+            {activePrice <= 0 ? (
+              <span className="pd-regular-price pd-price-request">
+                {isRtl ? 'السعر عند الطلب' : 'Price on request'}
+              </span>
+            ) : hasSale ? (
               <>
                 <span className="pd-regular-price-strike">{regularPrice} {t('currency')}</span>
                 <span className="pd-sale-price">{activePrice} {t('currency')}</span>
@@ -489,6 +493,11 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           font-weight: 700;
           color: var(--pd-ink);
           letter-spacing: -0.01em;
+        }
+        .pd-price-request {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: var(--pd-ink-soft);
         }
         .pd-currency {
           font-size: 0.95rem;

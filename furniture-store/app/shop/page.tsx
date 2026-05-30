@@ -302,37 +302,8 @@ export default function ShopPage() {
 
       <div className="container" style={{ paddingTop: '0px' }}>
         <div className="shop-layout">
-          {/* 1. Desktop Sidebar */}
-          <aside className="shop-sidebar">
-            <button
-              onClick={clearFilter}
-              className={`shop-sidebar-category ${selectedCategoryId === null ? 'is-active' : ''}`}
-            >
-              <i className="bi bi-grid-fill" style={{ fontSize: '0.9rem' }}></i>
-              <span>{isRtl ? 'الكل' : 'ALL PRODUCTS'}</span>
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.id)}
-                className={`shop-sidebar-category ${selectedCategoryId === cat.id ? 'is-active' : ''}`}
-              >
-                <span>{isRtl ? cat.nameAr : cat.name}</span>
-              </button>
-            ))}
-            {selectedCategoryId && (
-              <button
-                onClick={clearFilter}
-                className="shop-sidebar-clear"
-                style={{ marginLeft: '12px', flexShrink: 0 }}
-                title={isRtl ? 'إزالة الفلتر' : 'Clear filter'}
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            )}
-          </aside>
-
-          {/* 2. Main Gallery Area */}
+          {/* Main Gallery Area — category filtering lives in the pill tabs
+              below (the old sticky segmented bar duplicated this). */}
           <div className="shop-gallery" id="all-designs">
             {/* Horizontal category tabs (mockup style) */}
             <div className="shop-tabs" role="tablist" aria-label={isRtl ? 'الفئات' : 'Categories'}>
@@ -368,7 +339,10 @@ export default function ShopPage() {
                   }
                 </h2>
                 <p style={{ margin: '4px 0 0', color: 'rgba(42, 32, 24, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
-                  {filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0)} {isRtl ? 'قطعة متوفرة' : 'items found'}
+                  {(() => {
+                    const count = filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0);
+                    return isRtl ? `${count} قطعة` : `${count} ${count === 1 ? 'item' : 'items'} found`;
+                  })()}
                 </p>
               </div>
 
@@ -465,7 +439,9 @@ export default function ShopPage() {
 
                           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px', justifyContent: 'center', width: '100%' }}>
                             <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                              {item.salePrice ?? item.price} {t('currency')}
+                              {(item.salePrice ?? item.price) > 0
+                                ? `${item.salePrice ?? item.price} ${t('currency')}`
+                                : (isRtl ? 'السعر عند الطلب' : 'Price on request')}
                             </span>
                             {item.salePrice && item.salePrice < item.price && (
                               <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#2251A4', whiteSpace: 'nowrap' }}>
@@ -1081,7 +1057,7 @@ export default function ShopPage() {
         .samsung-details-link {
           background: none;
           border: none;
-          color: var(--bg-main);
+          color: var(--text-main);
           font-size: 0.78rem;
           font-weight: 700;
           text-transform: uppercase;
@@ -1091,7 +1067,7 @@ export default function ShopPage() {
           display: flex;
           align-items: center;
           transition: all 0.3s ease;
-          opacity: 0.6;
+          opacity: 0.75;
         }
         .samsung-details-link:hover {
           opacity: 1;

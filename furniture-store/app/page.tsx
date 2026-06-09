@@ -32,10 +32,10 @@ import Footer from '../components/layout/Footer';
 // Pillar icons for the 4-up feature strip + "German Quality" row.
 // Using Bootstrap Icons since the project already loads the font.
 const FEATURE_PILLARS = [
-  { key: 'years',       icon: 'bi-patch-check',  enLabel: '26+ Years of Excellence',   arLabel: 'أكثر من 26 سنة من التميز' },
-  { key: 'wood',        icon: 'bi-tree',         enLabel: 'German Wood',               arLabel: 'خشب ألماني' },
+  { key: 'years', icon: 'bi-patch-check', enLabel: '26+ Years of Excellence', arLabel: 'أكثر من 26 سنة من التميز' },
+  { key: 'wood', icon: 'bi-tree', enLabel: 'German Wood', arLabel: 'خشب ألماني' },
   { key: 'accessories', icon: 'bi-bounding-box', enLabel: 'German & Austrian Accessories', arLabel: 'إكسسوارات ألمانية ونمساوية' },
-  { key: 'techniques',  icon: 'bi-diagram-3',    enLabel: 'Latest Techniques',         arLabel: 'أحدث التقنيات' },
+  { key: 'techniques', icon: 'bi-diagram-3', enLabel: 'Latest Techniques', arLabel: 'أحدث التقنيات' },
 ];
 
 const QUALITY_FEATURES = [
@@ -74,20 +74,20 @@ const QUALITY_FEATURES = [
 ];
 
 const MINI_BENEFITS = [
-  { key: 'custom',     icon: 'bi-pencil',      enTitle: 'Custom Designs',     arTitle: 'تصاميم مخصصة',  enSub: 'Tailored to your space',   arSub: 'مُصممة لمساحتك' },
-  { key: 'craft',      icon: 'bi-hammer',      enTitle: 'Expert Craftsmanship', arTitle: 'حرفية متمرسة',  enSub: 'Attention to every detail', arSub: 'اهتمام بكل تفصيل' },
-  { key: 'sustain',    icon: 'bi-leaf',        enTitle: 'Sustainable Choice', arTitle: 'خيار مستدام',  enSub: 'Responsibly sourced',      arSub: 'مصدرها مسؤول' },
-  { key: 'support',    icon: 'bi-headset',     enTitle: 'After Sales Support', arTitle: 'دعم ما بعد البيع', enSub: 'We care, always',         arSub: 'نهتم بكم دائماً' },
+  { key: 'custom', icon: 'bi-pencil', enTitle: 'Custom Designs', arTitle: 'تصاميم مخصصة', enSub: 'Tailored to your space', arSub: 'مُصممة لمساحتك' },
+  { key: 'craft', icon: 'bi-hammer', enTitle: 'Expert Craftsmanship', arTitle: 'حرفية متمرسة', enSub: 'Attention to every detail', arSub: 'اهتمام بكل تفصيل' },
+  { key: 'sustain', icon: 'bi-leaf', enTitle: 'Sustainable Choice', arTitle: 'خيار مستدام', enSub: 'Responsibly sourced', arSub: 'مصدرها مسؤول' },
+  { key: 'support', icon: 'bi-headset', enTitle: 'After Sales Support', arTitle: 'دعم ما بعد البيع', enSub: 'We care, always', arSub: 'نهتم بكم دائماً' },
 ];
 
 // Compare-table specs are not (yet) modeled in the Supabase products table,
 // so each visible column gets a stub block of attributes keyed by index.
 // Phase 7 (or a follow-up DB migration) can replace this with real fields.
 const COMPARE_SPECS = [
-  { enKey: 'Wood Finish',  arKey: 'نوع الخشب',     vals: ['Walnut',    'Oak',        'Maple'] },
-  { enKey: 'Coverage',     arKey: 'التغطية',       vals: ['Full',      'Standard',   'Standard'] },
-  { enKey: 'Warranty',     arKey: 'الضمان',        vals: ['10 years',  '5 years',    '5 years'] },
-  { enKey: 'Hardware',     arKey: 'الإكسسوارات',   vals: ['Blum',      'Hettich',    'Hettich'] },
+  { enKey: 'Wood Finish', arKey: 'نوع الخشب', vals: ['Walnut', 'Oak', 'Maple'] },
+  { enKey: 'Coverage', arKey: 'التغطية', vals: ['Full', 'Standard', 'Standard'] },
+  { enKey: 'Warranty', arKey: 'الضمان', vals: ['10 years', '5 years', '5 years'] },
+  { enKey: 'Hardware', arKey: 'الإكسسوارات', vals: ['Blum', 'Hettich', 'Hettich'] },
 ];
 
 export default function HomePage() {

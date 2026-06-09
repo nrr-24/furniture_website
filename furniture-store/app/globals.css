@@ -5573,3 +5573,198 @@ select {
   }
 }
 
+/* ============================================================
+   PROJECTS / PORTFOLIO 2026 REDESIGN
+   Composed in app/projects/page.tsx. Scoped under .projects-2026.
+   ============================================================ */
+.projects-2026 {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-app);
+}
+
+.projects-2026 .projects-header {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(64px, 8vw, 112px) 24px clamp(32px, 4vw, 56px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.projects-2026 .projects-kicker {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+  margin-bottom: 12px;
+}
+
+.projects-2026 .projects-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.projects-2026 .projects-list {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px clamp(64px, 8vw, 120px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(48px, 8vw, 96px);
+}
+
+.projects-2026 .project-row {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+
+.projects-2026 .project-row:nth-child(even) {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.projects-2026 .project-row:nth-child(even) .project-img-container {
+  order: 2;
+}
+
+.projects-2026 .project-row:nth-child(even) .project-text-container {
+  order: 1;
+}
+
+.projects-2026 .project-img-container {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  aspect-ratio: 1.35;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--line-soft);
+  background: var(--surface-soft);
+}
+
+.projects-2026 .project-img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: var(--transition-smooth);
+}
+
+.projects-2026 .project-row:hover .project-img-container img {
+  transform: scale(1.02);
+}
+
+.projects-2026 .project-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.projects-2026 .project-meta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent-warm);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.projects-2026 .project-name {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.projects-2026 .project-desc {
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.projects-2026 .projects-cta {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--line-soft);
+  padding: clamp(64px, 8vw, 96px) 24px;
+  text-align: center;
+}
+
+.projects-2026 .projects-cta-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0 0 16px;
+}
+
+.projects-2026 .projects-cta-subtitle {
+  font-size: 1rem;
+  color: var(--text-soft);
+  max-width: 45ch;
+  margin: 0 auto 28px;
+  line-height: 1.5;
+}
+
+.projects-2026 .sw-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 26px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--text-main);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.projects-2026 .sw-btn-outline:hover {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+.projects-2026 .sw-btn-outline i {
+  font-size: 0.95rem;
+}
+
+/* RTL Support */
+[dir="rtl"] .projects-2026 .project-text-container {
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .projects-2026 .project-row {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  .projects-2026 .project-row:nth-child(even) .project-img-container {
+    order: 1 !important;
+  }
+  .projects-2026 .project-row:nth-child(even) .project-text-container {
+    order: 2 !important;
+  }
+  .projects-2026 .project-img-container {
+    aspect-ratio: 1.5;
+  }
+  .projects-2026 .projects-header {
+    padding: clamp(48px, 6vw, 64px) 20px clamp(24px, 3vw, 36px);
+  }
+  .projects-2026 .projects-list {
+    padding: 0 20px clamp(48px, 6vw, 80px);
+    gap: 40px;
+  }
+}
+
+

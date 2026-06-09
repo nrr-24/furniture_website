@@ -1,59 +1,148 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useMemo } from 'react';
 import { useLanguage } from '../../data/LanguageContext';
 import { useFurniture } from '../../data/FurnitureContext';
 import { FALLBACK_IMAGE } from '../../data/furnitureData';
+import { useEffect, useMemo } from 'react';
 import Footer from '../../components/layout/Footer';
 
 /* ============================================================
- * Craftsmanship Page (SmartWood Mockup Redesign)
+ * Craftsmanship (Smartwood 2026 redesign) — route: /about
  *
- * Scoped under .about-2026 for pixel-perfect cream + espresso styling
- * that matches the premium visual mockup exactly:
- *   1. Hero — Walnut backdrop niche left with overlays & glass card, dark panel right with sunburst
- *   2. Excellence in Every Detail — Left hinge/joinery cards, right text + 3 icons
- *   3. Designed for Living — 3-card category grid (Walk-in Wardrobe, Dining, Bedrooms)
- *   4. Proudly Kuwaiti — Heritage banner with workshop floor & 26+ badge
- *   5. Compare Our Models — Spec comparison table with active column highlight
- *   6. SmartWood Collection — 4 product cards (Custom Station, Wardrobe, Hinge, Sensor Light)
+ * Deliberately NOT a second homepage. Where the homepage answers
+ * "what we offer", this page answers "how we make it":
+ *   1. Hero — moody, craft-focused
+ *   2. Intro statement
+ *   3. The Process — numbered zig-zag journey w/ detail shots
+ *   4. Materials & Hardware — German wood + DE/AT fittings (macros)
+ *   5. Craft detail gallery — tight close-ups
+ *   6. CTA — start a project (not the homepage quote)
  * ============================================================ */
 
 export default function CraftsmanshipPage() {
   const { isRtl, language } = useLanguage();
-  const { items, initialized } = useFurniture();
-  const featuredProduct = useMemo(() => items[0] || null, [items]);
+  const { items } = useFurniture();
+  // Prefer a priced item so the hero card never shows "0 KWD".
+  const featuredProduct = useMemo(
+    () => items.find((i) => i.price > 0) || items[0] || null,
+    [items]
+  );
   const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
 
+  useEffect(() => {
+    const main = document.querySelector('main.craft');
+    // Enable the hidden→reveal animation only now that JS is running, so the
+    // content is never stuck invisible if the observer never fires.
+    main?.classList.add('reveal-ready');
+    // Use the scrollable container as the observer root (the app scrolls inside
+    // main.app-content, not the window).
+    const root = document.querySelector('main.app-content');
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { root: root || null, threshold: 0.12 }
+    );
+    const els = document.querySelectorAll('.craft .cr-step, .craft .cr-tile');
+    els.forEach((el) => observer.observe(el));
+    // Safety net: if anything hasn't revealed shortly after load, show it.
+    const t = setTimeout(() => els.forEach((el) => el.classList.add('visible')), 1800);
+    return () => { observer.disconnect(); clearTimeout(t); };
+  }, []);
+
+  const STEPS = [
+    {
+      icon: 'bi-pencil-square',
+      img: '/images/home/living-custom.png',
+      enTitle: 'Design & Blueprint',
+      arTitle: 'التصميم والمخطط',
+      enText: 'Every piece begins as a precise digital blueprint. We translate your space and vision into exact specifications before a single cut is made.',
+      arText: 'كل قطعة تبدأ كمخطط رقمي دقيق. نحوّل مساحتك ورؤيتك إلى مواصفات دقيقة قبل أول قطع.',
+    },
+    {
+      icon: 'bi-cpu',
+      img: '/images/home/hardware.png',
+      enTitle: 'Precision CNC',
+      arTitle: 'دقة CNC',
+      enText: 'Fully automated CNC machinery executes each cut, carve, and bore to 100% accuracy — repeatable and flawless, every time.',
+      arText: 'آلات CNC آلية بالكامل تنفّذ كل قطع ونحت وثقب بدقة 100٪ — نتائج مثالية ومتكررة في كل مرة.',
+    },
+    {
+      icon: 'bi-tools',
+      img: '/images/home/craft-joinery.png',
+      enTitle: 'Joinery & Assembly',
+      arTitle: 'التجميع والنجارة',
+      enText: 'Master craftsmen assemble each component with German & Austrian hardware engineered for a lifetime of smooth, silent use.',
+      arText: 'حرفيون مهرة يجمّعون كل مكوّن بإكسسوارات ألمانية ونمساوية مصممة لعمر طويل من الأداء السلس والصامت.',
+    },
+    {
+      icon: 'bi-brush',
+      img: '/images/home/craft-finish.png',
+      enTitle: 'Finishing',
+      arTitle: 'التشطيب',
+      enText: 'Surfaces are sanded, sealed, and hand-inspected — sustainable woods finished to withstand the Gulf’s climate for generations.',
+      arText: 'تُصقل الأسطح وتُختم وتُفحص يدوياً — أخشاب مستدامة مُشطّبة لتتحمّل مناخ الخليج لأجيال.',
+    },
+    {
+      icon: 'bi-house-check',
+      img: '/images/home/living-wardrobes.png',
+      enTitle: 'Delivery & Installation',
+      arTitle: 'التوصيل والتركيب',
+      enText: 'Our team delivers and installs on schedule, leaving you with a flawless, ready-to-live-in result.',
+      arText: 'فريقنا يوصّل ويركّب في الموعد المحدد، ليترك لك نتيجة مثالية جاهزة للاستخدام.',
+    },
+  ];
+
+  const MATERIALS = [
+    {
+      icon: 'bi-tree',
+      enTitle: 'Premium German Wood',
+      arTitle: 'خشب ألماني فاخر',
+      enText: 'Sustainably sourced, moisture-tested timber selected for durability and natural beauty.',
+      arText: 'خشب مستدام تم اختباره للرطوبة ومختار للمتانة والجمال الطبيعي.',
+    },
+    {
+      icon: 'bi-bounding-box',
+      enTitle: 'German & Austrian Hardware',
+      arTitle: 'إكسسوارات ألمانية ونمساوية',
+      enText: 'Soft-close hinges, concealed runners and precision fittings built for silent, lasting performance.',
+      arText: 'مفصلات بإغلاق ناعم ومجاري مخفية وتجهيزات دقيقة لأداء صامت ودائم.',
+    },
+    {
+      icon: 'bi-droplet',
+      enTitle: 'Advanced Finishes',
+      arTitle: 'تشطيبات متقدمة',
+      enText: 'Climate-resilient coatings and lacquers applied with the latest techniques for a flawless surface.',
+      arText: 'طلاءات ودهانات مقاومة للمناخ تُطبّق بأحدث التقنيات لسطح مثالي.',
+    },
+  ];
+
+  const GALLERY = [
+    '/images/home/hardware.png',
+    '/images/home/craft-finish.png',
+    '/images/home/craft-interior.png',
+    '/images/home/craft-joinery.png',
+  ];
+
   return (
-    <main className="app-content about-2026" dir={isRtl ? 'rtl' : 'ltr'}>
-      
-      {/* === 1. Hero =========================================== */}
+    <main className="app-content craft about-2026" dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* === 1. Hero (image-3 mockup: niche + floating badges + glass card + signature) === */}
       <section className="av-hero-mockup">
-        {/* Left Side: Walnut Niche Photo & Interactive Floating Badges */}
+        {/* Left: niche photo + floating editorial badges */}
         <div className="av-hero-left">
-          <img 
-            src="/images/home/hero-niche.png" 
-            alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood Craftsmanship'} 
+          <img
+            src="/images/home/hero-niche.png"
+            alt={isRtl ? 'حرفية سمارت وود' : 'SmartWood Craftsmanship'}
             className="hero-bg-img"
           />
-          
-          {/* Overlays (Two-line badges) */}
-          <div className="hero-overlay-badge badge-wood animate-fade-in">
-            <div className="badge-icon-box">
-              <i className="bi bi-tree"></i>
-            </div>
+          <div className="hero-overlay-badge badge-wood">
+            <div className="badge-icon-box"><i className="bi bi-tree"></i></div>
             <div className="badge-text-box">
               <span className="badge-small-text">{isRtl ? 'ممتاز' : 'Premium'}</span>
               <span className="badge-bold-text">{isRtl ? 'خشب ألماني' : 'German Wood'}</span>
             </div>
           </div>
-
-          <div className="hero-overlay-badge badge-accessories animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="badge-icon-box">
-              <i className="bi bi-gear"></i>
-            </div>
+          <div className="hero-overlay-badge badge-accessories">
+            <div className="badge-icon-box"><i className="bi bi-gear"></i></div>
             <div className="badge-text-box">
               <span className="badge-small-text">{isRtl ? 'ألماني ونمساوي' : 'German & Austrian'}</span>
               <span className="badge-bold-text">{isRtl ? 'إكسسوارات' : 'Accessories'}</span>
@@ -61,42 +150,38 @@ export default function CraftsmanshipPage() {
           </div>
         </div>
 
-        {/* Glassmorphic card — positioned absolutely inside hero section */}
+        {/* Floating glassmorphic product card (overlaps the seam) */}
         {featuredProduct && (
           <Link href={`/shop/product/${featuredProduct.id}`} className="hero-glass-card-link">
             <div className="hero-glass-card">
               <div className="hero-glass-img-container">
-                <img 
-                  src={featuredProduct.image || FALLBACK_IMAGE} 
-                  alt={isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name} 
+                <img
+                  src={featuredProduct.image || FALLBACK_IMAGE}
+                  alt={isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name}
                   className="hero-glass-img"
                 />
               </div>
               <div className="hero-glass-info">
                 <span className="hero-glass-title">
-                  {isRtl ? (
-                    <>{featuredProduct.nameAr || featuredProduct.name}</>
-                  ) : (
-                    <>{featuredProduct.name}</>
-                  )}
+                  {isRtl ? featuredProduct.nameAr || featuredProduct.name : featuredProduct.name}
                 </span>
-                <div className="hero-glass-price-wrap">
-                  <span className="hero-glass-price">{isRtl ? `${featuredProduct.price} د.ك` : `${featuredProduct.price} KWD`}</span>
-                </div>
+                {featuredProduct.price > 0 && (
+                  <div className="hero-glass-price-wrap">
+                    <span className="hero-glass-price">
+                      {isRtl ? `${featuredProduct.price} د.ك` : `${featuredProduct.price} KWD`}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </Link>
         )}
 
-        {/* Right Side: Dark Walnut Copy Panel */}
+        {/* Right: dark walnut copy panel + signature */}
         <div className="av-hero-right">
           <div className="av-hero-right-content">
             <h1 className="av-hero-title">
-              {isRtl ? (
-                <>صُنع ليدوم.<br />خُلق ليلهم.</>
-              ) : (
-                <>Built to last.<br />Made to inspire.</>
-              )}
+              {isRtl ? (<>صُنع ليدوم.<br />خُلق ليلهم.</>) : (<>Built to last.<br />Made to inspire.</>)}
             </h1>
             <p className="av-hero-sub">
               {isRtl
@@ -104,217 +189,84 @@ export default function CraftsmanshipPage() {
                 : 'SmartWood factory has been a leader in the Kuwaiti high-end furniture for more than 26 years.'}
             </p>
           </div>
-
-          {/* Signature — simple italic font text */}
-          <span className="hero-signature-text">SmartWood</span>
+          <img className="hero-signature-logo" src={`/images/LOGO/smartwood-${language}-white.svg`} alt="" aria-hidden="true" />
         </div>
       </section>
 
-      {/* === 2. Excellence in Every Detail ===================== */}
-      <section className="av-excellence">
-        <h2 className="av-excellence-title">
-          {isRtl ? 'التميز في كل تفصيل' : 'Excellence in Every Detail'}
-        </h2>
-
-        <div className="av-excellence-inner">
-          {/* Left Column: Visual Hardware & Joinery Cards */}
-          <div className="av-excellence-cards">
-          <div className="av-excel-card">
-            <img 
-              src="/images/home/hardware.png" 
-              alt={isRtl ? 'إكسسوارات ألمانية دقيقة' : 'German Precision Hardware'} 
-              className="av-excel-img"
-            />
-            <div className="av-excel-info">
-              <h3 className="av-excel-title">
-                {isRtl ? 'إكسسوارات ألمانية دقيقة' : 'Precision German Hardware'}
-              </h3>
-              <p className="av-excel-text">
-                {isRtl
-                  ? 'مصممة خصيصاً لأداء سلس واعتمادية طويلة الأمد.'
-                  : 'Engineered for smooth performance and lasting reliability.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="av-excel-card">
-            <img 
-              src="/images/home/perspective-1-wood.png" 
-              alt={isRtl ? 'تجميع خشب احترافي' : 'Masterful Wood Joinery'} 
-              className="av-excel-img"
-            />
-            <div className="av-excel-info">
-              <h3 className="av-excel-title">
-                {isRtl ? 'تجميع خشب احترافي' : 'Masterful Wood Joinery'}
-              </h3>
-              <p className="av-excel-text">
-                {isRtl
-                  ? 'مصنوعة بدقة متناهية، ومصممة لتتحمل اختبار الزمن.'
-                  : 'Built with precision, designed to endure.'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Copy & Core Feature Pillars */}
-        <div className="av-excellence-copy">
-          <p style={{ color: 'var(--text-soft)', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 16px 0' }}>
-            {isRtl
-              ? 'نحن نستخدم أخشاب ألمانية عالية الجودة، وأحدث الحلول، وإكسسوارات ألمانية ونمساوية فاخرة.'
-              : 'We use high quality German wood, latest techniques and solutions, and premium German & Austrian accessories.'}
-          </p>
-          <p style={{ color: 'var(--text-soft)', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 24px 0' }}>
-            {isRtl
-              ? 'كل قطعة تُصنع بدقة متناهية في مصانعنا لتناسب ذوقك الرفيع وتدوم لأجيال.'
-              : 'Every piece is crafted with precision, built to last for generations.'}
-          </p>
-
-          <div className="av-excellence-features">
-            <div className="av-excel-feat">
-              <i className="bi bi-tree"></i>
-              <span>{isRtl ? 'خشب ألماني' : 'German Wood'}</span>
-            </div>
-            <div className="av-excel-feat">
-              <i className="bi bi-gear"></i>
-              <span>{isRtl ? 'إكسسوارات ألمانية ونمساوية' : 'German & Austrian Accessories'}</span>
-            </div>
-            <div className="av-excel-feat">
-              <i className="bi bi-diagram-3"></i>
-              <span>{isRtl ? 'أحدث التقنيات' : 'Latest Techniques'}</span>
-            </div>
-          </div>
-        </div>
-        </div>
+      {/* === 2. Intro === */}
+      <section className="cr-intro">
+        <p>
+          {isRtl
+            ? 'لا نشكّل الخشب فحسب — بل ندمج أحدث آلات CNC في العالم مع أيدي حرفيين مهرة لنصنع قطعاً مبنية لتدوم لأجيال.'
+            : "We don't just shape wood — we fuse the world's most advanced CNC machinery with the hands of master craftsmen to build pieces made to last for generations."}
+        </p>
       </section>
 
-      {/* === 3. Designed for Living. Crafted for Life. ========= */}
-      <section className="av-living">
-        <h2 className="av-section-title-centered">
-          {isRtl ? 'مُصمم للمعيشة. مصنوع للحياة.' : 'Designed for Living. Crafted for Life.'}
-        </h2>
-        
-        <div className="av-living-grid">
-          <Link href="/shop" className="av-living-tile">
-            <img src="/images/home/living-wardrobes.png" alt={isRtl ? 'خزانة ملابس مدمجة' : 'Walk-in Wardrobe'} />
-            <span className="av-living-label">{isRtl ? 'خزانة ملابس مدمجة' : 'Walk-in Wardrobe'}</span>
-          </Link>
-
-          <Link href="/shop" className="av-living-tile">
-            <img src="/images/home/cat-dining.png" alt={isRtl ? 'طاولات الطعام' : 'Dining Sets'} />
-            <span className="av-living-label">{isRtl ? 'طاولات الطعام' : 'Dining Sets'}</span>
-          </Link>
-
-          <Link href="/shop" className="av-living-tile">
-            <img src="/images/home/living-bedrooms.png" alt={isRtl ? 'غرف النوم' : 'Bedrooms'} />
-            <span className="av-living-label">{isRtl ? 'غرف النوم' : 'Bedrooms'}</span>
-          </Link>
+      {/* === 3. The Process (zig-zag) === */}
+      <section className="cr-process">
+        <div className="cr-process-header">
+          <span className="section-kicker">{isRtl ? 'كيف نصنع' : 'HOW WE BUILD'}</span>
+          <h2 className="cr-section-title sw-center">{isRtl ? 'العملية' : 'The Process'}</h2>
         </div>
-      </section>
 
-      {/* === 4. Proudly Kuwaiti Banner ========================= */}
-      <section className="av-heritage">
-        <img className="av-heritage-bg" src="/images/home/feature-wide.png" alt="" aria-hidden="true" />
-        <div className="av-heritage-scrim" aria-hidden="true" />
-        <div className="av-heritage-inner">
-          <div className="av-heritage-copy">
-            <span className="section-kicker av-heritage-kicker" style={{ color: '#fff', opacity: 0.8 }}>EST. 1998</span>
-            <h2 className="av-heritage-title">
-              {isRtl ? (<>كويتيون بفخر.<br />ملهمون عالمياً.</>) : (<>Proudly Kuwaiti.<br />Globally Inspired.</>)}
-            </h2>
-            <p className="av-heritage-body">
-              {isRtl
-                ? 'مصنع سمارت وود هو مصنع كويتي رائد يلتزم بأعلى معايير الحرفية والجودة العالمية.'
-                : 'SmartWood factory has been a leader in the Kuwaiti high-end furniture for more than 26 years.'}
-            </p>
-            <Link href="/contact" className="av-link-arrow av-link-arrow-light" style={{ color: '#fff', borderColor: '#fff' }}>
-              <span>{isRtl ? 'تواصل معنا' : 'Get in Touch'}</span>
-              <i className={`bi ${arrow}`}></i>
-            </Link>
+        {STEPS.map((s, i) => (
+          <div key={i} className={`cr-step ${i % 2 === 1 ? 'cr-step-rev' : ''}`}>
+            <div className="cr-step-media">
+              <img src={s.img} alt={isRtl ? s.arTitle : s.enTitle} />
+            </div>
+            <div className="cr-step-copy">
+              <span className="cr-step-num">{String(i + 1).padStart(2, '0')}</span>
+              <i className={`bi ${s.icon} cr-step-icon`}></i>
+              <h3 className="cr-step-title">{isRtl ? s.arTitle : s.enTitle}</h3>
+              <p className="cr-step-text">{isRtl ? s.arText : s.enText}</p>
+            </div>
           </div>
-          <div className="av-heritage-badge" aria-hidden="true">
-            <span className="av-heritage-badge-top">{isRtl ? 'سنوات من' : 'YEARS OF'}</span>
-            <span className="av-heritage-badge-num">26+</span>
-            <span className="av-heritage-badge-bot">{isRtl ? 'التميز' : 'EXCELLENCE'}</span>
-          </div>
-        </div>
+        ))}
       </section>
 
-      {/* === 5. Compare Our Models ============================= */}
-      <section className="av-compare">
-        <h2 className="av-section-title-centered">
-          {isRtl ? 'قارن بين موديلاتنا' : 'Compare Our Models'}
-        </h2>
-        
-        <div className="av-compare-table-wrap">
-          <table className="av-compare-table">
-            <thead>
-              <tr>
-                <th style={{ background: 'var(--surface-soft)' }} />
-                <th className="av-compare-col-active">{isRtl ? 'محطة مخصصة (Q12)' : 'Custom Station (Q12)'}</th>
-                <th>{isRtl ? 'خزانة ملابس (Q10)' : 'Wardrobe (Q10)'}</th>
-                <th>{isRtl ? 'طاولة تجميل (Q15)' : 'Vanity (Q15)'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>{isRtl ? 'نوع الخشب' : 'Wood Finish'}</th>
-                <td className="av-compare-col-active">{isRtl ? '٣ أقدام مربعة' : '3 sq ft'}</td>
-                <td>{isRtl ? 'تشطيب يورجيد' : 'Eurged Finish'}</td>
-                <td>{isRtl ? 'تشطيب خشبي' : 'Wood Finish'}</td>
-              </tr>
-              <tr>
-                <th>{isRtl ? 'التغطية' : 'Coverage'}</th>
-                <td className="av-compare-col-active">{isRtl ? 'فلتر HEPA' : 'HEPA Filter'}</td>
-                <td>{isRtl ? 'فلتر' : 'Filter'}</td>
-                <td>{isRtl ? 'محرك' : 'Motor'}</td>
-              </tr>
-              <tr>
-                <th>{isRtl ? 'الضمان' : 'Warranty'}</th>
-                <td className="av-compare-col-active">22dB</td>
-                <td>40dB</td>
-                <td>80dB</td>
-              </tr>
-              <tr>
-                <th>{isRtl ? 'نوع الإكسسوارات' : 'Hardware Type'}</th>
-                <td className="av-compare-col-active">{isRtl ? 'متوافق' : 'Fits'}</td>
-                <td>{isRtl ? 'متوافق' : 'Fits'}</td>
-                <td>{isRtl ? 'متوافق' : 'Fits'}</td>
-              </tr>
-            </tbody>
-          </table>
+      {/* === 4. Materials & Hardware === */}
+      <section className="cr-materials">
+        <div className="cr-materials-header">
+          <span className="section-kicker">{isRtl ? 'المواد' : 'MATERIALS & HARDWARE'}</span>
+          <h2 className="cr-section-title sw-center">{isRtl ? 'جودة ألمانية في كل تفصيل' : 'German Quality in Every Detail'}</h2>
         </div>
-      </section>
-
-      {/* === 6. SmartWood Collection =========================== */}
-      <section className="av-collection">
-        <h2 className="av-section-title-centered">
-          {isRtl ? 'مجموعة سمارت وود' : 'SmartWood Collection'}
-        </h2>
-
-        <div className="av-collection-grid">
-          {items.slice(0, 4).map((product) => (
-            <Link
-              key={product.id}
-              href={`/shop/product/${product.id}`}
-              className="av-product-card"
-            >
-              <div className="av-product-img">
-                <img
-                  src={product.image || FALLBACK_IMAGE}
-                  alt={isRtl ? (product.nameAr || product.name) : product.name}
-                />
-              </div>
-              <div className="av-product-meta">
-                <h3 className="av-product-name">
-                  {isRtl ? (product.nameAr || product.name) : product.name}
-                </h3>
-                <p className="av-product-price">
-                  {product.price}
-                  <span>{isRtl ? ' د.ك' : ' KWD'}</span>
-                </p>
-              </div>
-            </Link>
+        <div className="cr-materials-grid">
+          {MATERIALS.map((m, i) => (
+            <div key={i} className="cr-material">
+              <i className={`bi ${m.icon} cr-material-icon`}></i>
+              <h3 className="cr-material-title">{isRtl ? m.arTitle : m.enTitle}</h3>
+              <p className="cr-material-text">{isRtl ? m.arText : m.enText}</p>
+            </div>
           ))}
+        </div>
+      </section>
+
+      {/* === 5. Detail gallery === */}
+      <section className="cr-gallery">
+        <div className="cr-gallery-grid">
+          {GALLERY.map((src, i) => (
+            <div key={i} className="cr-tile" style={{ transitionDelay: `${i * 70}ms` }}>
+              <img src={src} alt={isRtl ? 'تفصيل الحرفية' : 'Craft detail'} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* === 6. CTA === */}
+      <section className="cr-cta-wrap">
+        <div className="cr-cta">
+          <h2 className="cr-cta-title">
+            {isRtl ? 'لديك مشروع في بالك؟' : 'Have a project in mind?'}
+          </h2>
+          <p className="cr-cta-sub">
+            {isRtl
+              ? 'دعنا نحوّل مساحتك إلى قطعة مصنوعة بدقة وحرفية.'
+              : "Let's turn your space into something crafted with precision and built to last."}
+          </p>
+          <Link href="/contact" className="cr-cta-btn">
+            {isRtl ? 'ابدأ مشروعك' : 'Start Your Project'}
+            <i className={`bi ${arrow}`}></i>
+          </Link>
         </div>
       </section>
 

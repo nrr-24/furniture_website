@@ -83,7 +83,7 @@
 @font-face {
   font-family: 'SydneySignature';
   src: url('/fonts/Sydney Signature.otf') format('opentype'),
-       url('/fonts/Sydney Signature.ttf') format('truetype');
+    url('/fonts/Sydney Signature.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -104,19 +104,26 @@
      which now plays that role on the cream page. */
 
   /* Page surfaces */
-  --bg-main: #F2EBE0;            /* Page background — warm cream */
-  --bg-panel: #FAF6EE;           /* Cards & raised panels — lighter cream */
-  --surface-soft: #E8DFD2;       /* Chips, subtle fills — slightly deeper cream */
+  --bg-main: #F2EBE0;
+  /* Page background — warm cream */
+  --bg-panel: #FAF6EE;
+  /* Cards & raised panels — lighter cream */
+  --surface-soft: #E8DFD2;
+  /* Chips, subtle fills — slightly deeper cream */
 
   /* Text */
-  --text-main: #2A2018;          /* Body text — espresso */
+  --text-main: #2A2018;
+  /* Body text — espresso */
   --text-soft: rgba(42, 32, 24, 0.65);
   --line-soft: rgba(42, 32, 24, 0.12);
 
   /* Brand accents */
-  --accent-deep: #1F1812;        /* Footer, quote card — darkest espresso */
-  --accent-warm: #8B6F4E;        /* Primary action buttons, links — tan */
-  --accent-hover: #6E5638;       /* Hover state for tan */
+  --accent-deep: #1F1812;
+  /* Footer, quote card — darkest espresso */
+  --accent-warm: #8B6F4E;
+  /* Primary action buttons, links — tan */
+  --accent-hover: #6E5638;
+  /* Hover state for tan */
 
   /* Effects */
   --shadow-main: 0 32px 80px rgba(42, 32, 24, 0.10);
@@ -126,7 +133,9 @@
 
   /* Typography */
   --font-app: 'UbuntuArabic', 'MontserratArabic', sans-serif;
-  --font-serif: var(--font-cormorant), 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  /* UbuntuArabic is first so Arabic headings use it; its Arabic-only
+     unicode-range means Latin headings skip it and fall through to Cormorant. */
+  --font-serif: 'UbuntuArabic', var(--font-cormorant), 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
 
   /* Geometry */
   --r-card: 24px;
@@ -136,10 +145,14 @@
   /* === Legacy aliases — pointed at the new palette so existing
      `var(--blue-*)` / `var(--sand-soft)` references keep producing
      visually correct results without a global rename pass. === */
-  --blue-main: var(--text-main);     /* was cream; usages were as a text color → keep dark */
-  --blue-deep: var(--accent-warm);   /* was action blue; now tan */
-  --blue-accent: var(--accent-deep); /* was deep navy panel; now near-black brown */
-  --sand-soft: var(--surface-soft);  /* was cream; now slightly deeper cream chip */
+  --blue-main: var(--text-main);
+  /* was cream; usages were as a text color → keep dark */
+  --blue-deep: var(--accent-warm);
+  /* was action blue; now tan */
+  --blue-accent: var(--accent-deep);
+  /* was deep navy panel; now near-black brown */
+  --sand-soft: var(--surface-soft);
+  /* was cream; now slightly deeper cream chip */
 }
 
 * {
@@ -174,9 +187,32 @@ h3 {
   color: var(--text-main);
 }
 
-h1 { font-weight: 500; }
-h2 { font-weight: 500; }
-h3 { font-weight: 600; }
+h1 {
+  font-weight: 500;
+}
+
+h2 {
+  font-weight: 500;
+}
+
+h3 {
+  font-weight: 600;
+}
+
+/* Something in the bundled CSS applies a content-based max-width to headings
+   and paragraphs, shrink-wrapping them so they pin to the LEFT inside centered
+   containers (kicker centered, title/subtext drifting left). Reset it here.
+   Intentional caps (.sw-section-title-center: 720px, .cr-material-text: 32ch,
+   .sw-hero-body: 40ch, etc.) all use classes, so they still win by specificity. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  max-width: none;
+}
 
 /* Small uppercase kicker — used above section titles in the new design.
    Example: "OUR PROMISE", "EST. 1998". */
@@ -207,7 +243,7 @@ h3 { font-weight: 600; }
 }
 
 main.app-content,
-.monolithic-island > main {
+.monolithic-island>main {
   flex: 1;
   /* min-height: 0 lets flex:1 actually constrain the main when its intrinsic content
      is taller than the remaining flex space — without this, the main pushes the
@@ -293,8 +329,12 @@ select {
   text-decoration: none;
   line-height: 1;
 }
+
 @media (max-width: 767px) {
-  .brand-wordmark { font-size: 1.1rem; letter-spacing: 0.1em; }
+  .brand-wordmark {
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+  }
 }
 
 .brand-logo-img {
@@ -304,7 +344,9 @@ select {
 }
 
 @media (min-width: 992px) {
-  .brand-logo-img { height: 30px; }
+  .brand-logo-img {
+    height: 30px;
+  }
 }
 
 /* --- Center pill bar (desktop) ---
@@ -424,8 +466,14 @@ select {
   transition: opacity 0.2s ease;
   opacity: 0.75;
 }
-.nav-text-link:hover { opacity: 1; }
-.nav-text-link-danger { color: #a8553a; }
+
+.nav-text-link:hover {
+  opacity: 1;
+}
+
+.nav-text-link-danger {
+  color: #a8553a;
+}
 
 .nav-auth-group {
   align-items: center;
@@ -448,6 +496,7 @@ select {
   cursor: pointer;
   transition: var(--transition-smooth);
 }
+
 .nav-lang-btn:hover {
   background: var(--surface-soft);
 }
@@ -476,6 +525,7 @@ select {
   cursor: pointer;
   text-decoration: none;
 }
+
 .contact-cta-btn:hover {
   background: var(--text-main);
   color: var(--bg-main);
@@ -494,6 +544,7 @@ select {
   cursor: pointer;
   transition: var(--transition-smooth);
 }
+
 .nav-icon-btn:hover {
   background: var(--text-main);
   color: var(--bg-main);
@@ -512,7 +563,8 @@ select {
   min-height: 100%;
   flex: 1;
   overflow: hidden;
-  background: var(--bg-main); /* Keep navy background just in case */
+  background: var(--bg-main);
+  /* Keep navy background just in case */
 }
 
 .hero-bg-animate,
@@ -534,7 +586,8 @@ select {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%; /* Focus higher up to avoid awkward zoom on the middle */
+  object-position: center 30%;
+  /* Focus higher up to avoid awkward zoom on the middle */
   display: block;
 }
 
@@ -611,6 +664,7 @@ select {
     transform: scale(0.5);
     opacity: 0.8;
   }
+
   100% {
     transform: scale(2.5);
     opacity: 0;
@@ -755,7 +809,7 @@ select {
     margin-top: 48px;
     z-index: 5;
   }
-  
+
   .feature-box-content {
     background: rgba(42, 32, 24, 0.5);
     backdrop-filter: blur(20px);
@@ -764,7 +818,7 @@ select {
     padding: 14px;
     border-radius: 20px;
   }
-  
+
   .feature-box-img {
     width: 90px;
     height: 90px;
@@ -999,9 +1053,11 @@ select {
      these overrides the heading/labels render dark-on-dark. */
   color: var(--bg-main);
 }
+
 .auth-card .smartwood-title {
   color: var(--bg-main);
 }
+
 /* Inline styles on the labels/paragraphs use color: var(--text-soft)
    (now a dark espresso alpha). Force them to a light cream alpha so they
    read on the dark frosted card. */
@@ -1009,6 +1065,7 @@ select {
 .auth-card p {
   color: rgba(242, 235, 224, 0.78) !important;
 }
+
 .auth-card a {
   color: var(--bg-main) !important;
 }
@@ -1384,13 +1441,15 @@ select {
 
 .hero-secondary-btn {
   background: transparent;
-  color: var(--sand-soft);
-  border: 1px solid var(--sand-soft);
+  /* was var(--sand-soft) — near-cream text/border that was invisible on the
+     cream surfaces (Cancel, Edit Categories). */
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
 }
 
 .hero-secondary-btn:hover {
-  background: rgba(242, 235, 224, 0.1);
-  /* Cream hint */
+  background: var(--text-main);
+  color: var(--bg-main);
   transform: translateY(-2px);
 }
 
@@ -1434,7 +1493,9 @@ select {
 .section-kicker {
   display: inline-block;
   margin-bottom: 10px;
-  color: var(--sand-soft);
+  /* was var(--sand-soft) — a near-cream chip color that rendered invisible as
+     text on the cream page (dark-theme leftover). */
+  color: var(--text-soft);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1706,6 +1767,7 @@ select {
     .home-hero .split-left .hero-main-actions {
       gap: 8px !important;
     }
+
     .home-hero .split-left .hero-primary-btn,
     .home-hero .split-left .hero-secondary-btn {
       padding: 0 8px !important;
@@ -1824,6 +1886,7 @@ select {
     color: var(--text-main);
     border: 1px solid var(--line-soft);
   }
+
   .nav-icon-hamburger:hover {
     background: var(--surface-soft);
     color: var(--text-main);
@@ -3297,6 +3360,7 @@ select {
   border-radius: 6px;
   transition: var(--transition-smooth);
 }
+
 .sw-footer-meta-link:hover {
   background: var(--surface-soft);
 }
@@ -3311,6 +3375,7 @@ select {
   align-items: center;
   gap: 16px;
 }
+
 .sw-footer-meta-social a {
   color: var(--text-main);
   font-size: 1.05rem;
@@ -3318,6 +3383,7 @@ select {
   transition: opacity 0.2s ease, transform 0.2s ease;
   text-decoration: none;
 }
+
 .sw-footer-meta-social a:hover {
   opacity: 1;
   transform: translateY(-1px);
@@ -3399,6 +3465,7 @@ select {
   overflow: hidden;
   transition: border-color 0.25s ease, background 0.25s ease;
 }
+
 .sw-footer-newsletter-form:focus-within {
   border-color: rgba(242, 235, 224, 0.45);
   background: rgba(242, 235, 224, 0.1);
@@ -3415,6 +3482,7 @@ select {
   font-family: inherit;
   font-size: 0.92rem;
 }
+
 .sw-footer-newsletter-form input::placeholder {
   color: rgba(242, 235, 224, 0.5);
 }
@@ -3431,6 +3499,7 @@ select {
   font-size: 1.05rem;
   transition: transform 0.25s ease, background 0.25s ease;
 }
+
 .sw-footer-newsletter-form button:hover {
   background: rgba(242, 235, 224, 0.1);
 }
@@ -3467,6 +3536,7 @@ select {
   display: inline-block;
   line-height: 0;
 }
+
 .sw-footer-brand-logo img {
   height: 26px;
   width: auto;
@@ -3485,6 +3555,7 @@ select {
   align-items: center;
   gap: 18px;
 }
+
 .sw-footer-social a {
   display: inline-flex;
   align-items: center;
@@ -3499,6 +3570,7 @@ select {
   text-decoration: none;
   background: transparent;
 }
+
 .sw-footer-social a:hover {
   opacity: 1;
   transform: translateY(-2px);
@@ -3510,24 +3582,48 @@ select {
   .sw-footer-shell {
     padding: 12px 12px 16px;
   }
+
   .sw-footer-card {
     padding: 28px 24px;
     gap: 24px;
   }
+
   .sw-footer-newsletter-head {
     gap: 12px;
   }
+
   .sw-footer-newsletter-icon {
     width: 38px;
     height: 38px;
     font-size: 1rem;
   }
-  .sw-footer-newsletter-title { font-size: 1.4rem; }
-  .sw-footer-newsletter-sub  { font-size: 0.82rem; }
-  .sw-footer-newsletter-form input { padding: 12px 14px; font-size: 0.88rem; }
-  .sw-footer-brandbar { gap: 16px; }
-  .sw-footer-brand-logo img { height: 22px; }
-  .sw-footer-social a { width: 32px; height: 32px; font-size: 0.95rem; }
+
+  .sw-footer-newsletter-title {
+    font-size: 1.4rem;
+  }
+
+  .sw-footer-newsletter-sub {
+    font-size: 0.82rem;
+  }
+
+  .sw-footer-newsletter-form input {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+  }
+
+  .sw-footer-brandbar {
+    gap: 16px;
+  }
+
+  .sw-footer-brand-logo img {
+    height: 22px;
+  }
+
+  .sw-footer-social a {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
 }
 
 /* ============================================================
@@ -3590,6 +3686,7 @@ select {
 
 /* Desktop-only refinements for the About page hero */
 @media (min-width: 992px) {
+
   /* Remove the dark scrim sitting on top of the right-side hero image */
   .about-page-theme .hero-overlay-dark {
     display: none;
@@ -3959,14 +4056,37 @@ select {
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.mobile-menu-overlay.open .mobile-menu-header.stagger-item { transition-delay: 0.10s; }
-.mobile-menu-overlay.open .mobile-menu-eyebrow.stagger-item { transition-delay: 0.16s; }
-.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(1) { transition-delay: 0.20s; }
-.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(2) { transition-delay: 0.26s; }
-.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(3) { transition-delay: 0.32s; }
-.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(4) { transition-delay: 0.38s; }
-.mobile-menu-overlay.open .mobile-menu-auth.stagger-item { transition-delay: 0.44s; }
-.mobile-menu-overlay.open .mobile-menu-footer.stagger-item { transition-delay: 0.50s; }
+.mobile-menu-overlay.open .mobile-menu-header.stagger-item {
+  transition-delay: 0.10s;
+}
+
+.mobile-menu-overlay.open .mobile-menu-eyebrow.stagger-item {
+  transition-delay: 0.16s;
+}
+
+.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(1) {
+  transition-delay: 0.20s;
+}
+
+.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(2) {
+  transition-delay: 0.26s;
+}
+
+.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(3) {
+  transition-delay: 0.32s;
+}
+
+.mobile-menu-overlay.open .mobile-nav-link.stagger-item:nth-of-type(4) {
+  transition-delay: 0.38s;
+}
+
+.mobile-menu-overlay.open .mobile-menu-auth.stagger-item {
+  transition-delay: 0.44s;
+}
+
+.mobile-menu-overlay.open .mobile-menu-footer.stagger-item {
+  transition-delay: 0.50s;
+}
 
 .mobile-menu-overlay.open .stagger-item {
   opacity: 1;
@@ -3979,14 +4099,17 @@ select {
     font-size: 1.65rem;
     padding: 20px 4px;
   }
+
   .mobile-menu-body {
     padding: 24px 20px 12px;
   }
+
   .mobile-menu-header,
   .mobile-menu-footer {
     padding-left: 20px;
     padding-right: 20px;
   }
+
   .mobile-menu-tagline {
     font-size: 0.6rem;
   }
@@ -3996,6 +4119,7 @@ select {
   .mobile-nav-link {
     font-size: 1.45rem;
   }
+
   .mobile-menu-tagline {
     display: none;
   }
@@ -4024,6 +4148,7 @@ select {
   color: var(--text-main);
   margin: 0 0 28px;
 }
+
 .home-2026 .sw-section-title-center {
   text-align: center;
   margin-left: auto;
@@ -4056,10 +4181,12 @@ select {
   text-decoration: none;
   transition: var(--transition-smooth);
 }
+
 .home-2026 .sw-btn-outline:hover {
   background: var(--text-main);
   color: var(--bg-main);
 }
+
 .home-2026 .sw-btn-outline i {
   font-size: 0.95rem;
 }
@@ -4078,59 +4205,235 @@ select {
   padding-bottom: 4px;
   transition: var(--transition-smooth);
 }
-.home-2026 .sw-link-arrow:hover { gap: 14px; }
+
+.home-2026 .sw-link-arrow:hover {
+  gap: 14px;
+}
+
 .home-2026 .sw-link-arrow-light {
   color: var(--bg-main);
   border-color: var(--bg-main);
 }
 
-/* === 1. Hero ==============================================
-   Clean split: solid cream copy panel on the left, niche photo on the
-   right with a hard vertical seam (no gradient/overlay). */
+/* === 1. Hero — dark editorial card ========================
+   One large rounded espresso card: niche photo (left) with floating
+   feature badges, dark copy panel (right) with a blue ray graphic and a
+   script signature, plus a floating product card on the bottom seam. */
 .home-2026 .sw-hero {
+  position: relative;
   display: flex;
   align-items: stretch;
-  background: var(--bg-main);
-  min-height: 80vh;
+  margin: clamp(14px, 1.8vw, 26px);
+  border-radius: clamp(20px, 2vw, 30px);
+  background: var(--accent-deep);
   overflow: hidden;
+  isolation: isolate;
+  min-height: 560px;
 }
-.home-2026 .sw-hero-copy {
-  flex: 0 0 42%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: clamp(36px, 6vw, 88px);
-  background: var(--bg-main);
-}
+
 .home-2026 .sw-hero-media {
-  flex: 1;
   position: relative;
+  flex: 0 0 54%;
   overflow: hidden;
 }
+
 .home-2026 .sw-hero-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Shifted right so the lit niche + wood frame fill the panel. */
-  object-position: 62% center;
+  object-position: 60% center;
   display: block;
 }
+
+/* Floating glass feature badges over the photo */
+.home-2026 .sw-hero-badge {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 200px;
+  padding: 10px 15px;
+  border-radius: 12px;
+  background: rgba(20, 14, 9, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(242, 235, 224, 0.16);
+  color: #f4efe6;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.home-2026 .sw-hero-badge i {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.home-2026 .sw-hero-badge-tl {
+  top: 26px;
+  left: 26px;
+}
+
+.home-2026 .sw-hero-badge-bl {
+  bottom: 92px;
+  left: 26px;
+}
+
+[dir="rtl"] .home-2026 .sw-hero-badge-tl,
+[dir="rtl"] .home-2026 .sw-hero-badge-bl {
+  left: auto;
+  right: 26px;
+}
+
+.home-2026 .sw-hero-copy {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(40px, 5vw, 76px);
+  background: var(--accent-deep);
+  overflow: hidden;
+}
+
+/* Blue rays fanning from the top-right corner of the dark panel */
+.home-2026 .sw-hero-rays {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: conic-gradient(from 166deg at 100% 0,
+      transparent 0 6deg,
+      rgba(58, 99, 192, 0.85) 6deg 11deg,
+      transparent 11deg 18deg,
+      rgba(58, 99, 192, 0.7) 18deg 22.5deg,
+      transparent 22.5deg 30deg,
+      rgba(58, 99, 192, 0.55) 30deg 33.5deg,
+      transparent 33.5deg 42deg,
+      rgba(58, 99, 192, 0.4) 42deg 44.5deg,
+      transparent 44.5deg 360deg);
+  -webkit-mask: radial-gradient(135% 135% at 100% 0, #000 0%, #000 26%, transparent 62%);
+  mask: radial-gradient(135% 135% at 100% 0, #000 0%, #000 26%, transparent 62%);
+}
+
+[dir="rtl"] .home-2026 .sw-hero-rays {
+  background: conic-gradient(from 102.5deg at 0 0,
+      transparent 0 6deg,
+      rgba(58, 99, 192, 0.85) 6deg 11deg,
+      transparent 11deg 18deg,
+      rgba(58, 99, 192, 0.7) 18deg 22.5deg,
+      transparent 22.5deg 30deg,
+      rgba(58, 99, 192, 0.55) 30deg 33.5deg,
+      transparent 33.5deg 42deg,
+      rgba(58, 99, 192, 0.4) 42deg 44.5deg,
+      transparent 44.5deg 360deg);
+  -webkit-mask: radial-gradient(135% 135% at 0 0, #000 0%, #000 26%, transparent 62%);
+  mask: radial-gradient(135% 135% at 0 0, #000 0%, #000 26%, transparent 62%);
+}
+
 .home-2026 .sw-hero-title {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-size: clamp(2.6rem, 4vw, 3.6rem);
   line-height: 1.06;
   letter-spacing: -0.015em;
-  margin: 0 0 24px;
-  color: var(--text-main);
+  margin: 0 0 22px;
+  color: #fff;
 }
+
 .home-2026 .sw-hero-body {
-  font-size: 1.02rem;
-  line-height: 1.55;
-  color: var(--text-soft);
-  margin: 0 0 36px;
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(242, 235, 224, 0.74);
+  margin: 0;
   max-width: 40ch;
+}
+
+.home-2026 .sw-hero-signature {
+  position: absolute;
+  z-index: 1;
+  right: clamp(40px, 5vw, 76px);
+  bottom: 34px;
+  width: clamp(96px, 9vw, 132px);
+  height: auto;
+  opacity: 0.95;
+}
+
+[dir="rtl"] .home-2026 .sw-hero-signature {
+  right: auto;
+  left: clamp(40px, 5vw, 76px);
+}
+
+/* Floating product card on the bottom seam */
+.home-2026 .sw-hero-product {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-52%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(38, 28, 21, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(242, 235, 224, 0.14);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.home-2026 .sw-hero-product:hover {
+  transform: translateX(-52%) translateY(-3px);
+}
+
+.home-2026 .sw-hero-product-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(242, 235, 224, 0.08);
+}
+
+.home-2026 .sw-hero-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.home-2026 .sw-hero-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-right: 6px;
+}
+
+.home-2026 .sw-hero-product-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #f4efe6;
+  line-height: 1.25;
+  max-width: 16ch;
+}
+
+.home-2026 .sw-hero-product-price {
+  font-size: 0.8rem;
+  color: rgba(242, 235, 224, 0.65);
+}
+
+.home-2026 .sw-hero-product-price em {
+  font-style: normal;
+  font-size: 0.72rem;
 }
 
 /* === 2. Feature strip ===================================== */
@@ -4144,6 +4447,7 @@ select {
   border-bottom: 1px solid var(--line-soft);
   background: var(--bg-main);
 }
+
 .home-2026 .sw-feature-cell {
   position: relative;
   flex: 1;
@@ -4156,11 +4460,13 @@ select {
   justify-content: center;
   text-align: center;
 }
+
 .home-2026 .sw-feature-cell i {
   font-size: 1.25rem;
   color: var(--text-main);
   opacity: 0.85;
 }
+
 .home-2026 .sw-feature-divider {
   position: absolute;
   right: calc(clamp(16px, 3vw, 40px) * -0.5);
@@ -4170,37 +4476,126 @@ select {
   height: 28px;
   background: var(--line-soft);
 }
+
 [dir="rtl"] .home-2026 .sw-feature-divider {
   right: auto;
   left: calc(clamp(16px, 3vw, 40px) * -0.5);
 }
 
-/* === 3. Excellence in Every Detail ======================== */
+/* === 3. Excellence in Every Detail ========================
+   Centered title; left column = two stacked image+copy feature cards,
+   right column = body paragraphs + a 3-up icon pillar row. */
 .home-2026 .sw-excellence {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: clamp(32px, 5vw, 80px);
-  align-items: center;
-  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
+  padding: clamp(56px, 8vw, 104px) clamp(24px, 6vw, 80px);
   background: var(--bg-main);
 }
-.home-2026 .sw-excellence-copy {
-  max-width: 460px;
+
+.home-2026 .sw-excellence .sw-section-title-center {
+  margin-bottom: clamp(36px, 5vw, 60px);
 }
-.home-2026 .sw-excellence-copy .sw-section-title {
-  margin-bottom: 24px;
+
+.home-2026 .sw-excellence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
 }
-.home-2026 .sw-excellence-media {
+
+/* --- left: stacked feature cards --- */
+.home-2026 .sw-excellence-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.home-2026 .sw-feature-card {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  align-items: stretch;
+  gap: 24px;
+  background: var(--bg-panel);
   border-radius: var(--r-card);
   overflow: hidden;
-  aspect-ratio: 16 / 11;
-  background: var(--bg-panel);
+  padding: 0;
 }
-.home-2026 .sw-excellence-media img {
+
+.home-2026 .sw-feature-card-img {
+  overflow: hidden;
+  background: var(--bg-main);
+  min-height: 150px;
+}
+
+.home-2026 .sw-feature-card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.home-2026 .sw-feature-card-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 26px 26px 0;
+}
+
+.home-2026 .sw-feature-card-text h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 1.8vw, 1.55rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  color: var(--text-main);
+}
+
+.home-2026 .sw-feature-card-text p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+  margin: 0;
+}
+
+[dir="rtl"] .home-2026 .sw-feature-card-text {
+  padding: 26px 0 26px 26px;
+}
+
+/* --- right: body copy + icon pillars --- */
+.home-2026 .sw-excellence-copy {
+  max-width: 480px;
+}
+
+.home-2026 .sw-excellence-copy .sw-body {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.home-2026 .sw-excellence-icons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+  text-align: center;
+}
+
+.home-2026 .sw-excellence-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--text-main);
+}
+
+.home-2026 .sw-excellence-icon i {
+  font-size: 1.7rem;
+  color: var(--text-main);
+  opacity: 0.85;
 }
 
 /* === 4. Designed for Living =============================== */
@@ -4208,22 +4603,28 @@ select {
   padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
   background: var(--bg-main);
 }
+
 .home-2026 .sw-living-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
+
 .home-2026 .sw-living-tile {
   position: relative;
   display: block;
   border-radius: var(--r-card);
   overflow: hidden;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 3;
   text-decoration: none;
   isolation: isolate;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.home-2026 .sw-living-tile:hover { transform: translateY(-4px); }
+
+.home-2026 .sw-living-tile:hover {
+  transform: translateY(-4px);
+}
+
 .home-2026 .sw-living-tile img {
   width: 100%;
   height: 100%;
@@ -4231,7 +4632,11 @@ select {
   display: block;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.home-2026 .sw-living-tile:hover img { transform: scale(1.04); }
+
+.home-2026 .sw-living-tile:hover img {
+  transform: scale(1.04);
+}
+
 .home-2026 .sw-living-tile::after {
   content: '';
   position: absolute;
@@ -4239,6 +4644,7 @@ select {
   background: linear-gradient(180deg, transparent 55%, rgba(31, 24, 18, 0.55) 100%);
   pointer-events: none;
 }
+
 .home-2026 .sw-living-label {
   position: absolute;
   left: 20px;
@@ -4249,6 +4655,7 @@ select {
   font-weight: 600;
   letter-spacing: 0.01em;
 }
+
 [dir="rtl"] .home-2026 .sw-living-label {
   left: auto;
   right: 20px;
@@ -4264,6 +4671,7 @@ select {
   isolation: isolate;
   min-height: 460px;
 }
+
 .home-2026 .sw-heritage-bg {
   position: absolute;
   inset: 0;
@@ -4272,15 +4680,17 @@ select {
   object-fit: cover;
   z-index: 0;
 }
+
 .home-2026 .sw-heritage-scrim {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(110deg,
-    rgba(31, 24, 18, 0.92) 0%,
-    rgba(31, 24, 18, 0.78) 45%,
-    rgba(31, 24, 18, 0.35) 100%);
+      rgba(31, 24, 18, 0.92) 0%,
+      rgba(31, 24, 18, 0.78) 45%,
+      rgba(31, 24, 18, 0.35) 100%);
 }
+
 .home-2026 .sw-heritage-inner {
   position: relative;
   z-index: 2;
@@ -4290,11 +4700,16 @@ select {
   align-items: center;
   padding: clamp(40px, 6vw, 72px);
 }
-.home-2026 .sw-heritage-copy { max-width: 460px; }
+
+.home-2026 .sw-heritage-copy {
+  max-width: 460px;
+}
+
 .home-2026 .sw-heritage-kicker {
   color: var(--bg-main);
   opacity: 0.85;
 }
+
 .home-2026 .sw-heritage-title {
   font-family: var(--font-serif);
   font-weight: 500;
@@ -4303,12 +4718,14 @@ select {
   margin: 0 0 18px;
   color: var(--bg-main);
 }
+
 .home-2026 .sw-heritage-body {
   font-size: 0.95rem;
   line-height: 1.6;
   color: rgba(242, 235, 224, 0.78);
   margin: 0 0 22px;
 }
+
 .home-2026 .sw-heritage-badge {
   width: 168px;
   height: 168px;
@@ -4322,12 +4739,14 @@ select {
   color: var(--bg-main);
   flex-shrink: 0;
 }
+
 .home-2026 .sw-heritage-badge-top,
 .home-2026 .sw-heritage-badge-bot {
   font-size: 0.62rem;
   letter-spacing: 0.28em;
   font-weight: 600;
 }
+
 .home-2026 .sw-heritage-badge-num {
   font-family: var(--font-serif);
   font-size: 2.4rem;
@@ -4341,14 +4760,17 @@ select {
   padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
   background: var(--bg-main);
 }
+
 .home-2026 .sw-quality-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(24px, 3vw, 48px);
 }
+
 .home-2026 .sw-quality-cell {
   text-align: center;
 }
+
 .home-2026 .sw-quality-cell i {
   display: inline-flex;
   align-items: center;
@@ -4360,6 +4782,7 @@ select {
   margin-bottom: 16px;
   opacity: 0.85;
 }
+
 .home-2026 .sw-quality-title {
   font-family: var(--font-app);
   font-size: 0.92rem;
@@ -4368,6 +4791,7 @@ select {
   color: var(--text-main);
   margin: 0 0 6px;
 }
+
 .home-2026 .sw-quality-text {
   font-size: 0.85rem;
   line-height: 1.55;
@@ -4380,6 +4804,7 @@ select {
 .home-2026 .sw-quote-wrap {
   padding: 0 clamp(24px, 6vw, 80px) clamp(40px, 6vw, 80px);
 }
+
 .home-2026 .sw-quote {
   position: relative;
   background: var(--accent-deep);
@@ -4394,6 +4819,7 @@ select {
   align-items: center;
   gap: 12px;
 }
+
 .home-2026 .sw-quote-mark {
   display: inline-flex;
   align-items: center;
@@ -4408,6 +4834,7 @@ select {
   letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
+
 .home-2026 .sw-quote p {
   font-family: var(--font-serif);
   font-size: clamp(1.2rem, 2.4vw, 1.8rem);
@@ -4416,6 +4843,7 @@ select {
   margin: 0;
   color: var(--bg-main);
 }
+
 .home-2026 .sw-quote footer {
   font-family: var(--font-serif);
   font-style: italic;
@@ -4430,11 +4858,13 @@ select {
   padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 80px);
   background: var(--bg-main);
 }
+
 .home-2026 .sw-collection-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
+
 .home-2026 .sw-product-card {
   display: flex;
   flex-direction: column;
@@ -4446,15 +4876,18 @@ select {
   border: 1px solid var(--line-soft);
   transition: var(--transition-smooth);
 }
+
 .home-2026 .sw-product-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card);
 }
+
 .home-2026 .sw-product-img {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--surface-soft);
 }
+
 .home-2026 .sw-product-img img {
   width: 100%;
   height: 100%;
@@ -4462,10 +4895,15 @@ select {
   display: block;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.home-2026 .sw-product-card:hover .sw-product-img img { transform: scale(1.03); }
+
+.home-2026 .sw-product-card:hover .sw-product-img img {
+  transform: scale(1.03);
+}
+
 .home-2026 .sw-product-meta {
   padding: 18px 20px 22px;
 }
+
 .home-2026 .sw-product-name {
   font-family: var(--font-app);
   font-size: 0.92rem;
@@ -4474,19 +4912,25 @@ select {
   margin: 0 0 8px;
   color: var(--text-main);
 }
+
 .home-2026 .sw-product-price {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-main);
 }
+
 .home-2026 .sw-product-price span {
   font-size: 0.78rem;
   font-weight: 600;
   margin-left: 2px;
   opacity: 0.75;
 }
-[dir="rtl"] .home-2026 .sw-product-price span { margin-left: 0; margin-right: 2px; }
+
+[dir="rtl"] .home-2026 .sw-product-price span {
+  margin-left: 0;
+  margin-right: 2px;
+}
 
 /* === 9. Mini benefit chips ================================ */
 .home-2026 .sw-benefits {
@@ -4495,6 +4939,7 @@ select {
   gap: 14px;
   padding: 0 clamp(24px, 6vw, 80px) clamp(40px, 6vw, 72px);
 }
+
 .home-2026 .sw-benefit-chip {
   display: flex;
   align-items: center;
@@ -4504,23 +4949,27 @@ select {
   border: 1px solid var(--line-soft);
   border-radius: 16px;
 }
+
 .home-2026 .sw-benefit-chip i {
   font-size: 1.4rem;
   color: var(--text-main);
   opacity: 0.85;
   flex-shrink: 0;
 }
+
 .home-2026 .sw-benefit-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
+
 .home-2026 .sw-benefit-text strong {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-main);
 }
+
 .home-2026 .sw-benefit-text span {
   font-size: 0.78rem;
   color: var(--text-soft);
@@ -4530,6 +4979,7 @@ select {
 .home-2026 .sw-compare {
   padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 80px);
 }
+
 .home-2026 .sw-compare-table-wrap {
   max-width: 1100px;
   margin: 0 auto;
@@ -4538,12 +4988,14 @@ select {
   overflow: hidden;
   background: var(--bg-panel);
 }
+
 .home-2026 .sw-compare-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
   color: var(--text-main);
 }
+
 .home-2026 .sw-compare-table thead th {
   padding: 18px 24px;
   font-family: var(--font-app);
@@ -4553,10 +5005,12 @@ select {
   background: var(--bg-panel);
   border-bottom: 1px solid var(--line-soft);
 }
+
 .home-2026 .sw-compare-table thead th.sw-compare-col-active {
   background: var(--text-main);
   color: var(--bg-main);
 }
+
 .home-2026 .sw-compare-table tbody th {
   padding: 16px 24px;
   text-align: left;
@@ -4565,17 +5019,23 @@ select {
   border-bottom: 1px solid var(--line-soft);
   background: var(--bg-panel);
 }
-[dir="rtl"] .home-2026 .sw-compare-table tbody th { text-align: right; }
+
+[dir="rtl"] .home-2026 .sw-compare-table tbody th {
+  text-align: right;
+}
+
 .home-2026 .sw-compare-table tbody td {
   padding: 16px 24px;
   text-align: center;
   border-bottom: 1px solid var(--line-soft);
   background: var(--bg-panel);
 }
+
 .home-2026 .sw-compare-table tbody td.sw-compare-col-active {
   background: var(--surface-soft);
   font-weight: 600;
 }
+
 .home-2026 .sw-compare-table tbody tr:last-child th,
 .home-2026 .sw-compare-table tbody tr:last-child td {
   border-bottom: none;
@@ -4587,82 +5047,116 @@ select {
 
 /* Tablet: tighten 4-col grids to 2-col, keep hero side-by-side */
 @media (max-width: 991px) {
+
   .home-2026 .sw-quality-grid,
   .home-2026 .sw-collection-grid,
-  .home-2026 .sw-living-grid,
   .home-2026 .sw-benefits {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .home-2026 .sw-compare { display: none; }
+  .home-2026 .sw-compare {
+    display: none;
+  }
 
   .home-2026 .sw-heritage-inner {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+
   .home-2026 .sw-heritage-badge {
     width: 132px;
     height: 132px;
     align-self: flex-start;
   }
-  .home-2026 .sw-heritage-badge-num { font-size: 2rem; }
+
+  .home-2026 .sw-heritage-badge-num {
+    font-size: 2rem;
+  }
 }
 
-/* Phone: image fills the hero but pulled back (shorter hero → wider slice)
-   so the wood backdrop + lit wardrobe both show. White copy overlaid on the
-   dark-wood left, with a filled-rectangle CTA. */
+/* Phone: the dark hero card stacks — photo on top with its badges, dark copy
+   panel below, and the product card flowing at the bottom of the panel. */
 @media (max-width: 767px) {
   .home-2026 .sw-hero {
-    position: relative;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 0;
-    /* Shorter than the desktop 80vh so object-fit shows a wider slice of
-       the scene (backdrop + wardrobe), not just the tight niche interior. */
-    height: 56vh;
+    height: auto;
     flex-shrink: 0;
+    margin: 14px;
   }
+
   .home-2026 .sw-hero-media {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
+    width: 100%;
+    flex: none;
+    aspect-ratio: 4 / 3;
   }
+
   .home-2026 .sw-hero-media img {
-    /* Anchor so the dark walnut backdrop sits on the left under the text and
-       the lit niche shows on the right. */
-    object-position: 52% center;
+    object-position: 60% center;
   }
+
+  .home-2026 .sw-hero-badge {
+    max-width: 160px;
+    font-size: 0.7rem;
+    padding: 8px 12px;
+  }
+
+  .home-2026 .sw-hero-badge-tl {
+    top: 16px;
+    left: 16px;
+  }
+
+  .home-2026 .sw-hero-badge-bl {
+    bottom: 16px;
+    left: 16px;
+  }
+
+  [dir="rtl"] .home-2026 .sw-hero-badge-tl,
+  [dir="rtl"] .home-2026 .sw-hero-badge-bl {
+    left: auto;
+    right: 16px;
+  }
+
   .home-2026 .sw-hero-copy {
-    position: relative;
-    z-index: 2;
     flex: none;
     width: 100%;
-    background: transparent;
-    padding: 0 28px;
+    padding: 32px 24px 26px;
     align-items: flex-start;
   }
-  /* White copy over the dark wood. Subtle shadow for legibility (not a
-     fade overlay). */
+
   .home-2026 .sw-hero-title {
-    color: #fff;
-    text-shadow: 0 2px 16px rgba(20, 14, 8, 0.5);
+    font-size: clamp(2.1rem, 9vw, 3rem);
+    margin-bottom: 16px;
   }
+
   .home-2026 .sw-hero-body {
-    color: rgba(255, 255, 255, 0.92);
-    text-shadow: 0 1px 10px rgba(20, 14, 8, 0.55);
-    max-width: 60%;
+    max-width: none;
+    margin-bottom: 26px;
   }
-  /* Filled rectangle CTA — solid cream block, espresso text. */
-  .home-2026 .sw-hero-copy .sw-btn-outline {
-    border: none;
-    border-radius: 6px;
-    background: var(--bg-main);
-    color: var(--text-main);
+
+  /* Signature + product card flow normally on mobile (not absolute). */
+  .home-2026 .sw-hero-signature {
+    position: static;
+    margin-bottom: 22px;
+    width: 110px;
   }
-  .home-2026 .sw-hero-copy .sw-btn-outline:hover {
-    background: #fff;
-    color: var(--text-main);
+
+  [dir="rtl"] .home-2026 .sw-hero-signature {
+    left: auto;
+  }
+
+  .home-2026 .sw-hero-product {
+    position: static;
+    transform: none;
+    align-self: stretch;
+    margin: 0 24px 26px;
+    bottom: auto;
+    left: auto;
+  }
+
+  .home-2026 .sw-hero-product:hover {
+    transform: translateY(-3px);
   }
 
   .home-2026 .sw-feature-strip {
@@ -4671,6 +5165,7 @@ select {
     gap: 12px;
     padding: 24px 20px;
   }
+
   .home-2026 .sw-feature-cell {
     flex-direction: column;
     gap: 8px;
@@ -4678,26 +5173,65 @@ select {
     text-align: center;
     line-height: 1.2;
   }
-  .home-2026 .sw-feature-cell i { font-size: 1.4rem; }
-  .home-2026 .sw-feature-divider { display: none; }
+
+  .home-2026 .sw-feature-cell i {
+    font-size: 1.4rem;
+  }
+
+  .home-2026 .sw-feature-divider {
+    display: none;
+  }
 
   .home-2026 .sw-excellence {
-    grid-template-columns: 1fr;
     padding: 48px 20px;
   }
-  .home-2026 .sw-excellence-media {
-    aspect-ratio: 4 / 5;
-    max-width: 360px;
-    margin: 0 auto;
+
+  .home-2026 .sw-excellence-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  /* Keep the image beside the copy but give it a fixed square so short
+     cards don't collapse the photo. */
+  .home-2026 .sw-feature-card {
+    grid-template-columns: 40% 1fr;
+    gap: 16px;
+  }
+
+  .home-2026 .sw-feature-card-img {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
+  .home-2026 .sw-feature-card-text {
+    padding: 18px 18px 18px 0;
+  }
+
+  [dir="rtl"] .home-2026 .sw-feature-card-text {
+    padding: 18px 0 18px 18px;
+  }
+
+  .home-2026 .sw-excellence-copy {
+    max-width: none;
+  }
+
+  .home-2026 .sw-excellence-icons {
+    gap: 12px;
+  }
+
+  .home-2026 .sw-excellence-icon {
+    font-size: 0.72rem;
   }
 
   .home-2026 .sw-living {
     padding: 48px 0 48px 20px;
   }
+
   .home-2026 .sw-living .sw-section-title-center {
     margin-right: 20px;
     margin-bottom: 28px;
   }
+
   .home-2026 .sw-living-grid {
     display: flex;
     grid-template-columns: none;
@@ -4707,7 +5241,11 @@ select {
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
-  .home-2026 .sw-living-grid::-webkit-scrollbar { display: none; }
+
+  .home-2026 .sw-living-grid::-webkit-scrollbar {
+    display: none;
+  }
+
   .home-2026 .sw-living-tile {
     flex: 0 0 70vw;
     max-width: 280px;
@@ -4715,26 +5253,56 @@ select {
     aspect-ratio: 4 / 5;
   }
 
-  .home-2026 .sw-quality { padding: 56px 20px; }
+  .home-2026 .sw-quality {
+    padding: 56px 20px;
+  }
+
   .home-2026 .sw-quality-grid {
     grid-template-columns: 1fr;
     gap: 28px;
   }
+
   .home-2026 .sw-quality-cell {
     display: grid;
-    grid-template-columns: 56px 1fr;
+    grid-template-columns: 44px 1fr;
+    column-gap: 16px;
+    row-gap: 4px;
     text-align: left;
-    align-items: start;
-    gap: 14px;
+    align-items: center;
   }
-  [dir="rtl"] .home-2026 .sw-quality-cell { text-align: right; }
-  .home-2026 .sw-quality-cell i { margin-bottom: 0; }
-  .home-2026 .sw-quality-text { max-width: none; margin: 0; }
+
+  [dir="rtl"] .home-2026 .sw-quality-cell {
+    text-align: right;
+  }
+
+  /* Icon spans both rows in col 1; title + text stay in the wide col 2 so
+     the description doesn't get squeezed into the narrow icon column. */
+  .home-2026 .sw-quality-cell i {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+  }
+
+  .home-2026 .sw-quality-title {
+    grid-column: 2;
+    align-self: end;
+  }
+
+  .home-2026 .sw-quality-text {
+    grid-column: 2;
+    align-self: start;
+    max-width: none;
+    margin: 0;
+  }
 
   .home-2026 .sw-collection {
     padding: 40px 0 40px 20px;
   }
-  .home-2026 .sw-collection .sw-section-title-center { margin-right: 20px; }
+
+  .home-2026 .sw-collection .sw-section-title-center {
+    margin-right: 20px;
+  }
+
   .home-2026 .sw-collection-grid {
     display: flex;
     grid-template-columns: none;
@@ -4744,7 +5312,11 @@ select {
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
-  .home-2026 .sw-collection-grid::-webkit-scrollbar { display: none; }
+
+  .home-2026 .sw-collection-grid::-webkit-scrollbar {
+    display: none;
+  }
+
   .home-2026 .sw-product-card {
     flex: 0 0 60vw;
     max-width: 240px;
@@ -4755,44 +5327,87 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 20px 48px;
   }
+
   .home-2026 .sw-benefit-chip {
     padding: 14px 14px;
     gap: 10px;
   }
-  .home-2026 .sw-benefit-text strong { font-size: 0.78rem; }
-  .home-2026 .sw-benefit-text span   { font-size: 0.72rem; }
+
+  .home-2026 .sw-benefit-text strong {
+    font-size: 0.78rem;
+  }
+
+  .home-2026 .sw-benefit-text span {
+    font-size: 0.72rem;
+  }
 
   .home-2026 .sw-heritage {
     margin: 24px 16px;
-    min-height: 260px;
+    /* .app-content is a flex column — without this the box gets shrunk to
+       its min-height and overflow:hidden clips the badge + CTA. */
+    flex-shrink: 0;
+    min-height: 500px;
   }
-  .home-2026 .sw-heritage-inner {
-    padding: 32px 28px;
-  }
-  .home-2026 .sw-heritage-title { font-size: 1.9rem; }
 
-  .home-2026 .sw-quote-wrap { padding: 0 20px 40px; }
-  .home-2026 .sw-quote { padding: 32px 24px; }
+  .home-2026 .sw-heritage-inner {
+    padding: 40px 30px;
+    gap: 28px;
+    align-content: center;
+  }
+
+  .home-2026 .sw-heritage-title {
+    font-size: 2.1rem;
+  }
+
+  .home-2026 .sw-heritage-badge {
+    width: 150px;
+    height: 150px;
+  }
+
+  .home-2026 .sw-heritage-badge-num {
+    font-size: 2.3rem;
+  }
+
+  .home-2026 .sw-quote-wrap {
+    padding: 0 20px 40px;
+  }
+
+  .home-2026 .sw-quote {
+    padding: 32px 24px;
+  }
 }
+
 /* ============================================================
-   ABOUT US / CRAFTSMANSHIP 2026 REDESIGN
-   Composed in app/about/page.tsx. Scoped under .about-2026.
+   CRAFTSMANSHIP 2026 (route: /about) — process-driven page.
+   Scoped under .craft. Deliberately distinct from the homepage.
    ============================================================ */
-.about-2026 {
+.craft {
   background: var(--bg-main);
   color: var(--text-main);
   font-family: var(--font-app);
 }
 
-.about-2026 .sw-center { text-align: center; }
+.craft .sw-center {
+  text-align: center;
+}
 
-/* 1. Hero Mockup Split layout */
+.craft .cr-section-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text-main);
+}
+
+/* --- 1. Hero (image-3 mockup: split niche + dark walnut copy panel) --- */
 .about-2026 .av-hero-mockup {
   display: flex;
   align-items: stretch;
   background: var(--bg-main);
   min-height: 82vh;
-  position: relative; /* Anchor for the glass card */
+  position: relative;
   border-bottom: 1px solid var(--line-soft);
 }
 
@@ -4807,11 +5422,10 @@ select {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 88% center; /* Crop left gray wall, show cabinet frame */
+  object-position: 88% center;
   display: block;
 }
 
-/* Floating overlay badges (Two-line editorial text format) */
 .about-2026 .hero-overlay-badge {
   position: absolute;
   background: rgba(42, 32, 24, 0.45);
@@ -4841,6 +5455,12 @@ select {
 .about-2026 .badge-accessories {
   bottom: 110px;
   left: 30px;
+}
+
+[dir="rtl"] .about-2026 .badge-wood,
+[dir="rtl"] .about-2026 .badge-accessories {
+  left: auto;
+  right: 30px;
 }
 
 .about-2026 .badge-icon-box {
@@ -4878,7 +5498,10 @@ select {
   line-height: 1.1;
 }
 
-/* Glassmorphic Customizable Corner Design card (overlaps vertical seam) */
+.about-2026 .hero-glass-card-link {
+  text-decoration: none;
+}
+
 .about-2026 .hero-glass-card {
   position: absolute;
   bottom: 32px;
@@ -4953,24 +5576,9 @@ select {
   color: #ffffff;
 }
 
-.about-2026 .hero-glass-badge {
-  background: #ffffff;
-  color: var(--text-main);
-  font-size: 0.72rem;
-  font-weight: 800;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: lowercase;
-}
-
-/* Right side walnut copy panel */
 .about-2026 .av-hero-right {
   flex: 0 0 45%;
-  background: var(--accent-deep); /* Dark walnut */
+  background: var(--accent-deep);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -4985,25 +5593,19 @@ select {
   z-index: 2;
 }
 
-/* Elegant signature text using Sydney Signature font */
-.about-2026 .hero-signature-text {
+.about-2026 .hero-signature-logo {
   position: absolute;
   bottom: 40px;
   right: 40px;
-  font-family: 'SydneySignature', 'Playfair Display', 'Georgia', serif;
-  font-style: normal;
-  font-size: 2.2rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.95);
-  letter-spacing: 0.08em;
+  width: clamp(110px, 11vw, 150px);
+  height: auto;
+  opacity: 0.95;
   z-index: 2;
   pointer-events: none;
   user-select: none;
-  font-smoothing: antialiased;
-  -webkit-font-smoothing: antialiased;
 }
 
-[dir="rtl"] .about-2026 .hero-signature-text {
+[dir="rtl"] .about-2026 .hero-signature-logo {
   right: auto;
   left: 40px;
 }
@@ -5024,400 +5626,327 @@ select {
   max-width: 36ch;
 }
 
-/* 2. Excellence in Every Detail */
-.about-2026 .av-excellence {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
-  background: var(--bg-main);
-  border-bottom: 1px solid var(--line-soft);
+/* Mockup hero responsive (phones) — stack: photo (with badges) on top, the
+   product card flows on the seam, then the dark copy panel. Previously the
+   image collapsed (badges overlapped) and the absolute card sat on the copy. */
+@media (max-width: 767px) {
+
+  /* Everything below the photo is one continuous dark panel, so the product
+     card reads as an intentional chip on the dark hero instead of floating on
+     a two-tone cream/dark seam. */
+  .about-2026 .av-hero-mockup {
+    flex-direction: column;
+    min-height: auto;
+    background: var(--accent-deep);
+  }
+
+  .about-2026 .av-hero-left {
+    flex: none;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Image is now tall enough that the two badges sit at opposite ends. */
+  .about-2026 .badge-wood,
+  .about-2026 .badge-accessories {
+    padding: 8px 12px;
+  }
+
+  .about-2026 .badge-wood {
+    top: 16px;
+    left: 16px;
+  }
+
+  .about-2026 .badge-accessories {
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+  }
+
+  [dir="rtl"] .about-2026 .badge-wood,
+  [dir="rtl"] .about-2026 .badge-accessories {
+    left: auto;
+    right: 16px;
+  }
+
+  /* Move the product card to the very bottom of the dark hero (after the copy
+     panel), full-width — same pattern as the homepage hero. */
+  .about-2026 .hero-glass-card-link {
+    order: 1;
+  }
+
+  .about-2026 .hero-glass-card {
+    position: relative;
+    z-index: 10;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    width: auto;
+    margin: 0 24px 28px;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    padding: 10px 16px 10px 10px;
+    gap: 14px;
+    border-radius: 16px;
+  }
+
+  .about-2026 .hero-glass-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Drop the white box — show the product image as a clean rounded thumb so
+     the multi-view BEEZ BLUE shot doesn't read as a broken white tile. */
+  .about-2026 .hero-glass-img-container {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .about-2026 .hero-glass-img {
+    border-radius: 10px;
+  }
+
+  .about-2026 .hero-glass-info {
+    gap: 4px;
+  }
+
+  .about-2026 .hero-glass-title {
+    font-size: 0.82rem;
+  }
+
+  /* Panel no longer needs bottom padding — the card sits under it. */
+  .about-2026 .av-hero-right {
+    flex: none;
+    width: 100%;
+    padding: 28px 24px 18px;
+  }
+
+  .about-2026 .av-hero-right .av-hero-title {
+    font-size: 2.2rem;
+  }
+
+  /* Signature flows under the copy instead of overlapping the card. */
+  .about-2026 .hero-signature-logo {
+    position: static;
+    display: block;
+    margin-top: 22px;
+    width: 130px;
+  }
+
+  [dir="rtl"] .about-2026 .hero-signature-logo {
+    left: auto;
+  }
 }
 
-.about-2026 .av-excellence-title {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-  margin: 0 0 40px;
+/* Kicker contrast fix — the soft token was too faint against cream, so the
+   craft kickers ("CRAFTSMANSHIP", "HOW WE BUILD", "MATERIALS & HARDWARE")
+   use the saturated tan accent at full opacity instead. */
+.craft .section-kicker {
+  color: var(--accent-warm);
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* --- 2. Intro --- */
+.craft .cr-intro {
+  padding: clamp(56px, 8vw, 100px) clamp(24px, 6vw, 80px);
+  max-width: 1000px;
+  margin: 0 auto;
   text-align: center;
-  max-width: 800px;
 }
 
-.about-2026 .av-excellence-inner {
+.craft .cr-intro p {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  line-height: 1.35;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* --- 3. Process (zig-zag rows) --- */
+.craft .cr-process {
+  padding: 0 clamp(24px, 6vw, 80px) clamp(48px, 7vw, 96px);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.craft .cr-process-header {
+  text-align: center;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.craft .cr-process-header .cr-section-title {
+  margin-top: 8px;
+}
+
+.craft .cr-step {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 5vw, 80px);
-  align-items: start;
-  width: 100%;
-  max-width: 1200px;
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+  margin-bottom: clamp(48px, 6vw, 88px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.about-2026 .av-excellence-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* Hidden initial state only once JS adds .reveal-ready (no-JS = visible). */
+.craft.reveal-ready .cr-step {
+  opacity: 0;
+  transform: translateY(28px);
 }
 
-.about-2026 .av-excel-card {
-  background: var(--bg-panel);
-  border: 1px solid var(--line-soft);
+.craft .cr-step.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.craft .cr-step:last-child {
+  margin-bottom: 0;
+}
+
+.craft .cr-step-rev .cr-step-media {
+  order: 2;
+}
+
+.craft .cr-step-media {
   border-radius: var(--r-card);
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  transition: var(--transition-smooth);
-}
-
-.about-2026 .av-excel-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
-}
-
-.about-2026 .av-excel-img {
-  width: 140px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
   background: var(--surface-soft);
-  flex-shrink: 0;
 }
 
-.about-2026 .av-excel-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
+.craft .cr-step-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.about-2026 .av-excel-title {
-  font-family: var(--font-app);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin: 0;
+.craft .cr-step-copy {
+  max-width: 420px;
 }
 
-.about-2026 .av-excel-text {
-  font-size: 0.82rem;
+.craft .cr-step-num {
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  font-weight: 500;
+  color: var(--accent-warm);
+  line-height: 1;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.craft .cr-step-icon {
+  font-size: 1.4rem;
   color: var(--text-soft);
-  line-height: 1.45;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.craft .cr-step-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  margin: 0 0 14px;
+  color: var(--text-main);
+}
+
+.craft .cr-step-text {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--text-soft);
   margin: 0;
 }
 
-.about-2026 .av-excellence-copy {
-  max-width: 100%;
-}
-
-.about-2026 .av-excellence-features {
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  margin-top: 24px;
-  padding-top: 20px;
+/* --- 4. Materials --- */
+.craft .cr-materials {
+  background: var(--bg-panel);
   border-top: 1px solid var(--line-soft);
-  justify-content: flex-start;
+  border-bottom: 1px solid var(--line-soft);
+  padding: clamp(64px, 9vw, 120px) clamp(24px, 6vw, 80px);
 }
 
-.about-2026 .av-excel-feat {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-main);
+.craft .cr-materials-header {
+  text-align: center;
+  margin-bottom: clamp(40px, 6vw, 64px);
 }
 
-.about-2026 .av-excel-feat i {
-  font-size: 1.3rem;
-  color: var(--text-main);
-  opacity: 0.85;
+.craft .cr-materials-header .cr-section-title {
+  margin-top: 8px;
 }
 
-/* 3. Designed for Living Category Grid */
-.about-2026 .av-living {
-  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
-  background: var(--bg-main);
-  border-bottom: none;
-}
-
-.about-2026 .av-living-grid {
+.craft .cr-materials-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.about-2026 .av-living-tile {
-  position: relative;
-  display: block;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  aspect-ratio: 4 / 5;
-  text-decoration: none;
-  isolation: isolate;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.about-2026 .av-living-tile:hover {
-  transform: translateY(-4px);
-}
-
-.about-2026 .av-living-tile img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.about-2026 .av-living-tile:hover img {
-  transform: scale(1.04);
-}
-
-.about-2026 .av-living-tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 55%, rgba(31, 24, 18, 0.6) 100%);
-  pointer-events: none;
-}
-
-.about-2026 .av-living-label {
-  position: absolute;
-  left: 24px;
-  bottom: 22px;
-  z-index: 1;
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
-[dir="rtl"] .about-2026 .av-living-label {
-  left: auto;
-  right: 24px;
-}
-
-/* 4. Proudly Kuwaiti Banner */
-.about-2026 .av-heritage {
-  position: relative;
-  margin: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
-  border-radius: var(--r-card);
-  overflow: hidden;
-  color: var(--bg-main);
-  isolation: isolate;
-  min-height: 440px;
-  box-shadow: var(--shadow-main);
-}
-
-.about-2026 .av-heritage-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.about-2026 .av-heritage-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(110deg,
-    rgba(31, 24, 18, 0.95) 0%,
-    rgba(31, 24, 18, 0.8) 45%,
-    rgba(31, 24, 18, 0.35) 100%);
-}
-
-.about-2026 .av-heritage-inner {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
-  align-items: center;
-  padding: clamp(40px, 6vw, 72px);
-}
-
-.about-2026 .av-heritage-copy {
-  max-width: 480px;
-}
-
-.about-2026 .av-heritage-kicker {
-  color: #fff;
-  opacity: 0.85;
-}
-
-.about-2026 .av-heritage-title {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 4.2vw, 3rem);
-  line-height: 1.08;
-  margin: 0 0 18px;
-  color: #fff;
-}
-
-.about-2026 .av-heritage-body {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: rgba(242, 235, 224, 0.78);
-  margin: 0 0 22px;
-}
-
-.about-2026 .av-heritage-badge {
-  width: 168px;
-  height: 168px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(242, 235, 224, 0.55);
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.about-2026 .av-heritage-badge-top,
-.about-2026 .av-heritage-badge-bot {
-  font-size: 0.62rem;
-  letter-spacing: 0.28em;
-  font-weight: 600;
-}
-
-.about-2026 .av-heritage-badge-num {
-  font-family: var(--font-serif);
-  font-size: 2.4rem;
-  font-weight: 500;
-  line-height: 1;
-  margin: 4px 0;
-}
-
-.about-2026 .av-link-arrow-light {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  border-bottom: 1px solid #fff;
-  padding-bottom: 4px;
-  transition: var(--transition-smooth);
-}
-
-.about-2026 .av-link-arrow-light:hover {
-  gap: 14px;
-}
-
-/* 5. Compare Our Models Section */
-.about-2026 .av-compare {
-  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
-  background: var(--bg-main);
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.about-2026 .av-compare-table-wrap {
+  gap: clamp(24px, 3vw, 48px);
   max-width: 1100px;
   margin: 0 auto;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--r-card);
-  overflow: hidden;
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-card);
 }
 
-.about-2026 .av-compare-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.92rem;
-  color: var(--text-main);
+.craft .cr-material {
+  text-align: center;
+  padding: 0 12px;
 }
 
-.about-2026 .av-compare-table thead th {
-  padding: 18px 24px;
+.craft .cr-material-icon {
+  font-size: 2rem;
+  color: var(--accent-warm);
+  display: block;
+  margin-bottom: 18px;
+}
+
+.craft .cr-material-title {
   font-family: var(--font-app);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  text-align: center;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.about-2026 .av-compare-table thead th.av-compare-col-active {
-  background: var(--text-main);
-  color: var(--bg-main);
-}
-
-.about-2026 .av-compare-table tbody th {
-  padding: 16px 24px;
-  text-align: left;
-  font-weight: 500;
-  color: var(--text-soft);
-  border-bottom: 1px solid var(--line-soft);
-  background: var(--bg-panel);
-}
-
-[dir="rtl"] .about-2026 .av-compare-table tbody th {
-  text-align: right;
-}
-
-.about-2026 .av-compare-table tbody td {
-  padding: 16px 24px;
-  text-align: center;
-  border-bottom: 1px solid var(--line-soft);
-  background: var(--bg-panel);
-}
-
-.about-2026 .av-compare-table tbody td.av-compare-col-active {
-  background: var(--surface-soft);
-  font-weight: 600;
-}
-
-.about-2026 .av-compare-table tbody tr:last-child th,
-.about-2026 .av-compare-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* 6. SmartWood Collection Section */
-.about-2026 .av-collection {
-  padding: clamp(64px, 8vw, 112px) clamp(24px, 6vw, 80px);
-  background: var(--bg-main);
-}
-
-.about-2026 .av-collection-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.about-2026 .av-product-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-panel);
-  border-radius: var(--r-card);
-  overflow: hidden;
-  text-decoration: none;
+  margin: 0 0 10px;
   color: var(--text-main);
-  border: 1px solid var(--line-soft);
-  transition: var(--transition-smooth);
 }
 
-.about-2026 .av-product-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card);
+.craft .cr-material-text {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-soft);
+  margin: 0 auto;
+  max-width: 32ch;
 }
 
-.about-2026 .av-product-img {
-  aspect-ratio: 4 / 3;
+/* --- 5. Detail gallery --- */
+.craft .cr-gallery {
+  padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
+}
+
+.craft .cr-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.craft .cr-tile {
+  border-radius: var(--r-img);
   overflow: hidden;
+  aspect-ratio: 3 / 4;
   background: var(--surface-soft);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.about-2026 .av-product-img img {
+.craft.reveal-ready .cr-tile {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.craft .cr-tile.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.craft .cr-tile img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -5425,346 +5954,90 @@ select {
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.about-2026 .av-product-card:hover .av-product-img img {
-  transform: scale(1.03);
+.craft .cr-tile:hover img {
+  transform: scale(1.05);
 }
 
-.about-2026 .av-product-meta {
-  padding: 18px 20px 22px;
+/* --- 6. CTA --- */
+.craft .cr-cta-wrap {
+  padding: 0 clamp(24px, 6vw, 80px) clamp(48px, 7vw, 88px);
 }
 
-.about-2026 .av-product-name {
-  font-family: var(--font-app);
-  font-size: 0.92rem;
-  font-weight: 500;
-  letter-spacing: 0;
-  margin: 0 0 8px;
-  color: var(--text-main);
-}
-
-.about-2026 .av-product-price {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-/* Centered Section Title */
-.about-2026 .av-section-title-centered {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: 40px;
-  color: var(--text-main);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-
-.about-2026 .av-product-price span {
-  font-size: 0.78rem;
-  font-weight: 600;
-  margin-left: 2px;
-  opacity: 0.75;
-}
-
-[dir="rtl"] .about-2026 .av-product-price span {
-  margin-left: 0;
-  margin-right: 2px;
-}
-
-/* Animations helper */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 14px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-.about-2026 .animate-fade-in {
-  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.about-2026 .animate-fade-in-up {
-  animation: fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* ============================================================
-   RESPONSIVE (tablet + mobile breakpoints)
-   ============================================================ */
-@media (max-width: 991px) {
-  .about-2026 .av-living-grid,
-  .about-2026 .av-collection-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .about-2026 .av-excellence {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  .about-2026 .av-compare { display: none; }
-  .about-2026 .av-heritage-inner {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  .about-2026 .av-heritage-badge {
-    width: 132px;
-    height: 132px;
-    align-self: flex-start;
-  }
-  .about-2026 .av-heritage-badge-num { font-size: 2rem; }
-}
-
-@media (max-width: 767px) {
-  .about-2026 .av-hero-mockup {
-    flex-direction: column;
-    min-height: auto;
-  }
-  .about-2026 .av-hero-left {
-    height: 45vh;
-  }
-  .about-2026 .av-hero-right {
-    flex: none;
-    width: 100%;
-    padding: 40px 24px;
-  }
-  .about-2026 .av-hero-right .av-hero-title {
-    font-size: 2.2rem;
-  }
-  .about-2026 .av-living-grid,
-  .about-2026 .av-collection-grid {
-    display: flex;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 8px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  .about-2026 .av-living-grid::-webkit-scrollbar,
-  .about-2026 .av-collection-grid::-webkit-scrollbar {
-    display: none;
-  }
-  .about-2026 .av-living-tile {
-    flex: 0 0 75vw;
-    scroll-snap-align: start;
-  }
-  .about-2026 .av-product-card {
-    flex: 0 0 65vw;
-    scroll-snap-align: start;
-  }
-  .about-2026 .badge-wood,
-  .about-2026 .badge-accessories {
-    padding: 8px 12px;
-    font-size: 0.75rem;
-  }
-  .about-2026 .badge-accessories {
-    bottom: 100px;
-  }
-  .about-2026 .hero-glass-card {
-    padding: 8px 12px;
-  }
-}
-
-/* ============================================================
-   PROJECTS / PORTFOLIO 2026 REDESIGN
-   Composed in app/projects/page.tsx. Scoped under .projects-2026.
-   ============================================================ */
-.projects-2026 {
-  background: var(--bg-main);
-  color: var(--text-main);
-  font-family: var(--font-app);
-}
-
-.projects-2026 .projects-header {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: clamp(28px, 4vw, 40px) 24px clamp(32px, 4vw, 56px);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.projects-2026 .projects-kicker {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent-warm);
-  margin-bottom: 12px;
-}
-
-.projects-2026 .projects-title {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
-  color: var(--text-main);
-  margin: 0;
-  line-height: 1.15;
-}
-
-.projects-2026 .projects-list {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px clamp(64px, 8vw, 120px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(48px, 8vw, 96px);
-}
-
-.projects-2026 .project-row {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(32px, 5vw, 80px);
-  align-items: center;
-}
-
-.projects-2026 .project-row:nth-child(even) {
-  grid-template-columns: 0.9fr 1.1fr;
-}
-
-.projects-2026 .project-row:nth-child(even) .project-img-container {
-  order: 2;
-}
-
-.projects-2026 .project-row:nth-child(even) .project-text-container {
-  order: 1;
-}
-
-.projects-2026 .project-img-container {
+.craft .cr-cta {
+  background: var(--accent-deep);
+  color: var(--bg-main);
   border-radius: var(--r-card);
-  overflow: hidden;
-  aspect-ratio: 1.35;
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--line-soft);
-  background: var(--surface-soft);
-}
-
-.projects-2026 .project-img-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: var(--transition-smooth);
-}
-
-.projects-2026 .project-row:hover .project-img-container img {
-  transform: scale(1.02);
-}
-
-.projects-2026 .project-text-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.projects-2026 .project-meta {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--accent-warm);
-  margin-bottom: 8px;
-  letter-spacing: 0.05em;
-}
-
-.projects-2026 .project-name {
-  font-family: var(--font-serif);
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 500;
-  color: var(--text-main);
-  margin: 0 0 16px;
-  line-height: 1.2;
-}
-
-.projects-2026 .project-desc {
-  font-size: 0.95rem;
-  color: var(--text-soft);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.projects-2026 .projects-cta {
-  background: var(--bg-panel);
-  border-top: 1px solid var(--line-soft);
-  padding: clamp(64px, 8vw, 96px) 24px;
+  padding: clamp(44px, 6vw, 80px) clamp(28px, 5vw, 80px);
   text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.projects-2026 .projects-cta-title {
+.craft .cr-cta-title {
   font-family: var(--font-serif);
-  font-size: clamp(2rem, 4.5vw, 2.8rem);
   font-weight: 500;
-  color: var(--text-main);
-  margin: 0 0 16px;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  margin: 0 0 12px;
+  color: var(--bg-main);
 }
 
-.projects-2026 .projects-cta-subtitle {
+.craft .cr-cta-sub {
   font-size: 1rem;
-  color: var(--text-soft);
-  max-width: 45ch;
+  line-height: 1.6;
+  color: rgba(242, 235, 224, 0.78);
   margin: 0 auto 28px;
-  line-height: 1.5;
+  max-width: 44ch;
 }
 
-.projects-2026 .sw-btn-outline {
+.craft .cr-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 26px;
+  gap: 12px;
+  padding: 15px 30px;
   border-radius: var(--r-pill);
-  border: 1px solid var(--text-main);
-  background: transparent;
+  background: var(--bg-main);
   color: var(--text-main);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-decoration: none;
   transition: var(--transition-smooth);
 }
 
-.projects-2026 .sw-btn-outline:hover {
-  background: var(--text-main);
-  color: var(--bg-main);
+.craft .cr-cta-btn:hover {
+  transform: translateY(-2px);
 }
 
-.projects-2026 .sw-btn-outline i {
-  font-size: 0.95rem;
-}
+/* --- Responsive --- */
+@media (max-width: 991px) {
+  .craft .cr-materials-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    max-width: 420px;
+  }
 
-/* RTL Support */
-[dir="rtl"] .projects-2026 .project-text-container {
-  text-align: right;
+  .craft .cr-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 767px) {
-  .projects-2026 .project-row {
-    grid-template-columns: 1fr !important;
+  .craft .cr-step {
+    grid-template-columns: 1fr;
     gap: 20px;
+    margin-bottom: 48px;
   }
-  .projects-2026 .project-row:nth-child(even) .project-img-container {
-    order: 1 !important;
+
+  /* Image always on top on mobile, regardless of zig-zag order. */
+  .craft .cr-step-rev .cr-step-media {
+    order: 0;
   }
-  .projects-2026 .project-row:nth-child(even) .project-text-container {
-    order: 2 !important;
+
+  .craft .cr-step-media {
+    aspect-ratio: 4 / 3;
   }
-  .projects-2026 .project-img-container {
-    aspect-ratio: 1.5;
-  }
-  .projects-2026 .projects-header {
-    padding: clamp(20px, 4vw, 28px) 20px clamp(24px, 3vw, 36px);
-  }
-  .projects-2026 .projects-list {
-    padding: 0 20px clamp(48px, 6vw, 80px);
-    gap: 40px;
+
+  .craft .cr-step-num {
+    font-size: 2rem;
   }
 }
-
-

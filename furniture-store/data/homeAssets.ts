@@ -38,6 +38,12 @@ export const HOME_ASSETS = {
     intent: 'Excellence section: close-up of precision German hardware (pull-out rail mechanism). Mockup shows a chrome hinge macro.',
   } as HomeAsset,
 
+  /** "Excellence in Every Detail" — wood joinery macro (second card). */
+  joinery: {
+    src: '/images/home/craft-joinery.png',
+    intent: 'Excellence section: macro of a precise wood joinery / mortise-and-tenon corner joint.',
+  } as HomeAsset,
+
   /** "Proudly Kuwaiti" heritage banner background (sits under a dark scrim). */
   factory: {
     src: '/images/home/feature-wide.png',
@@ -48,18 +54,10 @@ export const HOME_ASSETS = {
 /** "Designed for Living" category tiles. Order = display order, left→right. */
 export const LIVING_TILES = [
   {
-    key: 'custom',
-    src: '/images/home/living-custom.png',
-    enLabel: 'Custom Furniture',
-    arLabel: 'أثاث مخصص',
-    href: '/shop',
-    intent: 'Custom built-in cabinetry.',
-  },
-  {
     key: 'wardrobes',
     src: '/images/home/living-wardrobes.png',
-    enLabel: 'Wardrobes',
-    arLabel: 'الدواليب',
+    enLabel: 'Walk-in Wardrobe',
+    arLabel: 'غرفة ملابس',
     href: '/shop',
     intent: 'A walk-in wardrobe / closet interior.',
   },

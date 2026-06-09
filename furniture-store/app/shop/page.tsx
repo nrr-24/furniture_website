@@ -302,37 +302,8 @@ export default function ShopPage() {
 
       <div className="container" style={{ paddingTop: '0px' }}>
         <div className="shop-layout">
-          {/* 1. Desktop Sidebar */}
-          <aside className="shop-sidebar">
-            <button
-              onClick={clearFilter}
-              className={`shop-sidebar-category ${selectedCategoryId === null ? 'is-active' : ''}`}
-            >
-              <i className="bi bi-grid-fill" style={{ fontSize: '0.9rem' }}></i>
-              <span>{isRtl ? 'الكل' : 'ALL PRODUCTS'}</span>
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.id)}
-                className={`shop-sidebar-category ${selectedCategoryId === cat.id ? 'is-active' : ''}`}
-              >
-                <span>{isRtl ? cat.nameAr : cat.name}</span>
-              </button>
-            ))}
-            {selectedCategoryId && (
-              <button
-                onClick={clearFilter}
-                className="shop-sidebar-clear"
-                style={{ marginLeft: '12px', flexShrink: 0 }}
-                title={isRtl ? 'إزالة الفلتر' : 'Clear filter'}
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            )}
-          </aside>
-
-          {/* 2. Main Gallery Area */}
+          {/* Main Gallery Area — category filtering lives in the pill tabs
+              below (the old sticky segmented bar duplicated this). */}
           <div className="shop-gallery" id="all-designs">
             {/* Horizontal category tabs (mockup style) */}
             <div className="shop-tabs" role="tablist" aria-label={isRtl ? 'الفئات' : 'Categories'}>
@@ -368,7 +339,10 @@ export default function ShopPage() {
                   }
                 </h2>
                 <p style={{ margin: '4px 0 0', color: 'rgba(42, 32, 24, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
-                  {filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0)} {isRtl ? 'قطعة متوفرة' : 'items found'}
+                  {(() => {
+                    const count = filteredCategories.reduce((acc, cat) => acc + cat.products.length, 0);
+                    return isRtl ? `${count} قطعة` : `${count} ${count === 1 ? 'item' : 'items'} found`;
+                  })()}
                 </p>
               </div>
 
@@ -376,7 +350,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => setIsCategoryManagerOpen(true)}
                   className="hero-secondary-btn py-2 px-4 shadow-sm"
-                  style={{ fontSize: '0.85rem', borderRadius: '12px', border: '1.5px solid var(--bg-main)', color: 'var(--text-main)', fontWeight: 700 }}
+                  style={{ fontSize: '0.85rem', borderRadius: '12px', fontWeight: 700 }}
                 >
                   <i className="bi bi-tags-fill me-2"></i> {isRtl ? 'إدارة الفئات' : 'Edit Categories'}
                 </button>
@@ -465,12 +439,19 @@ export default function ShopPage() {
 
                           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '16px', justifyContent: 'center', width: '100%' }}>
                             <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
-                              {item.salePrice ?? item.price} {t('currency')}
+                              {(item.salePrice ?? item.price) > 0
+                                ? `${item.salePrice ?? item.price} ${t('currency')}`
+                                : (isRtl ? 'السعر عند الطلب' : 'Price on request')}
                             </span>
-                            {item.salePrice && item.salePrice < item.price && (
-                              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#2251A4', whiteSpace: 'nowrap' }}>
-                                {isRtl ? `وفر ${item.price - item.salePrice}` : `Save ${item.price - item.salePrice}`}
-                              </span>
+                            {item.salePrice && item.salePrice < item.price && item.price > 0 && (
+                              <>
+                                <span style={{ fontSize: '0.82rem', color: 'var(--text-soft)', textDecoration: 'line-through', whiteSpace: 'nowrap' }}>
+                                  {item.price} {t('currency')}
+                                </span>
+                                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fff', background: '#c0392b', borderRadius: '6px', padding: '2px 7px', whiteSpace: 'nowrap' }}>
+                                  -{Math.round((1 - item.salePrice / item.price) * 100)}%
+                                </span>
+                              </>
                             )}
                           </div>
 
@@ -573,7 +554,7 @@ export default function ShopPage() {
               right: isRtl ? 'auto' : 'max(24px, env(safe-area-inset-right))',
               left: isRtl ? 'max(24px, env(safe-area-inset-left))' : 'auto',
               zIndex: 1000,
-              background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50px',
+              background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50px',
               padding: '16px 32px', fontSize: '1.1rem', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '10px'
             }}
@@ -618,7 +599,7 @@ export default function ShopPage() {
           >
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 style={{ margin: 0, fontWeight: 700, fontSize: '1.5rem' }}>{isRtl ? 'إدارة الفئات' : 'Manage Categories'}</h3>
-              <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'var(--text-main)', border: 'none', color: 'var(--text-main)', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>&times;</button>
+              <button onClick={() => setIsCategoryManagerOpen(false)} style={{ background: 'var(--text-main)', border: 'none', color: 'var(--bg-main)', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>&times;</button>
             </div>
 
             <div style={{ marginBottom: '25px', padding: '20px', background: 'var(--bg-main)', borderRadius: '16px', border: '1px solid var(--line-soft)' }}>
@@ -629,8 +610,8 @@ export default function ShopPage() {
                 addCategory(formData.get('name') as string, formData.get('nameAr') as string);
                 e.currentTarget.reset();
               }} className="d-flex gap-2">
-                <input name="name" placeholder="Name (EN)" required style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid var(--line-soft)', color: 'white', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
-                <input name="nameAr" placeholder="الاسم (AR)" required style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid var(--line-soft)', color: 'white', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
+                <input name="name" placeholder="Name (EN)" required style={{ flex: 1, background: 'var(--bg-panel)', border: '1px solid var(--line-soft)', color: 'var(--text-main)', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
+                <input name="nameAr" placeholder="الاسم (AR)" required style={{ flex: 1, background: 'var(--bg-panel)', border: '1px solid var(--line-soft)', color: 'var(--text-main)', padding: '10px 14px', borderRadius: '10px', fontSize: '0.9rem' }} />
                 <button type="submit" className="hero-primary-btn" style={{ padding: '10px 15px', border: 'none' }}><i className="bi bi-plus-lg"></i></button>
               </form>
             </div>
@@ -653,7 +634,7 @@ export default function ShopPage() {
                         defaultValue={cat.name}
                         onBlur={(e) => updateCategory(cat.id, { name: e.target.value })}
                         placeholder="English"
-                        style={{ flex: 1, background: 'none', border: 'none', color: 'white', fontSize: '1rem', fontWeight: 600, padding: 0 }}
+                        style={{ flex: 1, background: 'none', border: 'none', color: 'var(--text-main)', fontSize: '1rem', fontWeight: 600, padding: 0 }}
                       />
                       <input
                         defaultValue={cat.nameAr}
@@ -682,7 +663,7 @@ export default function ShopPage() {
             <button
               onClick={() => setIsEditorOpen(false)}
               className="shadow-lg"
-              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
+              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001, fontSize: '1.1rem', lineHeight: 1 }}
             >&times;</button>
             <FurnitureManager initialItem={itemToEdit || undefined} onClose={() => setIsEditorOpen(false)} />
           </div>
@@ -1081,7 +1062,7 @@ export default function ShopPage() {
         .samsung-details-link {
           background: none;
           border: none;
-          color: var(--bg-main);
+          color: var(--text-main);
           font-size: 0.78rem;
           font-weight: 700;
           text-transform: uppercase;
@@ -1091,7 +1072,7 @@ export default function ShopPage() {
           display: flex;
           align-items: center;
           transition: all 0.3s ease;
-          opacity: 0.6;
+          opacity: 0.75;
         }
         .samsung-details-link:hover {
           opacity: 1;

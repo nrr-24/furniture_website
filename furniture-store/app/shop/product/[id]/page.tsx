@@ -155,7 +155,7 @@ export default function ProductPage() {
             <button
               onClick={() => setIsEditorOpen(false)}
               className="shadow-lg"
-              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--text-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001 }}
+              style={{ position: 'absolute', top: '15px', right: '25px', background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10001, fontSize: '1.1rem', lineHeight: 1 }}
             >&times;</button>
             <FurnitureManager initialItem={item} onClose={() => setIsEditorOpen(false)} />
           </div>

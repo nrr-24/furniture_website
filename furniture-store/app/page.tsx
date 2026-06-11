@@ -238,10 +238,10 @@ export default function HomePage() {
         </h2>
         <div className="sw-living-grid">
           {LIVING_TILES.map((c) => (
-            <Link key={c.key} href={c.href} className="sw-living-tile">
+            <div key={c.key} className="sw-living-tile">
               <img src={c.src} alt={isRtl ? c.arLabel : c.enLabel} />
               <span className="sw-living-label">{isRtl ? c.arLabel : c.enLabel}</span>
-            </Link>
+            </div>
           ))}
         </div>
       </section>

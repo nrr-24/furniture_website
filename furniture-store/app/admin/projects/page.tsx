@@ -164,13 +164,15 @@ export default function AdminProjectsPage() {
 
   const inp = (label: string, key: keyof typeof EMPTY_FORM, multiline = false) => (
     <div style={{ marginBottom: 14 }}>
-      <label className="admin-label">{label}</label>
+      <label style={labelStyle}>{label}</label>
       {multiline ? (
-        <textarea className="admin-input" rows={3} value={form[key] as string}
-          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))} style={{ resize: 'vertical' }} />
+        <textarea rows={3} value={form[key] as string}
+          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+          style={{ ...inputStyle, resize: 'vertical' }} />
       ) : (
-        <input className="admin-input" value={form[key] as string}
-          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))} />
+        <input value={form[key] as string}
+          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+          style={inputStyle} />
       )}
     </div>
   );
@@ -205,10 +207,10 @@ export default function AdminProjectsPage() {
 
             {/* Cover image */}
             <div style={{ marginBottom: 20 }}>
-              <label className="admin-label">Cover Image</label>
+              <label style={labelStyle}>Cover Image</label>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input className="admin-input" value={form.image_url} placeholder="URL or upload"
-                  onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} style={{ flex: 1 }} />
+                <input value={form.image_url} placeholder="URL or upload"
+                  onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} style={{ ...inputStyle, flex: 1 }} />
                 <button type="button" onClick={() => coverRef.current?.click()} disabled={uploading} style={ghostBtn}>
                   {uploading ? 'Uploading…' : 'Upload'}
                 </button>
@@ -222,19 +224,19 @@ export default function AdminProjectsPage() {
 
             {/* Media gallery */}
             <div style={{ marginBottom: 20 }}>
-              <label className="admin-label">Media Gallery (images & videos)</label>
+              <label style={labelStyle}>Media Gallery (images & videos)</label>
 
               {/* Add by URL */}
               <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
                 <select value={mediaType} onChange={(e) => setMediaType(e.target.value as 'image' | 'video')}
-                  style={{ ...ghostBtn, padding: '10px 12px', cursor: 'pointer' }}>
+                  style={{ ...inputStyle, width: 'auto', cursor: 'pointer' }}>
                   <option value="image">Image</option>
                   <option value="video">Video</option>
                 </select>
-                <input className="admin-input" value={mediaUrl} placeholder="Paste URL…"
+                <input value={mediaUrl} placeholder="Paste URL…"
                   onChange={(e) => setMediaUrl(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addMediaUrl()}
-                  style={{ flex: 1 }} />
+                  style={{ ...inputStyle, flex: 1 }} />
                 <button type="button" onClick={addMediaUrl} style={ghostBtn}>Add</button>
               </div>
 
@@ -317,17 +319,13 @@ export default function AdminProjectsPage() {
         </div>
       )}
 
-      <style jsx>{`
-        .admin-label { display: block; margin-bottom: 6px; font-size: 0.8rem; color: var(--text-soft); font-weight: 600; }
-        .admin-input { width: 100%; background: var(--bg-main); border: 1px solid var(--line-soft); border-radius: 10px; padding: 10px 14px; color: var(--text-main); font-size: 0.9rem; box-sizing: border-box; font-family: inherit; }
-        .admin-input:focus { border-color: var(--text-main); outline: none; }
-      `}</style>
-
       <Footer />
     </main>
   );
 }
 
+const labelStyle: React.CSSProperties = { display: 'block', marginBottom: 6, fontSize: '0.8rem', color: 'var(--text-soft)', fontWeight: 600 };
+const inputStyle: React.CSSProperties = { width: '100%', background: '#fff', border: '1px solid var(--line-soft)', borderRadius: 10, padding: '10px 14px', color: '#1a1a1a', fontSize: '0.9rem', boxSizing: 'border-box', fontFamily: 'inherit' };
 const primaryBtn: React.CSSProperties = { background: 'var(--text-main)', color: 'var(--bg-main)', border: 'none', borderRadius: 'var(--r-pill)', padding: '10px 22px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' };
 const ghostBtn: React.CSSProperties = { background: 'var(--bg-main)', border: '1px solid var(--line-soft)', borderRadius: 10, padding: '10px 16px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center' };
 const arrowBtn: React.CSSProperties = { background: 'var(--bg-main)', border: '1px solid var(--line-soft)', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)', fontSize: '0.75rem' };

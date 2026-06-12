@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { useLanguage } from '../../../data/LanguageContext';
 import Footer from '../../../components/layout/Footer';
 
+interface MediaItem { type: 'image' | 'video'; url: string; }
+
 interface Project {
   id: string;
   title_en: string;
@@ -16,7 +18,7 @@ interface Project {
   desc_en: string;
   desc_ar: string;
   image_url: string;
-  extra_images?: string[];
+  media?: MediaItem[];
   sort_order: number;
 }
 
@@ -91,12 +93,16 @@ export default function ProjectDetailPage() {
         <h1 className="pd-title">{title}</h1>
         <p className="pd-desc">{desc}</p>
 
-        {/* Extra images grid */}
-        {project.extra_images && project.extra_images.length > 0 && (
+        {/* Media gallery */}
+        {project.media && project.media.length > 0 && (
           <div className="pd-gallery">
-            {project.extra_images.map((src, i) => (
+            {project.media.map((m, i) => (
               <div key={i} className="pd-gallery-img">
-                <img src={src} alt={`${title} ${i + 1}`} />
+                {m.type === 'video' ? (
+                  <video src={m.url} controls playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <img src={m.url} alt={`${title} ${i + 1}`} />
+                )}
               </div>
             ))}
           </div>

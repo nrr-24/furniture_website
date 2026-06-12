@@ -181,9 +181,14 @@ export default function Navbar() {
                     {user ? (
                         <div className="nav-auth-group d-none d-lg-flex">
                             {isAdmin && (
-                                <Link href="/admin/users" className="nav-text-link">
-                                    {isRtl ? 'لوحة المشرف' : 'ADMIN'}
-                                </Link>
+                                <>
+                                  <Link href="/admin/users" className="nav-text-link">
+                                      {isRtl ? 'المستخدمون' : 'USERS'}
+                                  </Link>
+                                  <Link href="/admin/projects" className="nav-text-link">
+                                      {isRtl ? 'المشاريع' : 'PROJECTS'}
+                                  </Link>
+                                </>
                             )}
                             {!isAdmin && (
                                 <Link
@@ -469,14 +474,24 @@ export default function Navbar() {
                                     </Link>
                                 )}
                                 {isAdmin && (
-                                    <Link
-                                        href="/admin/users"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="mobile-menu-pill mobile-menu-pill-primary"
-                                    >
-                                        <i className="bi bi-shield-lock"></i>
-                                        <span>{isRtl ? 'لوحة المشرف' : 'Admin Panel'}</span>
-                                    </Link>
+                                    <>
+                                      <Link
+                                          href="/admin/users"
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                          className="mobile-menu-pill mobile-menu-pill-primary"
+                                      >
+                                          <i className="bi bi-people"></i>
+                                          <span>{isRtl ? 'إدارة المستخدمين' : 'Manage Users'}</span>
+                                      </Link>
+                                      <Link
+                                          href="/admin/projects"
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                          className="mobile-menu-pill mobile-menu-pill-primary"
+                                      >
+                                          <i className="bi bi-images"></i>
+                                          <span>{isRtl ? 'إدارة المشاريع' : 'Manage Projects'}</span>
+                                      </Link>
+                                    </>
                                 )}
                                 <button
                                     onClick={() => { logout(); setIsMobileMenuOpen(false); }}

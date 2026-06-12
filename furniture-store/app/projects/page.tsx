@@ -1,50 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../../data/LanguageContext';
 import Footer from '../../components/layout/Footer';
 
-/**
- * Projects showcase page – matches the visual language of the rest of the site.
- * Centered layout with alternating rows of images and descriptions.
- */
+interface Project {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  year: string;
+  location_en: string;
+  location_ar: string;
+  desc_en: string;
+  desc_ar: string;
+  image_url: string;
+  sort_order: number;
+}
+
 export default function ProjectsPage() {
   const { isRtl } = useLanguage();
   const arrow = isRtl ? 'bi-arrow-left' : 'bi-arrow-right';
 
-  const projects = [
-    {
-      titleEn: 'Villa Modernist',
-      titleAr: 'فيلا مودرنست',
-      year: '2024',
-      locationEn: 'Bayan, Kuwait',
-      locationAr: 'بيان، الكويت',
-      descEn: 'Complete interior woodwork including wardrobes, TV units, and wall paneling',
-      descAr: 'أعمال خشبية داخلية كاملة تشمل خزائن الملابس، وحدات التلفزيون، وتكسية الجدران',
-      img: '/images/projects/1.jpg',
-    },
-    {
-      titleEn: 'Contemporary Palace',
-      titleAr: 'قصر معاصر',
-      year: '2023',
-      locationEn: 'Salmiya, Kuwait',
-      locationAr: 'السالمية، الكويت',
-      descEn: 'Master bedroom suite with custom dressing room and hidden storage',
-      descAr: 'جناح غرفة النوم الرئيسية مع غرفة ملابس مخصصة ومساحات تخزين مخفية',
-      img: '/images/projects/2.jpg',
-    },
-    {
-      titleEn: 'Executive Residence',
-      titleAr: 'سكن تنفيذي',
-      year: '2023',
-      locationEn: 'Sabah Al Salem, Kuwait',
-      locationAr: 'صباح السالم، الكويت',
-      descEn: 'Home office with integrated library and sliding door system',
-      descAr: 'مكتب منزلي مع مكتبة متكاملة ونظام أبواب منزلقة',
-      img: '/images/projects/3.jpg',
-    },
-  ];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then((r) => r.json())
+      .then(({ data }) => setProjects(data || []))
+      .catch(() => setProjects([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <main className="app-content projects-2026" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -60,23 +47,39 @@ export default function ProjectsPage() {
 
       {/* === Projects list ========================================= */}
       <section className="projects-list">
+        {loading && (
+          <p style={{ textAlign: 'center', color: 'var(--text-soft)', padding: '40px 0' }}>
+            {isRtl ? 'جاري التحميل…' : 'Loading…'}
+          </p>
+        )}
+
+        {!loading && projects.length === 0 && (
+          <p style={{ textAlign: 'center', color: 'var(--text-soft)', padding: '40px 0' }}>
+            {isRtl ? 'لا توجد مشاريع حتى الآن.' : 'No projects yet.'}
+          </p>
+        )}
+
         {projects.map((p, idx) => (
-          <article key={idx} className="project-row">
+          <Link key={p.id} href={`/projects/${p.id}`} className="project-row project-row-link">
             <div className="project-img-container">
-              <img src={p.img} alt={isRtl ? p.titleAr : p.titleEn} />
+              <img src={p.image_url || '/images/projects/placeholder.jpg'} alt={isRtl ? p.title_ar : p.title_en} />
             </div>
             <div className="project-text-container">
               <div className="project-meta">
-                {p.year} • {isRtl ? p.locationAr : p.locationEn}
+                {p.year}{(isRtl ? p.location_ar : p.location_en) ? ` • ${isRtl ? p.location_ar : p.location_en}` : ''}
               </div>
               <h2 className="project-name">
-                {isRtl ? p.titleAr : p.titleEn}
+                {isRtl ? p.title_ar : p.title_en}
               </h2>
               <p className="project-desc">
-                {isRtl ? p.descAr : p.descEn}
+                {isRtl ? p.desc_ar : p.desc_en}
               </p>
+              <span className="project-cta-link">
+                <span>{isRtl ? 'عرض المشروع' : 'View Project'}</span>
+                <i className={`bi ${arrow}`} />
+              </span>
             </div>
-          </article>
+          </Link>
         ))}
       </section>
 
@@ -92,7 +95,7 @@ export default function ProjectsPage() {
         </p>
         <Link href="/contact" className="sw-btn-outline">
           <span>{isRtl ? 'ابدأ مشروعك' : 'Start Your Project'}</span>
-          <i className={`bi ${arrow}`}></i>
+          <i className={`bi ${arrow}`} />
         </Link>
       </section>
 

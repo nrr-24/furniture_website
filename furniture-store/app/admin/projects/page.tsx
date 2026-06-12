@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../data/AuthContext';
 import { useLanguage } from '../../../data/LanguageContext';
 import Footer from '../../../components/layout/Footer';
-import { authHeaders } from '../../../lib/authClient';
 
 interface MediaItem { type: 'image' | 'video'; url: string; }
 
@@ -30,7 +29,8 @@ const EMPTY_FORM = {
 };
 
 export default function AdminProjectsPage() {
-  const { isAdmin, isCustomer } = useAuth();
+  const { user, isAdmin, isCustomer } = useAuth();
+  const ah = () => user ? { 'x-user-id': user.id } : {};
   const { isRtl } = useLanguage();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -84,7 +84,7 @@ export default function AdminProjectsPage() {
 
   async function uploadFile(file: File): Promise<string | null> {
     const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
-      method: 'POST', body: file, headers: authHeaders(),
+      method: 'POST', body: file, headers: ah(),
     });
     const json = await res.json();
     return json.url || null;
@@ -126,14 +126,14 @@ export default function AdminProjectsPage() {
     try {
       if (editingId) {
         const res = await fetch('/api/projects', {
-          method: 'PATCH', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+          method: 'PATCH', headers: { 'Content-Type': 'application/json', ...ah() },
           body: JSON.stringify({ id: editingId, updates: form }),
         });
         const json = await res.json();
         if (json.error) { setError(json.error); return; }
       } else {
         const res = await fetch('/api/projects', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+          method: 'POST', headers: { 'Content-Type': 'application/json', ...ah() },
           body: JSON.stringify({ ...form, sort_order: projects.length }),
         });
         const json = await res.json();
@@ -146,7 +146,7 @@ export default function AdminProjectsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this project?')) return;
-    await fetch(`/api/projects?id=${id}`, { method: 'DELETE', headers: authHeaders() });
+    await fetch(`/api/projects?id=${id}`, { method: 'DELETE', headers: ah() });
     await load();
   }
 
@@ -158,7 +158,7 @@ export default function AdminProjectsPage() {
     const reordered = updated.map((p, i) => ({ ...p, sort_order: i }));
     setProjects(reordered);
     await fetch('/api/projects', {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      method: 'PATCH', headers: { 'Content-Type': 'application/json', ...ah() },
       body: JSON.stringify(reordered.map((p) => ({ id: p.id, sort_order: p.sort_order }))),
     });
   }

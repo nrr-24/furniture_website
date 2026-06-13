@@ -30,7 +30,7 @@ const EMPTY_FORM = {
 
 export default function AdminProjectsPage() {
   const { user, isAdmin, isCustomer } = useAuth();
-  const ah = () => user ? { 'x-user-id': user.id } : {};
+  const ah = (): Record<string, string> => ({ 'x-user-id': user?.id ?? '' });
   const { isRtl } = useLanguage();
 
   const [projects, setProjects] = useState<Project[]>([]);

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useLanguage } from '../../../data/LanguageContext';
 import Footer from '../../../components/layout/Footer';
@@ -84,7 +85,7 @@ export default function ProjectDetailPage() {
 
       {/* Hero image */}
       <div className="pd-hero-img">
-        <img src={project.image_url || '/images/projects/placeholder.jpg'} alt={title} />
+        <Image src={project.image_url || '/images/projects/placeholder.jpg'} alt={title} fill style={{ objectFit: 'cover' }} sizes="(max-width:767px) 100vw, 1000px" priority />
       </div>
 
       {/* Content */}

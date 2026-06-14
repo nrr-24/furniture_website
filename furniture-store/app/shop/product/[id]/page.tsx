@@ -2,14 +2,16 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter, useParams } from 'next/navigation';
 import { useLanguage } from '../../../../data/LanguageContext';
 import { useAuth } from '../../../../data/AuthContext';
 import { useFurniture } from '../../../../data/FurnitureContext';
 import { FALLBACK_IMAGE } from '../../../../data/furnitureData';
-import ProductDetailView from '../../../../components/ProductDetailView';
-import FurnitureManager from '../../../../components/FurnitureManager';
 import Footer from '../../../../components/layout/Footer';
+
+const ProductDetailView = dynamic(() => import('../../../../components/ProductDetailView'), { ssr: false });
+const FurnitureManager = dynamic(() => import('../../../../components/FurnitureManager'), { ssr: false });
 
 export default function ProductPage() {
   const router = useRouter();

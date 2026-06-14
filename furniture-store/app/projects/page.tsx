@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLanguage } from '../../data/LanguageContext';
 import Footer from '../../components/layout/Footer';
 
@@ -62,7 +63,7 @@ export default function ProjectsPage() {
         {projects.map((p, idx) => (
           <Link key={p.id} href={`/projects/${p.id}`} className="project-row project-row-link">
             <div className="project-img-container">
-              <img src={p.image_url || '/images/projects/placeholder.jpg'} alt={isRtl ? p.title_ar : p.title_en} />
+              <Image src={p.image_url || '/images/projects/placeholder.jpg'} alt={isRtl ? p.title_ar : p.title_en} fill style={{ objectFit: 'cover' }} sizes="(max-width:767px) 100vw, 55vw" />
             </div>
             <div className="project-text-container">
               <div className="project-meta">

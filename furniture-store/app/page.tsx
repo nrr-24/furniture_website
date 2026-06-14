@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLanguage } from '../data/LanguageContext';
 import { FurnitureItem, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
@@ -114,7 +115,7 @@ export default function HomePage() {
           product card overlapping the bottom seam. */}
       <section className="sw-hero">
         <div className="sw-hero-media">
-          <img src={HOME_ASSETS.hero.src} alt="" />
+          <Image src={HOME_ASSETS.hero.src} alt="" fill style={{ objectFit: 'cover', objectPosition: '60% center' }} priority />
           <span className="sw-hero-badge sw-hero-badge-tl">
             <i className="bi bi-tree" aria-hidden="true"></i>
             <span>{isRtl ? 'خشب ألماني فاخر' : 'Premium German Wood'}</span>
@@ -152,13 +153,15 @@ export default function HomePage() {
             src={`/images/LOGO/smartwood-${language}-white.svg`}
             alt=""
             aria-hidden="true"
+            width={180}
+            height={60}
           />
         </div>
 
         {heroProduct && (
           <Link href={`/shop/product/${heroProduct.id}`} className="sw-hero-product">
             <span className="sw-hero-product-thumb">
-              <img src={heroProduct.image || FALLBACK_IMAGE} alt="" />
+              <Image src={heroProduct.image || FALLBACK_IMAGE} alt="" fill style={{ objectFit: 'cover' }} sizes="64px" />
             </span>
             <span className="sw-hero-product-info">
               <span className="sw-hero-product-name">
@@ -185,7 +188,7 @@ export default function HomePage() {
           <div className="sw-excellence-cards">
             <article className="sw-feature-card">
               <div className="sw-feature-card-img">
-                <img src={HOME_ASSETS.hardware.src} alt={isRtl ? 'أجهزة ألمانية دقيقة' : 'Precision German hardware'} />
+                <Image src={HOME_ASSETS.hardware.src} alt={isRtl ? 'أجهزة ألمانية دقيقة' : 'Precision German hardware'} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 50vw" />
               </div>
               <div className="sw-feature-card-text">
                 <h3>{isRtl ? 'أجهزة ألمانية دقيقة' : (<>Precision<br />German Hardware</>)}</h3>
@@ -198,7 +201,7 @@ export default function HomePage() {
             </article>
             <article className="sw-feature-card">
               <div className="sw-feature-card-img">
-                <img src={HOME_ASSETS.joinery.src} alt={isRtl ? 'نجارة خشبية متقنة' : 'Masterful wood joinery'} />
+                <Image src={HOME_ASSETS.joinery.src} alt={isRtl ? 'نجارة خشبية متقنة' : 'Masterful wood joinery'} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 50vw" />
               </div>
               <div className="sw-feature-card-text">
                 <h3>{isRtl ? 'نجارة خشبية متقنة' : (<>Masterful<br />Wood Joinery</>)}</h3>
@@ -248,7 +251,7 @@ export default function HomePage() {
         <div className="sw-living-grid">
           {LIVING_TILES.map((c) => (
             <div key={c.key} className="sw-living-tile">
-              <img src={c.src} alt={isRtl ? c.arLabel : c.enLabel} />
+              <Image src={c.src} alt={isRtl ? c.arLabel : c.enLabel} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 33vw" />
               <span className="sw-living-label">{isRtl ? c.arLabel : c.enLabel}</span>
             </div>
           ))}
@@ -257,7 +260,7 @@ export default function HomePage() {
 
       {/* === 5. Proudly Kuwaiti banner ========================= */}
       <section className="sw-heritage">
-        <img className="sw-heritage-bg" src={HOME_ASSETS.factory.src} alt="" aria-hidden="true" />
+        <Image className="sw-heritage-bg" src={HOME_ASSETS.factory.src} alt="" fill style={{ objectFit: 'cover' }} sizes="100vw" />
         <div className="sw-heritage-scrim" aria-hidden="true" />
         <div className="sw-heritage-inner">
           <div className="sw-heritage-copy">
@@ -321,7 +324,7 @@ export default function HomePage() {
           {featuredItems.map((item) => (
             <Link key={item.id} href={`/shop/product/${item.id}`} className="sw-product-card">
               <div className="sw-product-img">
-                <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr || item.name : item.name} />
+                <Image src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr || item.name : item.name} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 25vw" />
               </div>
               <div className="sw-product-meta">
                 <h3 className="sw-product-name">{isRtl ? item.nameAr || item.name : item.name}</h3>

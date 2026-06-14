@@ -2,13 +2,16 @@
 
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '../../data/LanguageContext';
 import { FurnitureItem, Category, FALLBACK_IMAGE } from '../../data/furnitureData';
 import { useFurniture } from '../../data/FurnitureContext';
 import { useAuth } from '../../data/AuthContext';
 import { useCart } from '../../data/CartContext';
-import FurnitureManager from '../../components/FurnitureManager';
 import Footer from '../../components/layout/Footer';
+
+const FurnitureManager = dynamic(() => import('../../components/FurnitureManager'), { ssr: false });
 
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
@@ -388,7 +391,7 @@ export default function ShopPage() {
                         style={{ opacity: draggedItem?.id === item.id ? 0.3 : 1 }}
                       >
                         <div className="samsung-card-img">
-                          <img src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} />
+                          <Image src={item.image || FALLBACK_IMAGE} alt={isRtl ? item.nameAr : item.name} fill style={{ objectFit: 'cover' }} sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 20vw" />
                           {isAdmin && (
                             <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, display: 'flex', gap: '6px' }}>
                               <button

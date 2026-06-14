@@ -1,5 +1,3 @@
-@import "https://unpkg.com/open-props/open-props.min.css";
-@import "https://unpkg.com/open-props/normalize.min.css";
 
 @keyframes hero-animate-down {
   from {
@@ -2339,8 +2337,6 @@ select {
 }
 
 .samsung-card-img img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
 }
@@ -4238,11 +4234,8 @@ select {
 }
 
 .home-2026 .sw-hero-media img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   object-position: 60% center;
-  display: block;
 }
 
 /* Floating glass feature badges over the photo */
@@ -4396,6 +4389,7 @@ select {
 }
 
 .home-2026 .sw-hero-product-thumb {
+  position: relative;
   width: 56px;
   height: 56px;
   border-radius: 10px;
@@ -4405,10 +4399,7 @@ select {
 }
 
 .home-2026 .sw-hero-product-thumb img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .home-2026 .sw-hero-product-info {
@@ -4522,16 +4513,14 @@ select {
 }
 
 .home-2026 .sw-feature-card-img {
+  position: relative;
   overflow: hidden;
   background: var(--bg-main);
   min-height: 150px;
 }
 
 .home-2026 .sw-feature-card-img img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .home-2026 .sw-feature-card-text {
@@ -4626,10 +4615,7 @@ select {
 }
 
 .home-2026 .sw-living-tile img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -4889,10 +4875,7 @@ select {
 }
 
 .home-2026 .sw-product-img img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -6119,10 +6102,7 @@ select {
 }
 
 .projects-2026 .project-img-container img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
   transition: var(--transition-smooth);
 }
 

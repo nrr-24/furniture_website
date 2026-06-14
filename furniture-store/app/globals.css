@@ -4869,6 +4869,7 @@ select {
 }
 
 .home-2026 .sw-product-img {
+  position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--surface-soft);
@@ -6093,6 +6094,7 @@ select {
 }
 
 .projects-2026 .project-img-container {
+  position: relative;
   border-radius: var(--r-card);
   overflow: hidden;
   aspect-ratio: 1.35;
@@ -6285,19 +6287,14 @@ select {
 }
 
 .pd-page .pd-hero-img {
-  max-width: 1000px;
+  /* .app-content is a fixed-height flex column; without flex-shrink:0 this
+     box gets squished to its min-content and the image collapses to ~0. */
+  flex-shrink: 0;
+  width: calc(100% - 48px);
+  max-width: 952px;
   margin: 24px auto 0;
-  padding: 0 24px;
   border-radius: var(--r-card);
   overflow: hidden;
-}
-
-.pd-page .pd-hero-img img {
-  width: 100%;
-  aspect-ratio: 1.9;
-  object-fit: cover;
-  border-radius: var(--r-card);
-  display: block;
   border: 1px solid var(--line-soft);
 }
 
@@ -6358,7 +6355,4 @@ select {
     order: 2 !important;
   }
 
-  .pd-page .pd-hero-img img {
-    aspect-ratio: 1.3;
-  }
 }

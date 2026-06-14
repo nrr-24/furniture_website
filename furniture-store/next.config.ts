@@ -4,11 +4,12 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Admins can paste arbitrary image URLs for projects/products, so allow
+    // any https host. The Supabase storage bucket is covered by this too.
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: '**',
       },
     ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],

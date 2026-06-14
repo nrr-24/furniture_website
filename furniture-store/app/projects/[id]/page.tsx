@@ -85,7 +85,7 @@ export default function ProjectDetailPage() {
 
       {/* Hero image */}
       <div className="pd-hero-img">
-        <Image src={project.image_url || '/images/projects/placeholder.jpg'} alt={title} fill style={{ objectFit: 'cover' }} sizes="(max-width:767px) 100vw, 1000px" priority />
+        <Image src={project.image_url || '/images/projects/placeholder.jpg'} alt={title} width={1900} height={1000} style={{ width: '100%', height: 'auto', objectFit: 'cover', display: 'block' }} sizes="(max-width:767px) 100vw, 1000px" priority />
       </div>
 
       {/* Content */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../data/LanguageContext';
@@ -95,6 +95,40 @@ export default function HomePage() {
   const { isRtl, language } = useLanguage();
   const { items, initialized } = useFurniture();
 
+  // Scroll-reveal entrance for sections (same mechanism as the Craftsmanship
+  // page). Runs once content has mounted; the observer toggles .visible as each
+  // tagged block scrolls into the app's scroll container.
+  useEffect(() => {
+    if (!initialized) return;
+    const home = document.querySelector('main.home-2026');
+    if (!home) return;
+    // Hidden initial state only kicks in now that JS is running.
+    const els = home.querySelectorAll('.sw-reveal, .sw-reveal-x');
+
+    // Fallback: if IntersectionObserver isn't available, just show everything.
+    if (typeof IntersectionObserver === 'undefined') {
+      els.forEach((el) => el.classList.add('visible'));
+      return;
+    }
+
+    home.classList.add('reveal-ready');
+    // The app scrolls inside main.app-content, so that's the observer root.
+    // A negative bottom rootMargin means a section only reveals once it has
+    // genuinely scrolled into view (not while still below the fold).
+    const root = document.querySelector('main.app-content');
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target); // reveal once, then stop watching
+        }
+      }),
+      { root: root || null, threshold: 0.2, rootMargin: '0px 0px -10% 0px' }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [initialized]);
+
   if (!initialized) return null;
 
   // Top 4 items for the Collection grid; first 3 also feed the Compare table.
@@ -181,7 +215,7 @@ export default function HomePage() {
           Centered title; left = two stacked feature cards (image + copy),
           right = body copy followed by a 3-icon pillar row. */}
       <section className="sw-excellence">
-        <h2 className="sw-section-title sw-section-title-center">
+        <h2 className="sw-section-title sw-section-title-center sw-reveal-x">
           {isRtl ? 'تميّز في كل تفصيل' : 'Excellence in Every Detail'}
         </h2>
         <div className="sw-excellence-grid">
@@ -214,7 +248,7 @@ export default function HomePage() {
             </article>
           </div>
 
-          <div className="sw-excellence-copy">
+          <div className="sw-excellence-copy sw-reveal-x">
             <p className="sw-body">
               {isRtl
                 ? 'نستخدم الخشب الألماني عالي الجودة وأحدث التقنيات والحلول، وإكسسوارات ألمانية ونمساوية فاخرة.'
@@ -245,7 +279,7 @@ export default function HomePage() {
 
       {/* === 4. Designed for Living. Crafted for Life. ========= */}
       <section className="sw-living">
-        <h2 className="sw-section-title sw-section-title-center">
+        <h2 className="sw-section-title sw-section-title-center sw-reveal-x">
           {isRtl ? 'مصمم للحياة. مصنوع للأبد.' : 'Designed for Living. Crafted for Life.'}
         </h2>
         <div className="sw-living-grid">
@@ -263,7 +297,7 @@ export default function HomePage() {
         <Image className="sw-heritage-bg" src={HOME_ASSETS.factory.src} alt="" fill style={{ objectFit: 'cover' }} sizes="100vw" />
         <div className="sw-heritage-scrim" aria-hidden="true" />
         <div className="sw-heritage-inner">
-          <div className="sw-heritage-copy">
+          <div className="sw-heritage-copy sw-reveal-x">
             <span className="section-kicker sw-heritage-kicker">EST. 1998</span>
             <h2 className="sw-heritage-title">
               {isRtl ? (<>كويتيون بفخر.<br />ملهَمون عالمياً.</>) : (<>Proudly Kuwaiti.<br />Globally Inspired.</>)}
@@ -288,7 +322,7 @@ export default function HomePage() {
 
       {/* === 6. German Quality. Timeless Strength. ============= */}
       <section className="sw-quality">
-        <h2 className="sw-section-title sw-section-title-center">
+        <h2 className="sw-section-title sw-section-title-center sw-reveal-x">
           {isRtl ? 'جودة ألمانية. متانة خالدة.' : 'German Quality. Timeless Strength.'}
         </h2>
         <div className="sw-quality-grid">
@@ -304,7 +338,7 @@ export default function HomePage() {
 
       {/* === 7. Quote card ===================================== */}
       <section className="sw-quote-wrap">
-        <blockquote className="sw-quote">
+        <blockquote className="sw-quote sw-reveal-x">
           <span className="sw-quote-mark" aria-hidden="true">99</span>
           <p>
             {isRtl
@@ -317,7 +351,7 @@ export default function HomePage() {
 
       {/* === 8. SmartWood Collection =========================== */}
       <section className="sw-collection">
-        <h2 className="sw-section-title sw-section-title-center">
+        <h2 className="sw-section-title sw-section-title-center sw-reveal-x">
           {isRtl ? 'مجموعة سمارت وود' : 'SmartWood Collection'}
         </h2>
         <div className="sw-collection-grid">
@@ -353,7 +387,7 @@ export default function HomePage() {
       {/* === 10. Compare Our Models (desktop only) ============= */}
       {compareItems.length >= 2 && (
         <section className="sw-compare">
-          <h2 className="sw-section-title sw-section-title-center">
+          <h2 className="sw-section-title sw-section-title-center sw-reveal-x">
             {isRtl ? 'قارن بين موديلاتنا' : 'Compare Our Models'}
           </h2>
           <div className="sw-compare-table-wrap">

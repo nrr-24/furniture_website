@@ -251,6 +251,15 @@ main.app-content,
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  /* Glide to in-page anchors / scrollIntoView targets instead of jumping. */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.app-content,
+  .monolithic-island>main {
+    scroll-behavior: auto;
+  }
 }
 
 .hero-viewport {
@@ -4135,50 +4144,77 @@ select {
 }
 
 /* --- Scroll-reveal entrance (mirrors the Craftsmanship .cr-step pattern) ---
-   Elements tagged .sw-reveal fade + rise into place as they enter the
-   viewport. The hidden initial state only applies once JS adds .reveal-ready,
+   Elements tagged .sw-reveal (vertical fade-up) or .sw-reveal-x (slide-in from
+   the side) animate into place as they enter the viewport. The hidden initial
+   state only applies once JS adds .reveal-ready to the page's scroll container,
    so with no JS everything stays visible. .visible is toggled by an
-   IntersectionObserver in app/page.tsx. */
-.home-2026 .sw-reveal,
-.home-2026 .sw-reveal-x {
+   IntersectionObserver (see lib/useScrollReveal). Page-agnostic — used on the
+   home, projects, craftsmanship and contact pages. */
+.sw-reveal,
+.sw-reveal-x {
   transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
               transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Vertical fade-up — for cards / blocks. */
-.home-2026.reveal-ready .sw-reveal {
+.reveal-ready .sw-reveal {
   opacity: 0;
   transform: translateY(28px);
 }
 
 /* Horizontal slide-in from the side — for headings / text. */
-.home-2026.reveal-ready .sw-reveal-x {
+.reveal-ready .sw-reveal-x {
   opacity: 0;
   transform: translateX(-48px);
 }
 
-[dir="rtl"] .home-2026.reveal-ready .sw-reveal-x {
+[dir="rtl"] .reveal-ready .sw-reveal-x {
   transform: translateX(48px);
 }
 
-.home-2026 .sw-reveal.visible,
-.home-2026 .sw-reveal-x.visible {
+.sw-reveal.visible,
+.sw-reveal-x.visible {
   opacity: 1;
   transform: none;
 }
 
 /* Stagger helper: stepped transition-delay for siblings revealed together. */
-.home-2026 .sw-reveal-1 { transition-delay: 0.08s; }
-.home-2026 .sw-reveal-2 { transition-delay: 0.16s; }
-.home-2026 .sw-reveal-3 { transition-delay: 0.24s; }
-.home-2026 .sw-reveal-4 { transition-delay: 0.32s; }
+.sw-reveal-1 { transition-delay: 0.08s; }
+.sw-reveal-2 { transition-delay: 0.16s; }
+.sw-reveal-3 { transition-delay: 0.24s; }
+.sw-reveal-4 { transition-delay: 0.32s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-2026.reveal-ready .sw-reveal,
-  .home-2026.reveal-ready .sw-reveal-x {
+  .reveal-ready .sw-reveal,
+  .reveal-ready .sw-reveal-x {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* --- Tactile button press -------------------------------------------------
+   A tiny scale-down on press makes the primary CTAs feel physical. Cheap
+   (transform only) and applied to the shared button classes site-wide. */
+.sw-btn-outline,
+.cr-cta-btn,
+.hero-primary-btn,
+.sw-link-arrow {
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sw-btn-outline:active,
+.cr-cta-btn:active,
+.hero-primary-btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-btn-outline:active,
+  .cr-cta-btn:active,
+  .hero-primary-btn:active {
+    transform: none;
   }
 }
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../../data/LanguageContext';
 import Footer from '../../components/layout/Footer';
+import { useScrollReveal } from '../../lib/useScrollReveal';
 
 interface Project {
   id: string;
@@ -34,10 +35,13 @@ export default function ProjectsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Reveal text once the project list has loaded.
+  useScrollReveal(!loading);
+
   return (
     <main className="app-content projects-2026" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* === Header =============================================== */}
-      <header className="projects-header">
+      <header className="projects-header sw-reveal-x">
         <span className="projects-kicker">
           {isRtl ? 'معرض الأعمال' : 'Portfolio'}
         </span>
@@ -65,7 +69,7 @@ export default function ProjectsPage() {
             <div className="project-img-container">
               <Image src={p.image_url || '/images/projects/placeholder.jpg'} alt={isRtl ? p.title_ar : p.title_en} fill style={{ objectFit: 'cover' }} sizes="(max-width:767px) 100vw, 55vw" />
             </div>
-            <div className="project-text-container">
+            <div className="project-text-container sw-reveal-x">
               <div className="project-meta">
                 {p.year}{(isRtl ? p.location_ar : p.location_en) ? ` • ${isRtl ? p.location_ar : p.location_en}` : ''}
               </div>
@@ -85,7 +89,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* === Call to action ======================================= */}
-      <section className="projects-cta">
+      <section className="projects-cta sw-reveal-x">
         <h2 className="projects-cta-title">
           {isRtl ? 'ابدأ مشروعك' : 'Begin Your Project'}
         </h2>

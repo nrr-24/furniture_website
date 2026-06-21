@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useLanguage } from '../../../data/LanguageContext';
 import Footer from '../../../components/layout/Footer';
+import { useScrollReveal } from '../../../lib/useScrollReveal';
 
 interface MediaItem { type: 'image' | 'video'; url: string; }
 
@@ -43,6 +44,9 @@ export default function ProjectDetailPage() {
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [params.id]);
+
+  // Reveal the project copy once it has loaded.
+  useScrollReveal(!!project);
 
   if (loading) {
     return (
@@ -89,7 +93,7 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="pd-content">
+      <div className="pd-content sw-reveal-x">
         <p className="project-meta">{project.year}{location ? ` • ${location}` : ''}</p>
         <h1 className="pd-title">{title}</h1>
         <p className="pd-desc">{desc}</p>

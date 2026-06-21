@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useLanguage } from '../data/LanguageContext';
@@ -8,6 +8,7 @@ import { FurnitureItem, FALLBACK_IMAGE } from '../data/furnitureData';
 import { useFurniture } from '../data/FurnitureContext';
 import { HOME_ASSETS, LIVING_TILES } from '../data/homeAssets';
 import Footer from '../components/layout/Footer';
+import { useScrollReveal } from '../lib/useScrollReveal';
 
 /* ============================================================
  * Homepage (Smartwood 2026 redesign)
@@ -95,39 +96,9 @@ export default function HomePage() {
   const { isRtl, language } = useLanguage();
   const { items, initialized } = useFurniture();
 
-  // Scroll-reveal entrance for sections (same mechanism as the Craftsmanship
-  // page). Runs once content has mounted; the observer toggles .visible as each
-  // tagged block scrolls into the app's scroll container.
-  useEffect(() => {
-    if (!initialized) return;
-    const home = document.querySelector('main.home-2026');
-    if (!home) return;
-    // Hidden initial state only kicks in now that JS is running.
-    const els = home.querySelectorAll('.sw-reveal, .sw-reveal-x');
-
-    // Fallback: if IntersectionObserver isn't available, just show everything.
-    if (typeof IntersectionObserver === 'undefined') {
-      els.forEach((el) => el.classList.add('visible'));
-      return;
-    }
-
-    home.classList.add('reveal-ready');
-    // The app scrolls inside main.app-content, so that's the observer root.
-    // A negative bottom rootMargin means a section only reveals once it has
-    // genuinely scrolled into view (not while still below the fold).
-    const root = document.querySelector('main.app-content');
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          observer.unobserve(e.target); // reveal once, then stop watching
-        }
-      }),
-      { root: root || null, threshold: 0.2, rootMargin: '0px 0px -10% 0px' }
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [initialized]);
+  // Scroll-reveal entrance for section text — runs once furniture data has
+  // hydrated the page. Shared with the projects / craftsmanship / contact pages.
+  useScrollReveal(initialized);
 
   if (!initialized) return null;
 

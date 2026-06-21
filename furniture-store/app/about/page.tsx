@@ -6,6 +6,7 @@ import { useFurniture } from '../../data/FurnitureContext';
 import { FALLBACK_IMAGE } from '../../data/furnitureData';
 import { useEffect, useMemo } from 'react';
 import Footer from '../../components/layout/Footer';
+import { useScrollReveal } from '../../lib/useScrollReveal';
 
 /* ============================================================
  * Craftsmanship (Smartwood 2026 redesign) — route: /about
@@ -48,6 +49,9 @@ export default function CraftsmanshipPage() {
     const t = setTimeout(() => els.forEach((el) => el.classList.add('visible')), 1800);
     return () => { observer.disconnect(); clearTimeout(t); };
   }, []);
+
+  // Slide-in reveals for the section headings / intro text (shared helper).
+  useScrollReveal();
 
   const STEPS = [
     {
@@ -194,7 +198,7 @@ export default function CraftsmanshipPage() {
       </section>
 
       {/* === 2. Intro === */}
-      <section className="cr-intro">
+      <section className="cr-intro sw-reveal-x">
         <p>
           {isRtl
             ? 'لا نشكّل الخشب فحسب — بل ندمج أحدث آلات CNC في العالم مع أيدي حرفيين مهرة لنصنع قطعاً مبنية لتدوم لأجيال.'
@@ -204,7 +208,7 @@ export default function CraftsmanshipPage() {
 
       {/* === 3. The Process (zig-zag) === */}
       <section className="cr-process">
-        <div className="cr-process-header">
+        <div className="cr-process-header sw-reveal-x">
           <span className="section-kicker">{isRtl ? 'كيف نصنع' : 'HOW WE BUILD'}</span>
           <h2 className="cr-section-title sw-center">{isRtl ? 'العملية' : 'The Process'}</h2>
         </div>
@@ -226,7 +230,7 @@ export default function CraftsmanshipPage() {
 
       {/* === 4. Materials & Hardware === */}
       <section className="cr-materials">
-        <div className="cr-materials-header">
+        <div className="cr-materials-header sw-reveal-x">
           <span className="section-kicker">{isRtl ? 'المواد' : 'MATERIALS & HARDWARE'}</span>
           <h2 className="cr-section-title sw-center">{isRtl ? 'جودة ألمانية في كل تفصيل' : 'German Quality in Every Detail'}</h2>
         </div>
@@ -254,7 +258,7 @@ export default function CraftsmanshipPage() {
 
       {/* === 6. CTA === */}
       <section className="cr-cta-wrap">
-        <div className="cr-cta">
+        <div className="cr-cta sw-reveal-x">
           <h2 className="cr-cta-title">
             {isRtl ? 'لديك مشروع في بالك؟' : 'Have a project in mind?'}
           </h2>

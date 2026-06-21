@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '../../data/LanguageContext';
 import { useAuth } from '../../data/AuthContext';
 import Footer from '../../components/layout/Footer';
+import { useScrollReveal } from '../../lib/useScrollReveal';
 
 type Category = 'business_letter' | 'consultation' | 'quote' | 'after_sales' | 'general' | 'other';
 
@@ -92,14 +93,16 @@ export default function ContactPage() {
     }
   };
 
+  useScrollReveal();
+
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="app-content about-page-theme" style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: 'clamp(48px, 8vw, 80px) clamp(16px, 5vw, 60px)' }}>
         <section id="contact" style={{ maxWidth: '1000px', width: '100%', textAlign: 'center' }}>
-          <h2 className="smartwood-title" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>
+          <h2 className="smartwood-title sw-reveal-x" style={{ marginBottom: '20px', fontSize: 'clamp(2rem, 7vw, 3.5rem)' }}>
             {isRtl ? 'تواصل معنا' : 'Contact Us'}
           </h2>
-          <p style={{ color: 'rgba(42, 32, 24, 0.7)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
+          <p className="sw-reveal-x" style={{ color: 'rgba(42, 32, 24, 0.7)', maxWidth: '600px', margin: '0 auto 40px', fontSize: '1.05rem', lineHeight: '1.6' }}>
             {isRtl
               ? 'نحن هنا لتحويل رؤيتك إلى واقع. تواصل معنا اليوم لتحصل على استشارتك.'
               : 'We are here to turn your vision into reality. Reach out to us today for a consultation.'}
@@ -304,6 +307,19 @@ export default function ContactPage() {
           margin-bottom: 20px;
           border: 1px solid rgba(42, 32, 24, 0.12);
           color: var(--text-main);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      background 0.35s ease, border-color 0.35s ease;
+        }
+        .contact-info-card:hover .contact-info-icon {
+          transform: translateY(-4px);
+          background: var(--text-main);
+          border-color: var(--text-main);
+          color: var(--bg-main);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .contact-info-card:hover .contact-info-icon {
+            transform: none;
+          }
         }
         .contact-info-label {
           margin: 0 0 8px;

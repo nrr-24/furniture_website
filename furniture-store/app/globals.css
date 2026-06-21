@@ -6526,7 +6526,8 @@ select {
   color: #fff;
   background: var(--surface-soft);
   border: 1px solid var(--line-soft);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
               box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

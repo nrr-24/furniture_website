@@ -68,14 +68,14 @@ const SERVICES: Service[] = [
   },
   {
     key: 'storage',
-    img: '/images/home/cat-accents.png',
+    img: '/images/home/feature-wide.png',
     enTitle: 'Storage Systems', arTitle: 'أنظمة التخزين',
     enText: 'Bespoke storage solutions for every space',
     arText: 'حلول تخزين مخصصة لكل مساحة',
   },
   {
     key: 'desks',
-    img: '/images/home/feature-wide.png',
+    img: '/images/home/cat-dining.png',
     enTitle: 'Desks & Tables', arTitle: 'مكاتب وطاولات',
     enText: 'Executive desks and tables crafted with precision',
     arText: 'مكاتب وطاولات تنفيذية مصنوعة بدقة',
@@ -103,11 +103,11 @@ export default function ServicesPage() {
 
       {/* === Services grid ====================================== */}
       <section className="sv-grid">
-        {SERVICES.map((s) => (
+        {SERVICES.map((s, i) => (
           <Link
             key={s.key}
             href={`/contact?service=${encodeURIComponent(s.enTitle)}`}
-            className="sv-card"
+            className={`sv-card sw-reveal sw-reveal-${(i % 4) + 1}`}
           >
             <Image
               src={s.img}

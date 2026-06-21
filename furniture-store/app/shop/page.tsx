@@ -99,6 +99,15 @@ export default function ShopPage() {
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
+  // --- Search / sort / filter state ---
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured');
+  const [saleOnly, setSaleOnly] = useState(false);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+
+  const toggleColor = (color: string) =>
+    setSelectedColors(prev => prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]);
+
   const handleCategoryClick = (id: string) => {
     setSelectedCategoryId(id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,10 +202,55 @@ export default function ShopPage() {
     e.preventDefault(); // Required to allow drop
   };
 
+  // Unique colors across the whole catalog (order preserved by first appearance).
+  const availableColors = useMemo(() => {
+    const seen = new Set<string>();
+    items.forEach(i => (i.colors || []).forEach(c => { if (c) seen.add(c); }));
+    return [...seen];
+  }, [items]);
+
   const filteredCategories = useMemo(() => {
-    if (!selectedCategoryId) return groupedItems;
-    return groupedItems.filter(cat => cat.id === selectedCategoryId);
-  }, [groupedItems, selectedCategoryId]);
+    const q = searchQuery.trim().toLowerCase();
+    const base = selectedCategoryId
+      ? groupedItems.filter(cat => cat.id === selectedCategoryId)
+      : groupedItems;
+
+    const priceOf = (p: FurnitureItem) => (p.salePrice && p.salePrice > 0 ? p.salePrice : p.price);
+
+    return base
+      .map(cat => {
+        let products = cat.products;
+        if (q) {
+          products = products.filter(p =>
+            (p.name || '').toLowerCase().includes(q) ||
+            (p.nameAr || '').toLowerCase().includes(q) ||
+            (p.description || '').toLowerCase().includes(q) ||
+            (p.descriptionAr || '').toLowerCase().includes(q)
+          );
+        }
+        if (saleOnly) {
+          products = products.filter(p => p.salePrice != null && p.salePrice > 0);
+        }
+        if (selectedColors.length > 0) {
+          products = products.filter(p => (p.colors || []).some(c => selectedColors.includes(c)));
+        }
+        if (sortBy !== 'featured') {
+          products = [...products].sort((a, b) => {
+            switch (sortBy) {
+              case 'price-asc': return priceOf(a) - priceOf(b);
+              case 'price-desc': return priceOf(b) - priceOf(a);
+              case 'name': return (isRtl ? a.nameAr || a.name : a.name).localeCompare(isRtl ? b.nameAr || b.name : b.name);
+              default: return a.sortOrder - b.sortOrder;
+            }
+          });
+        }
+        return { ...cat, products };
+      })
+      // When searching/filtering, hide categories that have no matches.
+      .filter(cat => cat.products.length > 0 || (!q && !saleOnly && selectedColors.length === 0));
+  }, [groupedItems, selectedCategoryId, searchQuery, sortBy, saleOnly, selectedColors, isRtl]);
+
+  const isFiltering = searchQuery.trim() !== '' || saleOnly || selectedColors.length > 0;
 
   return (
     <main dir={isRtl ? 'rtl' : 'ltr'} className="shop-main" style={{ flex: 1, overflowY: 'auto' }}>
@@ -331,14 +385,82 @@ export default function ShopPage() {
               ))}
             </div>
 
+            {/* Search + sort toolbar */}
+            <div className="shop-toolbar">
+              <div className="shop-search">
+                <i className="bi bi-search shop-search-icon" aria-hidden="true"></i>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={isRtl ? 'ابحث عن منتج…' : 'Search products…'}
+                  aria-label={isRtl ? 'بحث' : 'Search'}
+                  className="shop-search-input"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="shop-search-clear"
+                    aria-label={isRtl ? 'مسح' : 'Clear'}
+                  >
+                    <i className="bi bi-x-lg"></i>
+                  </button>
+                )}
+              </div>
+
+              <div className="shop-toolbar-right">
+                {availableColors.length > 0 && (
+                  <div className="shop-colors" role="group" aria-label={isRtl ? 'تصفية حسب اللون' : 'Filter by color'}>
+                    {availableColors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => toggleColor(color)}
+                        className={`shop-color-swatch ${selectedColors.includes(color) ? 'is-active' : ''}`}
+                        style={{ background: color }}
+                        title={color}
+                        aria-pressed={selectedColors.includes(color)}
+                        aria-label={color}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <label className={`shop-sale-toggle ${saleOnly ? 'is-active' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={saleOnly}
+                    onChange={(e) => setSaleOnly(e.target.checked)}
+                  />
+                  <i className="bi bi-tag"></i>
+                  <span>{isRtl ? 'العروض فقط' : 'On sale'}</span>
+                </label>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  className="shop-sort"
+                  aria-label={isRtl ? 'ترتيب' : 'Sort by'}
+                >
+                  <option value="featured">{isRtl ? 'مميز' : 'Featured'}</option>
+                  <option value="price-asc">{isRtl ? 'السعر: من الأقل' : 'Price: Low to High'}</option>
+                  <option value="price-desc">{isRtl ? 'السعر: من الأعلى' : 'Price: High to Low'}</option>
+                  <option value="name">{isRtl ? 'الاسم' : 'Name'}</option>
+                </select>
+              </div>
+            </div>
+
             {/* Header / Filter Status */}
             {/* Unity Header */}
             <div className="shop-header-samsung" style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h2 style={{ margin: 0, fontWeight: 800, fontSize: '2rem', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-                  {selectedCategoryId
-                    ? (isRtl ? categories.find(c => c.id === selectedCategoryId)?.nameAr : categories.find(c => c.id === selectedCategoryId)?.name)
-                    : (isRtl ? 'جميع التصاميم' : 'All Designs')
+                  {searchQuery.trim()
+                    ? (isRtl ? `نتائج البحث` : `Search results`)
+                    : selectedCategoryId
+                      ? (isRtl ? categories.find(c => c.id === selectedCategoryId)?.nameAr : categories.find(c => c.id === selectedCategoryId)?.name)
+                      : (isRtl ? 'جميع التصاميم' : 'All Designs')
                   }
                 </h2>
                 <p style={{ margin: '4px 0 0', color: 'rgba(42, 32, 24, 0.45)', fontSize: '0.95rem', fontWeight: 500 }}>
@@ -538,8 +660,17 @@ export default function ShopPage() {
               <div style={{ textAlign: 'center', padding: '100px 0' }}>
                 <i className="bi bi-search" style={{ fontSize: '3rem', opacity: 0.1, marginBottom: '20px', display: 'block' }}></i>
                 <h3 style={{ fontWeight: 800 }}>{isRtl ? 'لا توجد منتجات' : 'No products found'}</h3>
-                <button onClick={clearFilter} className="samsung-btn samsung-btn-secondary mt-3" style={{ maxWidth: '200px', margin: '0 auto' }}>
-                  {isRtl ? 'إظهار الكل' : 'View All Products'}
+                {searchQuery.trim() && (
+                  <p style={{ color: 'rgba(42, 32, 24, 0.5)', margin: '8px 0 0' }}>
+                    {isRtl ? `لا نتائج لـ "${searchQuery.trim()}"` : `Nothing matches "${searchQuery.trim()}"`}
+                  </p>
+                )}
+                <button
+                  onClick={() => { setSearchQuery(''); setSaleOnly(false); setSelectedColors([]); setSortBy('featured'); clearFilter(); }}
+                  className="samsung-btn samsung-btn-secondary mt-3"
+                  style={{ maxWidth: '220px', margin: '16px auto 0' }}
+                >
+                  {isRtl ? 'مسح عوامل التصفية' : 'Clear filters'}
                 </button>
               </div>
             )}
@@ -718,6 +849,134 @@ export default function ShopPage() {
           background: var(--text-main);
           color: var(--bg-main);
           border-color: var(--text-main);
+        }
+
+        /* Search + sort toolbar */
+        .shop-toolbar {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex-wrap: wrap;
+          margin-bottom: 28px;
+        }
+        .shop-search {
+          position: relative;
+          flex: 1;
+          min-width: 220px;
+          display: flex;
+          align-items: center;
+        }
+        .shop-search-icon {
+          position: absolute;
+          inset-inline-start: 16px;
+          color: var(--text-soft);
+          font-size: 0.95rem;
+          pointer-events: none;
+        }
+        .shop-search-input {
+          width: 100%;
+          padding: 12px 16px;
+          padding-inline-start: 42px;
+          border-radius: var(--r-pill);
+          border: 1px solid var(--line-soft);
+          background: var(--bg-panel);
+          color: var(--text-main);
+          font-family: var(--font-app);
+          font-size: 0.9rem;
+          outline: none;
+          transition: var(--transition-smooth);
+        }
+        .shop-search-input::placeholder { color: var(--text-soft); }
+        .shop-search-input:focus {
+          border-color: var(--text-main);
+          background: var(--bg-main);
+        }
+        .shop-search-clear {
+          position: absolute;
+          inset-inline-end: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border: none;
+          border-radius: 50%;
+          background: var(--surface-soft);
+          color: var(--text-main);
+          font-size: 0.7rem;
+          cursor: pointer;
+          transition: var(--transition-smooth);
+        }
+        .shop-search-clear:hover { background: var(--line-soft); }
+
+        .shop-toolbar-right {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .shop-sale-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 10px 16px;
+          border-radius: var(--r-pill);
+          border: 1px solid var(--line-soft);
+          background: var(--bg-panel);
+          color: var(--text-main);
+          font-size: 0.82rem;
+          font-weight: 500;
+          cursor: pointer;
+          user-select: none;
+          transition: var(--transition-smooth);
+        }
+        .shop-sale-toggle input { display: none; }
+        .shop-sale-toggle:hover { background: var(--surface-soft); }
+        .shop-sale-toggle.is-active {
+          background: var(--text-main);
+          color: var(--bg-main);
+          border-color: var(--text-main);
+        }
+        .shop-sort {
+          padding: 11px 16px;
+          border-radius: var(--r-pill);
+          border: 1px solid var(--line-soft);
+          background: var(--bg-panel);
+          color: var(--text-main);
+          font-family: var(--font-app);
+          font-size: 0.82rem;
+          font-weight: 500;
+          cursor: pointer;
+          outline: none;
+          transition: var(--transition-smooth);
+        }
+        .shop-sort:focus { border-color: var(--text-main); }
+
+        /* Color filter swatches */
+        .shop-colors {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 0 4px;
+        }
+        .shop-color-swatch {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          border: 1px solid rgba(42, 32, 24, 0.18);
+          cursor: pointer;
+          padding: 0;
+          position: relative;
+          transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .shop-color-swatch:hover { transform: scale(1.12); }
+        .shop-color-swatch.is-active {
+          box-shadow: 0 0 0 2px var(--bg-main), 0 0 0 4px var(--text-main);
+        }
+        @media (max-width: 600px) {
+          .shop-toolbar-right { width: 100%; flex-wrap: wrap; }
+          .shop-sort { flex: 1; }
+          .shop-colors { order: 3; width: 100%; flex-wrap: wrap; }
         }
 
         /* Rotating Collection Showcase (self-contained, full-bleed image + scrim) */

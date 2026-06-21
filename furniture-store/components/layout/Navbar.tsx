@@ -12,10 +12,11 @@ import { usePathname, useRouter } from 'next/navigation';
 const LEGACY_PLACEHOLDER = '/images/LOGO/image.png';
 const cartImg = (src: string) => (!src || src === LEGACY_PLACEHOLDER ? FALLBACK_IMAGE : src);
 
-// 2026 redesign nav structure: Home / Craftsmanship / Portfolio / Collection.
-type NavItem = { href: string; key: 'home' | 'craftsmanship' | 'portfolio' | 'collection' };
+// 2026 redesign nav structure: Home / Services / Craftsmanship / Portfolio / Collection.
+type NavItem = { href: string; key: 'home' | 'services' | 'craftsmanship' | 'portfolio' | 'collection' };
 const NAV_ITEMS: NavItem[] = [
     { href: '/',      key: 'home' },
+    { href: '/services', key: 'services' },
     { href: '/about', key: 'craftsmanship' },
     { href: '/projects', key: 'portfolio' },
     { href: '/shop',  key: 'collection' },
@@ -23,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
 
 const NAV_LABEL: Record<NavItem['key'], { en: string; ar: string }> = {
     home:          { en: 'Home',          ar: 'الرئيسية' },
+    services:      { en: 'Services',      ar: 'خدماتنا' },
     craftsmanship: { en: 'Craftsmanship', ar: 'الحرفية' },
     portfolio:     { en: 'Portfolio',     ar: 'المشاريع' },
     collection:    { en: 'Collection',    ar: 'المجموعات' },

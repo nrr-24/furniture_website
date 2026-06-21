@@ -6345,6 +6345,24 @@ select {
   gap: 12px;
 }
 
+/* Subtle card lift on hover — the image rises and its shadow deepens
+   (the inner image also scales via the .project-row:hover rule above). */
+.projects-2026 .project-row-link .project-img-container {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.projects-2026 .project-row-link:hover .project-img-container {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 50px rgba(42, 32, 24, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projects-2026 .project-row-link:hover .project-img-container {
+    transform: none;
+  }
+}
+
 /* ============================================================
    Project detail page
    ============================================================ */

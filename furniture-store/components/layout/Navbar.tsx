@@ -86,14 +86,28 @@ export default function Navbar() {
                 }),
             });
             const json = await res.json();
-            if (res.ok && json.orderId) {
-                await clearCart();
-                removePromo();
-                setIsCartOpen(false);
-                router.push(`/order/${json.orderId}`);
-            } else {
+            if (!res.ok || !json.orderId) {
                 setPromoError(json.error || 'Checkout failed. Please try again.');
+                setCheckingOut(false);
+                return;
             }
+
+            // Start Hesabe payment for the newly created (pending) order and
+            // hand the customer off to the hosted KNET / card / Apple Pay page.
+            // The cart is intentionally kept until payment succeeds (cleared on
+            // the confirmation page) so a failed payment doesn't lose it.
+            const payRes = await fetch('/api/payment/hesabe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: json.orderId }),
+            });
+            const payJson = await payRes.json();
+            if (payRes.ok && payJson.url) {
+                setIsCartOpen(false);
+                window.location.href = payJson.url;
+                return;
+            }
+            setPromoError(payJson.error || 'Could not start payment. Please try again.');
         } catch {
             setPromoError('Checkout failed. Please try again.');
         } finally {

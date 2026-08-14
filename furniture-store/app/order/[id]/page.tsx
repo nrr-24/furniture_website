@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '../../../data/LanguageContext';
+import { useCart } from '../../../data/CartContext';
 import { FALLBACK_IMAGE } from '../../../data/furnitureData';
 import Footer from '../../../components/layout/Footer';
 
@@ -28,8 +29,10 @@ interface Order {
 export default function OrderConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { t, isRtl } = useLanguage();
+  const { clearCart } = useCart();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -39,6 +42,29 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ id
       .catch(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [id]);
+
+  // Once we confirm the order is paid, empty the cart (kept until now so a
+  // failed payment wouldn't lose it).
+  const isPaid = order?.status === 'paid';
+  const isFailed = order?.status === 'failed';
+  useEffect(() => {
+    if (isPaid) clearCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPaid]);
+
+  const retryPayment = async () => {
+    setRetrying(true);
+    try {
+      const res = await fetch('/api/payment/hesabe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: id }),
+      });
+      const j = await res.json();
+      if (res.ok && j.url) { window.location.href = j.url; return; }
+    } catch { /* fall through */ }
+    setRetrying(false);
+  };
 
   const cur = t('currency');
   const shortId = id.slice(0, 8).toUpperCase();
@@ -56,14 +82,38 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ id
           </div>
         ) : (
           <div className="oc-card">
-            <div className="oc-check" aria-hidden="true"><i className="bi bi-check-lg"></i></div>
-            <span className="section-kicker">{isRtl ? 'تم تأكيد الطلب' : 'ORDER CONFIRMED'}</span>
-            <h1 className="oc-title">{isRtl ? 'شكراً لطلبك!' : 'Thank you for your order!'}</h1>
-            <p className="oc-sub">
-              {isRtl
-                ? `تم استلام طلبك رقم #${shortId}. سنتواصل معك قريباً لتأكيد التفاصيل.`
-                : `Your order #${shortId} has been received. We'll be in touch shortly to confirm the details.`}
-            </p>
+            {isFailed ? (
+              <>
+                <div className="oc-check" aria-hidden="true" style={{ background: '#fdecec', color: '#b91c1c' }}>
+                  <i className="bi bi-x-lg"></i>
+                </div>
+                <span className="section-kicker" style={{ color: '#b91c1c' }}>{isRtl ? 'فشل الدفع' : 'PAYMENT FAILED'}</span>
+                <h1 className="oc-title">{isRtl ? 'لم تكتمل عملية الدفع' : "Your payment didn't go through"}</h1>
+                <p className="oc-sub">
+                  {isRtl
+                    ? `لم يتم الدفع للطلب رقم #${shortId}. يمكنك المحاولة مرة أخرى.`
+                    : `Order #${shortId} wasn't paid. You can try again.`}
+                </p>
+                <button onClick={retryPayment} disabled={retrying} className="oc-btn" style={{ border: 'none', cursor: 'pointer' }}>
+                  {retrying ? (isRtl ? 'جارٍ التحويل...' : 'Redirecting…') : (isRtl ? 'إعادة المحاولة' : 'Try payment again')}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="oc-check" aria-hidden="true"><i className="bi bi-check-lg"></i></div>
+                <span className="section-kicker">{isRtl ? 'تم تأكيد الطلب' : 'ORDER CONFIRMED'}</span>
+                <h1 className="oc-title">{isRtl ? 'شكراً لطلبك!' : 'Thank you for your order!'}</h1>
+                <p className="oc-sub">
+                  {isPaid
+                    ? (isRtl
+                        ? `تم الدفع بنجاح لطلبك رقم #${shortId}. سنتواصل معك قريباً لتأكيد التفاصيل.`
+                        : `Payment received for order #${shortId}. We'll be in touch shortly to confirm the details.`)
+                    : (isRtl
+                        ? `تم استلام طلبك رقم #${shortId}. سنتواصل معك قريباً لتأكيد التفاصيل.`
+                        : `Your order #${shortId} has been received. We'll be in touch shortly to confirm the details.`)}
+                </p>
+              </>
+            )}
 
             <div className="oc-items">
               {order.order_items?.map((it) => (

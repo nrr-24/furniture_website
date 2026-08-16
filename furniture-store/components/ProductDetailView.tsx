@@ -371,9 +371,12 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           overflow: hidden;
         }
         .pd-main-img img {
+          /* contain (not cover) so the full product image always fits the
+             frame instead of being cropped when the window gets smaller on
+             wide/landscape screens. The soft frame background fills any gap. */
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
         }
         .pd-nav {
           position: absolute;

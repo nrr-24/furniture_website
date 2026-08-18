@@ -363,6 +363,9 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           transform: scale(1.04);
         }
         .pd-main-img {
+          /* Fill the image side so it always matches the details panel's
+             height (the card's two columns stay equal height). cover keeps the
+             image edge-to-edge with no letterbox gaps. */
           flex: 1;
           position: relative;
           display: flex;
@@ -371,12 +374,9 @@ export default function ProductDetailView({ item, category, onEdit, onToggleFeat
           overflow: hidden;
         }
         .pd-main-img img {
-          /* contain (not cover) so the full product image always fits the
-             frame instead of being cropped when the window gets smaller on
-             wide/landscape screens. The soft frame background fills any gap. */
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
         }
         .pd-nav {
           position: absolute;

@@ -81,38 +81,63 @@ export async function createHesabeCheckout(params: CheckoutParams): Promise<stri
   });
 
   const text = await res.text();
-  const token = extractToken(text);
+
+  // Decode the response: it's usually an encrypted hex blob, sometimes plain
+  // JSON. Decrypt if it looks like hex, then parse.
+  let decoded = text.trim();
+  if (isHex(decoded)) {
+    try {
+      decoded = decrypt(decoded);
+    } catch (e) {
+      throw new Error(
+        `Hesabe response could not be decrypted (HTTP ${res.status}) — check HESABE_SECRET_KEY / HESABE_IV. ${(e as Error).message}`
+      );
+    }
+  }
+
+  let json: any;
+  try {
+    json = JSON.parse(decoded);
+  } catch {
+    throw new Error(`Hesabe response was not JSON after decrypt (HTTP ${res.status}): ${decoded.slice(0, 200)}`);
+  }
+
+  const token = pickToken(json);
   if (!token) {
-    throw new Error(`Hesabe checkout failed (HTTP ${res.status}): ${text.slice(0, 200)}`);
+    // Surface Hesabe's own error / the response shape so failures are diagnosable.
+    const msg = json?.message || json?.response?.message || json?.error || '';
+    throw new Error(
+      `Hesabe checkout returned no payment token (HTTP ${res.status}). ` +
+      `status=${json?.status} code=${json?.code} message=${msg} keys=[${Object.keys(json).join(',')}] ` +
+      `response=${JSON.stringify(json?.response)?.slice(0, 200)}`
+    );
   }
   return `${HESABE_PAYMENT_URL}?data=${encodeURIComponent(token)}`;
 }
 
+function isHex(s: string): boolean {
+  return s.length > 0 && s.length % 2 === 0 && /^[0-9a-f]+$/i.test(s);
+}
+
 /**
- * Hesabe's /checkout response comes in a couple of shapes depending on account
- * config: either plain JSON `{ response: { data: token } }`, or an encrypted
- * hex body that decrypts to that JSON. Handle both.
+ * Pull the payment token out of Hesabe's (decrypted) /checkout response.
+ * Documented shape is `{ response: { data: "<token>" } }`, but be lenient about
+ * where the token sits across account/version differences.
  */
-function extractToken(body: string): string | null {
-  // 1. Plain JSON with the token already exposed.
-  const fromJson = (raw: string): string | null => {
-    try {
-      const j = JSON.parse(raw);
-      if (j?.response?.data && typeof j.response.data === 'string') return j.response.data;
-      if (typeof j?.data === 'string' && /^[0-9a-f]+$/i.test(j.data)) {
-        // `data` is itself an encrypted hex blob → decrypt then recurse.
-        return fromJson(decrypt(j.data));
-      }
-    } catch { /* not JSON */ }
-    return null;
-  };
-
-  const direct = fromJson(body);
-  if (direct) return direct;
-
-  // 2. Whole body is an encrypted hex string.
-  if (/^[0-9a-f]+$/i.test(body.trim())) {
-    try { return fromJson(decrypt(body.trim())); } catch { /* fall through */ }
+function pickToken(json: any): string | null {
+  if (!json) return null;
+  const r = json.response ?? {};
+  const candidates = [
+    r?.data,
+    typeof json.response === 'string' ? json.response : null,
+    r?.paymentToken,
+    r?.token,
+    json?.data,
+    json?.paymentToken,
+    json?.token,
+  ];
+  for (const c of candidates) {
+    if (typeof c === 'string' && c.trim().length > 8) return c.trim();
   }
   return null;
 }

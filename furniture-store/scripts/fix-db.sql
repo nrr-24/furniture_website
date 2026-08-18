@@ -1,7 +1,8 @@
 -- ============================================================
--- SmartWood shop logic migration (wishlist, promo, order extras)
--- Run this in the Supabase SQL Editor.
--- Safe to re-run: everything uses IF NOT EXISTS / ON CONFLICT.
+-- SmartWood — one-shot DB fix. Run in Supabase → SQL Editor.
+-- Safe to re-run (IF NOT EXISTS / ON CONFLICT everywhere).
+-- Covers: wishlists, promo codes, order columns, order-item variants,
+-- and Hesabe payment columns.
 -- ============================================================
 
 -- ---------- Wishlists ----------
@@ -12,9 +13,7 @@ create table if not exists wishlists (
   created_at timestamptz default now(),
   unique (user_id, product_id)
 );
-
 alter table wishlists enable row level security;
-
 drop policy if exists "public_all_wishlists" on wishlists;
 create policy "public_all_wishlists" on wishlists
   for all using (true) with check (true);
@@ -23,33 +22,30 @@ create policy "public_all_wishlists" on wishlists
 create table if not exists promo_codes (
   id uuid primary key default gen_random_uuid(),
   code text unique not null,
-  -- 'percent' => discount_value is a % (0-100); 'fixed' => flat amount in KWD
-  discount_type text not null default 'percent',
+  discount_type text not null default 'percent',  -- 'percent' | 'fixed'
   discount_value numeric not null,
   active boolean default true,
   created_at timestamptz default now()
 );
-
 alter table promo_codes enable row level security;
-
 drop policy if exists "public_read_promo" on promo_codes;
 create policy "public_read_promo" on promo_codes
   for select using (true);
-
--- Seed a couple of demo codes (no-op if they already exist)
 insert into promo_codes (code, discount_type, discount_value, active) values
   ('WELCOME10', 'percent', 10, true),
   ('SAVE5',     'fixed',   5,  true)
 on conflict (code) do nothing;
 
--- ---------- Orders: discount + address snapshot ----------
+-- ---------- Orders: totals / promo / address ----------
 alter table orders add column if not exists subtotal        numeric;
 alter table orders add column if not exists discount_amount numeric default 0;
 alter table orders add column if not exists promo_code      text;
--- Plain uuid (no FK) so this doesn't depend on an `addresses` table existing —
--- a missing FK target here previously rolled back the whole migration.
-alter table orders add column if not exists address_id      uuid;
+alter table orders add column if not exists address_id      uuid;   -- no FK on purpose
 
--- ---------- Order items: capture chosen variant (optional) ----------
+-- ---------- Order items: chosen variant ----------
 alter table order_items add column if not exists selected_color text;
 alter table order_items add column if not exists selected_type  text;
+
+-- ---------- Hesabe payment ----------
+alter table orders add column if not exists payment_id     text;
+alter table orders add column if not exists payment_method text;

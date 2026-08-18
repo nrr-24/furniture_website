@@ -90,19 +90,24 @@ export async function POST(request: Request) {
     const safeDiscount = Math.min(Math.max(Number(discount) || 0, 0), computedSubtotal);
     const total = Math.max(0, computedSubtotal - safeDiscount);
 
-    // 1. Create the order. Extra columns (subtotal/discount/promo/address) are
-    //    added by scripts/shop-migration.sql.
+    // 1. Create the order. Extra columns (subtotal/discount/promo) are added by
+    //    scripts/shop-migration.sql. `address_id` is only included when an
+    //    address is actually supplied — the column is optional (it depends on
+    //    an `addresses` table that may not exist), so sending null when there's
+    //    no address would fail on setups without that column.
+    const orderRow: Record<string, unknown> = {
+      user_id: userId,
+      total_amount: total,
+      subtotal: computedSubtotal,
+      discount_amount: safeDiscount,
+      promo_code: promoCode,
+      status: 'pending',
+    };
+    if (addressId) orderRow.address_id = addressId;
+
     const { data: order, error: orderErr } = await supabase
       .from('orders')
-      .insert({
-        user_id: userId,
-        total_amount: total,
-        subtotal: computedSubtotal,
-        discount_amount: safeDiscount,
-        promo_code: promoCode,
-        address_id: addressId,
-        status: 'pending',
-      })
+      .insert(orderRow)
       .select('id')
       .single();
 

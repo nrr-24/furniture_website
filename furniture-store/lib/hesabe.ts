@@ -56,6 +56,18 @@ export async function createHesabeCheckout(params: CheckoutParams): Promise<stri
     throw new Error('Hesabe is not configured (missing env vars).');
   }
 
+  // AES-256-CBC needs a 32-byte key and 16-byte IV. Catch the most common
+  // config slip (stray whitespace/newline making the value the wrong length)
+  // with a clear message instead of a downstream "bad decrypt".
+  const keyLen = Buffer.byteLength(SECRET_KEY);
+  const ivLen = Buffer.byteLength(IV);
+  if (keyLen !== 32 || ivLen !== 16) {
+    throw new Error(
+      `Hesabe key/IV wrong length: HESABE_SECRET_KEY is ${keyLen} bytes (needs 32), ` +
+      `HESABE_IV is ${ivLen} bytes (needs 16). Check for extra spaces/quotes/newline in Vercel.`
+    );
+  }
+
   const payload = {
     merchantCode: MERCHANT_CODE,
     amount: Number(params.amount).toFixed(3), // KWD has 3 decimals

@@ -27,16 +27,40 @@ export function hesabeConfigured(): boolean {
 
 export const HESABE_PAYMENT_URL = `${BASE}/payment`;
 
+// Hesabe's HesabeCrypt uses AES-256-CBC with a *32-byte-block* PKCS pad (pad
+// bytes each equal to the pad length), hex-encoded, key/IV as raw UTF-8 bytes.
+// Node's built-in cipher only does standard 16-byte PKCS7, so we disable its
+// auto-padding and apply the 32-byte-block padding ourselves — otherwise
+// Hesabe can't read our request and its response fails to decrypt ("bad
+// decrypt", because its pad values run up to 32).
+const HESABE_BLOCK = 32;
+
+function pkcsPad(buf: Buffer): Buffer {
+  const padLen = HESABE_BLOCK - (buf.length % HESABE_BLOCK); // 1..32
+  return Buffer.concat([buf, Buffer.alloc(padLen, padLen)]);
+}
+
+function pkcsUnpad(buf: Buffer): Buffer {
+  if (buf.length === 0) return buf;
+  const padLen = buf[buf.length - 1];
+  if (padLen < 1 || padLen > HESABE_BLOCK || padLen > buf.length) return buf;
+  return buf.subarray(0, buf.length - padLen);
+}
+
 /** AES-256-CBC encrypt → hex (mirrors HesabeCrypt::encrypt). */
 export function encrypt(plain: string): string {
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(SECRET_KEY), Buffer.from(IV));
-  return Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]).toString('hex');
+  cipher.setAutoPadding(false);
+  const padded = pkcsPad(Buffer.from(plain, 'utf8'));
+  return Buffer.concat([cipher.update(padded), cipher.final()]).toString('hex');
 }
 
 /** hex → AES-256-CBC decrypt (mirrors HesabeCrypt::decrypt). */
 export function decrypt(hex: string): string {
   const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(SECRET_KEY), Buffer.from(IV));
-  return Buffer.concat([decipher.update(Buffer.from(hex, 'hex')), decipher.final()]).toString('utf8');
+  decipher.setAutoPadding(false);
+  const out = Buffer.concat([decipher.update(Buffer.from(hex, 'hex')), decipher.final()]);
+  return pkcsUnpad(out).toString('utf8');
 }
 
 export interface CheckoutParams {

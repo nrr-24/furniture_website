@@ -18,7 +18,7 @@ const NAV_ITEMS: NavItem[] = [
     { href: '/',      key: 'home' },
     { href: '/services', key: 'services' },
     { href: '/about', key: 'craftsmanship' },
-    { href: '/projects', key: 'portfolio' },
+    // Portfolio/projects page hidden from navigation for now.
     { href: '/shop',  key: 'collection' },
 ];
 

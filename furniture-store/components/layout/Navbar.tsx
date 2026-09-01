@@ -14,12 +14,9 @@ const cartImg = (src: string) => (!src || src === LEGACY_PLACEHOLDER ? FALLBACK_
 
 // 2026 redesign nav structure: Home / Services / Craftsmanship / Portfolio / Collection.
 type NavItem = { href: string; key: 'home' | 'services' | 'craftsmanship' | 'portfolio' | 'collection' };
+// Landing-page-only mode: every other page is hidden from navigation.
 const NAV_ITEMS: NavItem[] = [
     { href: '/',      key: 'home' },
-    { href: '/services', key: 'services' },
-    { href: '/about', key: 'craftsmanship' },
-    // Portfolio/projects page hidden from navigation for now.
-    { href: '/shop',  key: 'collection' },
 ];
 
 const NAV_LABEL: Record<NavItem['key'], { en: string; ar: string }> = {
